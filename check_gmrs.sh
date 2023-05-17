@@ -38,7 +38,6 @@ echo
 declare -a dns_array=(
 		"$CDNS"
 	    "8.8.8.8"
-        "192.168.0.1"
 	       )
 
 
