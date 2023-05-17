@@ -100,7 +100,7 @@ fi
 # D. Crompton, WA3DSP 10/2017
 #
 # WA3DSP Modified 8/2018 to accompdate new registration system. 
-
+echo -e "\n\t\e[1mYChecking if your registered at register.gmrslive.com\e[0m\n" 
 Registrations=$(/bin/asterisk -rx "iax2 show registry" | tail -n +2)
 
 IFS=$'\n'
@@ -124,12 +124,5 @@ Server_DOMAIN=`dig +short -x $Server_IP`
 
 echo  "Node - $NODE at IP address- $IP, Port- $PORT is $REGISTERED at Server"
 echo "IP- $Server_IP ("$Server_DOMAIN"), Port- $Server_PORT"
-
-  if [ -e /usr/local/sbin/dns-query ]
-    then
-	j=$(awk '{print $3}' <<< $i| sed 's/#.*//' | sed 's/.*\///')
-	echo -e "\n DNS lookup returns - \c"
-	dns-query $j
-  fi
-  echo
+echo
 done
