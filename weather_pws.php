@@ -36,6 +36,8 @@
 // Contact me if you have a local station running AmbientWeather ObserverIP and wish to submit weather data to CWOP.
 // I am testing a new PHP version that will run on a PI..... pws.winnfreenet.com 
 //
+// place in  /etc/asterisk/local
+//
 // chrontab -e add the following for time on the hr between 6am and 11pm
 // 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /tmp/time.txt
 
