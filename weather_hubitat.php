@@ -12,6 +12,8 @@
 //
 //
 // place in  /etc/asterisk/local
+// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/weather_hubitat.php
+//
 //
 // The timezone in PHP is not setup properly in hamvoip
 //  so you need to set your timezone.
@@ -23,7 +25,7 @@ $zone =	ltrim(exec('timedatectl | grep "Time zone"'));//testing get timezone fro
 $node="2955"; // Your node number
 $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 $phpVersion= phpversion();
-$ver= "v1.0";  
+$ver= "v1.1";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 //$WBdatum = gmdate('m-d-Y [H:i:s]');
@@ -139,7 +141,7 @@ $u = explode(" ","$cond1 ");
 if ($cond1){
 check_name ($u[0]);
 check_name ($u[1]); 
-check_name ($u[2]);
+//check_name ($u[2]);
 }
 if ($cond2){
 $u = explode(" ",$cond2);
@@ -188,10 +190,11 @@ if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );
 $fileIN = file_get_contents ($silence1);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
 
-$preFile="";$am=false;$status ="good night";
-if ($hour < 12 ) {$status = "good-morning";  $am =true; check_name ($status);}
-if ($hour >= 12) {$status = "good-afternoon";$am =false;check_name ($status);}
-if ($hour >= 18) {$status = "good-evening";  $am =false;check_name ($status);}
+$status ="";
+if ($hour < 12 ) {$status = "good-morning";  check_name ($status);}
+if ($hour >= 12) {$status = "good-afternoon";check_name ($status);}
+if ($hour >= 18) {$status = "good-evening"; ;check_name ($status);}
+$datum   = date('m-d-Y H:i:s');
 
 check_name ("the-time-is");
 $oh=false;make_number ($hr);$theHR = $file1; $theHR2 = $file2;
@@ -204,8 +207,11 @@ else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;
  if ($theMin != ""){$fileIN = file_get_contents ($theMin);file_put_contents($file,$fileIN, FILE_APPEND); $cmd="$cmd $theMin"; }
  if ($theMin2 != "") { $fileIN = file_get_contents ($theMin2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theMin2";}
 }
-if ($am=true){$fileIN = file_get_contents ("$vpath/digits/a-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
-else{$fileIN = file_get_contents ("$vpath/digits/p-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($hour < 12 ){$pm="am";$fileIN = file_get_contents ("$vpath/digits/a-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($hour >= 12){$pm="pm";$fileIN = file_get_contents ("$vpath/digits/p-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+
+print "$datum $status Time is $hr:$min $pm   
+";
 
 $fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);
 // Weather
