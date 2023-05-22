@@ -37,6 +37,7 @@
 // I am testing a new PHP version that will run on a PI..... pws.winnfreenet.com 
 //
 // place in  /etc/asterisk/local
+// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/weather_pws.php
 //
 // chrontab -e add the following for time on the hr between 6am and 11pm
 // 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /tmp/time.txt
@@ -50,7 +51,7 @@ $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain
 date_default_timezone_set(TIMEZONE);
 $zone =	exec('timedatectl | grep "Time zone"'); //testing
 $phpVersion= phpversion();
-$ver= "v1.0";  
+$ver= "v1.1";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
@@ -61,7 +62,7 @@ print " =============================================
 ";
 print " mesowest, madis, APRSWXNET(CWOP) script
 ";
-print " (c) 2013/2023 by winnfreenet.com
+print " $ver (c) 2013/2023 by winnfreenet.com
 ";
 print " =============================================
 ";
@@ -185,7 +186,7 @@ $u = explode(" ","$cond1 ");
 if ($cond1){
 check_name ($u[0]);
 check_name ($u[1]); 
-check_name ($u[2]);
+
 }
 if ($cond2){
 $u = explode(" ",$cond2);
@@ -211,19 +212,9 @@ $hour = date('H');
 $day  = date('l');
 $hr =   date('h');
 $min  = date('i');
-
-
-
 $oh=false;make_number ($hr);$theHR = $file1; $theHR2 = $file2;
-
 if ($min == 0 ){$theMin="$vpath/digits/oclock.gsm";$theMin2="";}
 else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;}
-
-$datum   = date('m-d-Y H:i:s');
-print "$datum Local Time $hr:$min  
-";
-
-
 
 $silence1    = "$vpath/silence/1.gsm";
 $silence2    = "$vpath/silence/2.gsm";
@@ -234,10 +225,11 @@ if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );
 $fileIN = file_get_contents ($silence1);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
 
-$preFile="";$am=false;$status ="good night";
-if ($hour < 12 ) {$status = "good-morning";  $am =true; check_name ($status);}
-if ($hour >= 12) {$status = "good-afternoon";$am =false;check_name ($status);}
-if ($hour >= 18) {$status = "good-evening";  $am =false;check_name ($status);}
+$status ="";
+if ($hour < 12 ) {$status = "good-morning";  check_name ($status);}
+if ($hour >= 12) {$status = "good-afternoon";check_name ($status);}
+if ($hour >= 18) {$status = "good-evening"; ;check_name ($status);}
+$datum   = date('m-d-Y H:i:s');
 
 check_name ("the-time-is");
 $oh=false;make_number ($hr);$theHR = $file1; $theHR2 = $file2;
@@ -250,8 +242,11 @@ else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;
  if ($theMin != ""){$fileIN = file_get_contents ($theMin);file_put_contents($file,$fileIN, FILE_APPEND); $cmd="$cmd $theMin"; }
  if ($theMin2 != "") { $fileIN = file_get_contents ($theMin2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theMin2";}
 }
-if ($am=true){$fileIN = file_get_contents ("$vpath/digits/a-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
-else{$fileIN = file_get_contents ("$vpath/digits/p-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($hour < 12 ){$pm="am";$fileIN = file_get_contents ("$vpath/digits/a-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($hour >= 12){$pm="pm";$fileIN = file_get_contents ("$vpath/digits/p-m.gsm");file_put_contents ($file,$fileIN, FILE_APPEND);}
+
+print "$datum $status Time is $hr:$min $pm   
+";
 
 $fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);
 // Weather
