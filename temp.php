@@ -2,7 +2,7 @@
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
-//
+//    for allstar gmrs nodes to keep track of the temp
 // -------------------------------------------------------------
 //
 // The node image is missing the CPU temp monitor at
