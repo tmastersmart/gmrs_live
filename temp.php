@@ -47,21 +47,37 @@
 $node="2955";// Set your node number
 
 $reportAll = true;
-//$nodeName = "server";// What name do you want it to use
+$nodeName = "server";// What name do you want it to use
 //$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
-$nodeName = "node";
+//$nodeName = "node";
 $high = 80;// hot 85 is danger
 $hot  = 60;// still ok
 $warn = 50;
 $normal = 45;
-define('TIMEZONE', 'America/Chicago');
-$ver="v1.0";
+
+// Get php timezone in sync with the PI
+$line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
+$line = str_replace(" ", "", $line);
+$pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
+if ($pos1){  $zone   = substr($line, $pos1+1, $pos2-$pos1-1); }
+else {$zone="America/Chicago";}
+define('TIMEZONE', $zone);
+date_default_timezone_set(TIMEZONE);
+$phpzone = date_default_timezone_get(); // test it 
+if ($phpzone == $zone ){$phpzone="$phpzone set";}
+else{$phpzone="$phpzone ERROR";}
+
+$phpVersion= phpversion();
+
+$ver="v1.1";
 $out="";
 print "===================================================
 ";
 print " PI temp Monitor $ver 
 "; 
 print "(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
+";
+print "$phpzone PHP v$phpVersion
 ";
 print "===================================================
 ";
@@ -120,17 +136,15 @@ print "$datum Playing file to NODE:$node $speak
 ";
 $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/temp '",$output,$return_var);
 if(!$status){$status="OK";}
-
-
-if ($temp >=$high){
-$status="$status WARNING";
-check_name_cust ("warning");
-if($file1){
-$d= exec("sudo asterisk -rx 'rpt localplay $node $file1 '",$output,$return_var);
-$status="$status $d WARN";
 sleep(1);
+
+// if its high say something.
+if ($temp >=$hot){
+if ($temp >=$high){$status="$status >$high WARNING";check_name_cust ("warning");}
+else{$status="$status >$hot HOT";check_name_cust ("warning");} // Need another file here
+if($file1){$d= exec("sudo asterisk -rx 'rpt localplay $node $file1 '",$output,$return_var);$status="$status $d";sleep(1);}
 }
-}
+
 if ($throttled){
 $status="$status $throttled";
 check_name_cust ($throttled);
