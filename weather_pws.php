@@ -45,26 +45,39 @@
 $node="2955";
 $station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
 $fc="F";$zipcode="71432";// acuweather will say cloudy or such
-define('TIMEZONE', 'America/Chicago');
-$level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 
+$level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
+$cputemp= true;// Check if cpu temp exists and run if true
+
+// Get php timezone in sync with the PI
+$line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
+$line = str_replace(" ", "", $line);
+$pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
+if ($pos1){  $zone   = substr($line, $pos1+1, $pos2-$pos1-1); }
+else {$zone="America/Chicago";}
+define('TIMEZONE', $zone);
 date_default_timezone_set(TIMEZONE);
-$zone =	exec('timedatectl | grep "Time zone"'); //testing
+$phpzone = date_default_timezone_get(); // test it 
+if ($phpzone == $zone ){$phpzone="$phpzone set";}
+else{$phpzone="$phpzone ERROR";}
+
 $phpVersion= phpversion();
-$ver= "v1.1";  
+$ver= "v1.4";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
 // You are authorised to use for this script only. 
 $token = "473c0a7b78d24dc99c182f78619d0090";
 //DO NOT COPY!!! Get your own
-print " =============================================
+print "===================================================
 ";
-print " mesowest, madis, APRSWXNET(CWOP) script
+print "mesowest, madis, APRSWXNET(CWOP) $ver
 ";
-print " $ver (c) 2013/2023 by winnfreenet.com
+print "(c)2013/2023 WRXB288 LAGMRS.com all rights reserved
 ";
-print " =============================================
+print "$phpzone PHP v$phpVersion
+";
+print "===================================================
 ";
 
 // read the station
@@ -227,7 +240,7 @@ $fileIN = file_get_contents ($silence1);file_put_contents ($file,$fileIN, FILE_A
 
 $status ="";
 if ($hour < 12 ) {$status = "good-morning";  check_name ($status);}
-if ($hour >= 12) {$status = "good-afternoon";check_name ($status);}
+if ($hour >= 12 and $hour <18) {$status = "good-afternoon";check_name ($status);}
 if ($hour >= 18) {$status = "good-evening"; ;check_name ($status);}
 $datum   = date('m-d-Y H:i:s');
 
@@ -271,13 +284,17 @@ check_name ("percent");
 
 if($avgwind>1){
 check_name ("wind"); 
-$oh=false;make_number ($avgwind);if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $degrees";}
+$oh=false;make_number ($avgwind); 
+if ($file1){$fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 check_name ("miles-per-hour");
 }
 
 if ($rainofdaily>1){
- check_name ("rain"); 
- $oh=false;make_number ($rainofdaily);if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $rainofdaily";}
+check_name ("rain"); 
+$oh=false;make_number ($rainofdaily);
+if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
 } 
  
@@ -290,12 +307,22 @@ $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$outpu
 if(!$status){$status="OK";}
 print "$datum finished  $status $return_var
 ";
-print " =============================================
-";        
-
-
-
-
+print "===================================================
+";
+if ($cputemp){
+sleep (2); // make sure time plays first
+// Add on to run temp module 
+$tempScript="/etc/asterisk/local/temp.php";// Download this script from my site
+$tempFile="/tmp/temp-output.txt";
+if (file_exists($tempScript)){      
+ $datum   = date('m-d-Y H:i:s');
+ $status= exec("sudo php $tempScript > $tempFile",$output,$return_var);
+ $fileIN = file_get_contents ($tempFile);
+ 
+ print "$fileIN
+";
+}
+}
 function make_number ($in){
 global $vpath,$file0,$file1,$file2,$file3,$negative,$oh;
 // Speak all possible numbers
