@@ -51,6 +51,11 @@ https://madis-data.ncep.noaa.gov
 https://aprs.fi/ These are aprs stations but you cant use station numbers from this map.
 
 Once you have a station id edit the file
+
 nano weather_pws.php  
-add your node number and the station ID
+
+add your node number and the station ID. Select how much data you want only temp or temp hum rain wind. 
+The temp data is more accurate than the stock script which does not allow you to pick the station.
+in addition this allows station owners like me and hams running CWOP stations to use your own local temp.
+
 
