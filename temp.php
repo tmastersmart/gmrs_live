@@ -53,15 +53,17 @@
 //and run it at load time.  /etc/rc.local
 //
 $node="2955";// Set your node number
+$reportAll = true; // change to false to not talk if normal temp
 
-$reportAll = true;
 $nodeName = "server";// What name do you want it to use
 //$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
 //$nodeName = "node";
-$high = 60;// hot 85 is danger
+$high = 60;// 85 is danger
 $hot  = 50;
 // 45 is normal 50 is slightly hot. I recomend cooling at 50-60. I would not run anything above 70
 // see https://raspberrypi.stackexchange.com/questions/114462/how-much-temperature-is-normal-temperature-for-raspberry-pi-4
+
+
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -76,7 +78,7 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.2";
+$ver="v1.3";
 $out="";
 print "===================================================
 ";
@@ -99,7 +101,8 @@ $line = str_replace("'", "", $line);
 $line = str_replace("C", "", $line);
 $u= explode("=",$line);
 $temp=$u[1];
-print "$datum $nodeName Temp is $temp C
+$tempf = (float)(($temp * 9 / 5) + 32);
+print "$datum $nodeName Temp is $tempf F $temp C
 ";
 
 $line= exec("/opt/vc/bin/vcgencmd get_throttled",$output,$return_var);
@@ -120,21 +123,27 @@ if($u[1]== "80000"){$throttled = "soft-temp-limit-occurred";}
 print "$datum $nodeName Status: $throttled code: $u[1] 
 ";
 
-
-
-
-
 $fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
-if (!$reportAll and $temp <=$warn){die;}
+
+if (!$reportAll and $temp <=$hot){die;}
+
 $speak = "/tmp/temp.gsm";
 $vpath ="/var/lib/asterisk/sounds";
 $file=$speak; $cmd="";
 if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );
 check_name ($nodeName); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-$oh=false;make_number ($temp);
+list($whole, $decimal) = explode('.', $temp);
+$oh=false;make_number ($whole);
 if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if($decimal>=1){
+check_name ("point"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+$oh=false;make_number ($decimal);
+if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+}
+
 check_name ("degrees"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 check_name ("celsius"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
@@ -166,7 +175,6 @@ print "$datum finished  $status $return_var
 "; 
 print "===================================================
 ";
-
 
 
 // v1 modules 
