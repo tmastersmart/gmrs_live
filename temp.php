@@ -76,7 +76,7 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.1";
+$ver="v1.2";
 $out="";
 print "===================================================
 ";
