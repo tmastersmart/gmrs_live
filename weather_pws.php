@@ -43,7 +43,7 @@
 // 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /tmp/time.txt
 
 $node="2955";
-$station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
+$station="KIER";// this is your local Station ID (CWOP)  EXXXX  (see map) KIER is the natchitoches La airport
 $fc="F";$zipcode="71432";// acuweather will say cloudy or such
 
 $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
