@@ -15,8 +15,8 @@
 //
 //Pi must stay below 85c at all times. To be safe 80 is my danger zone. 
 //The Pi will start throttling to reduce heat. Reducing cpu cycles could 
-//problems in audio.  You need to keep it under about 60c.
-//You should have a heatsync. Note If room air is arround 80c
+//problems in audio.  You need to keep it under about 50c.
+//You should have a heatsync. Note If room air is arround over 100F
 //then it cant control its heat and you are in danger. 
 //
 //
@@ -50,11 +50,10 @@ $reportAll = true;
 $nodeName = "server";// What name do you want it to use
 //$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
 //$nodeName = "node";
-$high = 80;// hot 85 is danger
-$hot  = 60;// still ok
-$warn = 50;
-$normal = 45;
-
+$high = 60;// hot 85 is danger
+$hot  = 50;
+// 45 is normal 50 is slightly hot. I recomend cooling at 50-60. I would not run anything above 70
+// see https://raspberrypi.stackexchange.com/questions/114462/how-much-temperature-is-normal-temperature-for-raspberry-pi-4
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
