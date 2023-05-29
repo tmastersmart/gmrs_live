@@ -40,9 +40,17 @@
 //
 //NOTICE NOTICE on First run the script will download sound files from..
 //https://github.com/tmastersmart/gmrs_live/tree/main/sounds
-//
-//
 //This process is very fast and might alarm you if you dont expect it.
+//
+// NOTES:
+//
+//If you need it there is a script that will turn the fan on and off with the temp.
+//This is a old script thats no longer used on the new PIs since its now built in the OS.
+//https://howchoo.com/g/ote2mjkzzta/control-raspberry-pi-fan-temperature-python
+//Do not run the autoinstall script. Its not compatable with the node image
+//Only install the script here.
+//https://github.com/Howchoo/pi-fan-controller/blob/master/fancontrol.py 
+//and run it at load time.  /etc/rc.local
 //
 $node="2955";// Set your node number
 
