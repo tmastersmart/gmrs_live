@@ -13,12 +13,12 @@
 // Supermon uses the same monitor
 //
 //
-//Pi must stay below 85c at all times. To be safe 80 is my danger zone. 
-//The Pi will start throttling to reduce heat. Reducing cpu cycles could 
-//problems in audio.  You need to keep it under about 50c.
-//You should have a heatsync. Note If room air is arround over 100F
-//then it cant control its heat and you are in danger. 
+//Pi must stay below 85c at all times. To be safe 70 is my danger zone. 
+//The PI will regulate its own temp by throttling down when its hot, 
+//but throttling down reduces cpu cycles and will likely cause dropouts. 
+// 
 //
+// install
 //
 // place in  /etc/asterisk/local
 // wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/temp.php
