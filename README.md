@@ -34,9 +34,10 @@ you can now add it to cron
 // 30 7-23 * * * php /etc/asterisk/local/temp.php >> /dev/null
 
 weather_pws.php
+
 This is a custom time and temp system that reads data from 
 mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
-It allows you to pick your station. 
+It allows you to pick a station closest to you. 
 find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
 
 http://www.wxqa.com/  (CWOP) main website
