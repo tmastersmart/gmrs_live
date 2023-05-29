@@ -36,10 +36,15 @@ you can now add it to cron
 weather_pws.php
 This is a custom time and temp system that reads data from 
 mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
-It allows you to pick your station. See the madis map for station numbers
+It allows you to pick your station. 
+find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
+
 http://www.wxqa.com/  (CWOP) main website
+
 https://mesowest.utah.edu/
+
 https://madis-data.ncep.noaa.gov
+
 https://aprs.fi/
 
 Once you have a station id edit the file
