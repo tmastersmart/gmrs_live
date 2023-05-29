@@ -40,7 +40,7 @@ mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
 It allows you to pick a station closest to you. 
 find your local MADIS station and airport go to the map 
 
-https://madis-data.ncep.noaa.gov/MadisSurface/
+https://madis-data.ncep.noaa.gov/MadisSurface/ Get the ID from this map only
 
 http://www.wxqa.com/  (CWOP) main website
 
@@ -48,7 +48,7 @@ https://mesowest.utah.edu/
 
 https://madis-data.ncep.noaa.gov
 
-https://aprs.fi/
+https://aprs.fi/ These are aprs stations but you cant use station numbers from this map.
 
 Once you have a station id edit the file
 nano weather_pws.php  
