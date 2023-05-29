@@ -29,9 +29,9 @@
 // my weather_pws.php file from chron.
 //
 //
-//chrontab -e add the following for time on the hr between 6am and 11pm
+//crontab -e add the following for time on the hr between 6am and 11pm
 // at 30 mins on the hr to prevent overrun with time.
-// 30 7-23 * * * php /etc/asterisk/local/temp.php >> /tmp/temp.txt
+// 30 7-23 * * * php /etc/asterisk/local/temp.php >> /dev/null
 
 //
 //https://www.raspberrypi.com/documentation/computers/processors.html
@@ -53,7 +53,7 @@
 //and run it at load time.  /etc/rc.local
 //
 $node="2955";// Set your node number
-$reportAll = true; // change to false to not talk if normal temp
+$reportAll = true; // change to false to not talk for normal temp
 
 $nodeName = "server";// What name do you want it to use
 //$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
@@ -64,7 +64,7 @@ $hot  = 50;
 // see https://raspberrypi.stackexchange.com/questions/114462/how-much-temperature-is-normal-temperature-for-raspberry-pi-4
 
 
-// Get php timezone in sync with the PI
+// PHP is in UTC Get in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
 $pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
@@ -78,7 +78,7 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.3";
+$ver="v1.4";
 $out="";
 print "===================================================
 ";
@@ -90,9 +90,8 @@ print "$phpzone PHP v$phpVersion
 ";
 print "===================================================
 ";
-
-if (!file_exists("/etc/asterisk/local/sounds/warning.ul")){ install($out);}
 chdir("/etc/asterisk/local/");
+
 
 $log="/tmp/cpu_temp_log.txt";
 $datum = date('m-d-Y-H:i:s');
@@ -217,25 +216,8 @@ $file1="";
 if (file_exists("$path/$in.ul")){$file1 = "$path/$in";}
 }
 
-function install($in){
 
-$files = "hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
-$path  = "/etc/asterisk/local";
-$path2 = "$path/sounds";
-$repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds/";
-$u = explode(",",$files);
-chdir($path);
-if(!is_dir($path2)){ mkdir($path2, 0755);}
-chdir($path2);
-$datum = date('m-d-Y-H:i:s');
-print"$datum Starting one time install from github
-";
 
-foreach($u as $file) {
-if (!file_exists("$path2/$file")){ 
-   $d= exec("sudo wget $repo/$file ",$output,$return_var);
-   }
-   }
-print "
-";
-}
+
+
+
