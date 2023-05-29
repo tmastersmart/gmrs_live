@@ -10,7 +10,7 @@
 //
 // I am using the GPU temp monitor at
 // /opt/vc/bin/vcgencmd measure_temp
-// Supermon also uses this the CPU monitor
+// Supermon uses the same monitor
 //
 //
 //Pi must stay below 85c at all times. To be safe 80 is my danger zone. 
