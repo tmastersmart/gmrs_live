@@ -140,7 +140,7 @@ sleep(1);
 // if its high say something.
 if ($temp >=$hot){
 if ($temp >=$high){$status="$status >$high WARNING";check_name_cust ("warning");}
-else{$status="$status >$hot HOT";check_name_cust ("warning");} // Need another file here
+else{$status="$status >$hot HOT";check_name_cust ("hot");} 
 if($file1){$d= exec("sudo asterisk -rx 'rpt localplay $node $file1 '",$output,$return_var);$status="$status $d";sleep(1);}
 }
 
@@ -203,7 +203,7 @@ if (file_exists("$path/$in.ul")){$file1 = "$path/$in";}
 
 function install($in){
 
-$files = "warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local";
 $path2 = "$path/sounds";
 $repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds/";
