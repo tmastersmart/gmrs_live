@@ -58,4 +58,10 @@ add your node number and the station ID. Select how much data you want only temp
 The temp data is more accurate than the stock script which does not allow you to pick the station.
 in addition this allows station owners like me and hams running CWOP stations to use your own local temp.
 
+It also installs a ping checking script custimized for gmrslive. 
+
+Aditional scripts not in the installer
+
+
+
 
