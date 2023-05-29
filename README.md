@@ -62,6 +62,17 @@ It also installs a ping checking script custimized for gmrslive.
 
 Aditional scripts not in the installer
 
+weather_hubitat.php
+
+This script is for hubitat smart hub owners it pulls the temp from a sensor on your hub. See instructions in script
+
+port_rotate.php
+
+I created this script to get arround a problem with my isp ATT FIXED WIRELESS. After a while a day or 2 you become unregestered
+and rebooting will not solve the problem. I have discovered that changing the port will allow you to register, this
+script changes you port to a random number. You set a range in the script. You can run as you like I do it once a day. 
+The port wont actualy cange until asterisk is restarted. This is a beta script Im working on a automated script.
+If your node works for days then stops. Try running this script then reboot.
 
 
 
