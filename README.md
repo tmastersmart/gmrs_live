@@ -27,11 +27,11 @@ php temp.php
 
 you can now add it to cron
 
-//crontab -e add the following for time on the hr between 6am and 11pm
+crontab -e add the following for time on the hr between 6am and 11pm
 
-// at 30 mins on the hr to prevent overrun with time.
+at 30 mins on the hr to prevent overrun with time.
 
-// 30 7-23 * * * php /etc/asterisk/local/temp.php >> /dev/null
+30 7-23 * * * php /etc/asterisk/local/temp.php >> /dev/null
 
 weather_pws.php
 
