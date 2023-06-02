@@ -454,10 +454,9 @@ function check_name ($in){
 global $vpath,$file1,$file;
 $file1="";
 $fileSound= "$vpath/$in.gsm";
-if (file_exists($fileSound)){
-  $fileIN = file_get_contents ($fileSound);file_put_contents ($file,$fileIN, FILE_APPEND);
+if (file_exists($fileSound)){$file1 = "$fileSound/$in";}
   }
-}
+
 
 function check_name_cust ($in){
 global $file1,$path;
@@ -467,9 +466,9 @@ if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
 }
 
 
-// copyright by winnfreenet.com  
+// copyright by lagmrs.com  
 // Source code may not be used in other programs pws.winnfreenet.com
-// scrapper  v3
+// scrapper  v3 
 function read_madis ($html) {
 global $dateReading, $timeReading,$sitename,$data_good,$CurrTimeR,$CurrTimeMi,$CurrTimeHr,$CurrTime,$CurrTimeD,$CurrTimeM,$CurrTimeY,$html,$outtemp,$outhumi,$avgwind,$gustspeed,$rainofdaily,$rainofyearly;
 $data_good = false;
