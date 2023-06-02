@@ -11,7 +11,8 @@
 // https://madis-data.ncep.noaa.gov
 // https://aprs.fi/
 // 
-// v1.6 Released 06/01/2023  This is the first release with a mostly automated setup and installer.
+// v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
+// v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
 // 
 // This uses the authors token. At this time only authors need to get tokens
 // not you. This token may change in a later version.
@@ -90,7 +91,7 @@ $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($cur
 $vpath="/var/lib/asterisk/sounds";
 
 $phpVersion= phpversion();
-$ver= "v1.6";  
+$ver= "v1.7";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
@@ -213,40 +214,9 @@ if (!$cond3){
 
 } // end loop
 
-
-
-
-
 $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$the_temp F / $cond1 $cond2 $cond3");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $vpath="/var/lib/asterisk/sounds";
-$cond="/tmp/conditions.gsm";$file=$cond;//$condition  = "/tmp/condition.gsm";
-if(file_exists($file)){unlink($file);} // Mostly Cloudy
-$fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );  $cmd="";
 
-
-
-
-$u = explode(" ","$cond1 ");
-if ($cond1){
-check_name ($u[0]);if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-
-}
-if ($cond2){
-$u = explode(" ",$cond2);
-check_name ($u[0]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-}
-if ($cond3){
-$u = explode(" ",$cond3);
-check_name ($u[0]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-}
-flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-
-$datum   = date('m-d-Y H:i:s');
-print "$datum conditions:  ($cond1 $cond2 $cond3)
-";
 } // end level 2
 // ------------------------------------------------------------------------
 
@@ -295,8 +265,27 @@ save_word ("weather");
 // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 
 
-if ($level >1){save_word ("conditions");   }
-//tmp/conditions.gsm)
+if ($level >1){
+save_word ("conditions");   
+$u = explode(" ",$cond1);
+if ($cond1){save_word ($u[0]);
+ if (isset ($u[1])){save_word ($u[1]);}
+ }
+if ($cond2){
+$u = explode(" ",$cond2);
+save_word ($u[0]);
+ if (isset ($u[1])){save_word ($u[1]);}
+}
+if ($cond3){
+$u = explode(" ",$cond3);
+save_word ($u[0]);
+ if (isset ($u[1])){save_word ($u[1]);}
+}
+$datum   = date('m-d-Y H:i:s');
+print "$datum conditions:  ($cond1,$cond2,$cond3)
+";
+}
+
 save_word ("temperature"); 
 $oh=false;make_number ($the_temp);
 if($file0){$fileIN = file_get_contents ($file0);file_put_contents($file,$fileIN, FILE_APPEND);}
@@ -452,12 +441,14 @@ if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}
 }
 
 function check_name ($in){
-global $vpath,$file1;
+global $vpath,$file1,$datum;
 $file1="";
 $vpath="/var/lib/asterisk/sounds";
 if (file_exists("$vpath/$in.gsm")){$file1 = "$vpath/$in.gsm";}
-else{print"$vpath/$in.gsm not found";}
-  }
+else{print"
+$datum $vpath/$in.gsm not found
+";}
+}
 
 function check_name_cust ($in){
 global $file1,$path;
@@ -469,7 +460,10 @@ else{print"$customSound/$in.ul not found";}
 
 
 function save_word ($in){
-global $vpath,$file1,$path,$fileIN,$file;
+global $vpath,$file1,$path,$fileIN,$file,$datum;
+$datum   = date('m-d-Y H:i:s');
+//print"$datum Play $in
+//";
 check_name ($in);
 if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
