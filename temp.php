@@ -21,12 +21,11 @@
 // install
 //
 // place in  /etc/asterisk/local
-// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/temp.php
-// sound files will autodownload on first run type
-// php temp.php
+// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
+// php install.php
 //
-// This can be run from chron or it will be called if your are running 
-// my weather_pws.php file from chron.
+// This can be run from chron 
+// Note duplicate version ofthis script is built into the weather script  
 //
 //
 //crontab -e add the following for time on the hr between 6am and 11pm
@@ -52,9 +51,7 @@
 //https://github.com/Howchoo/pi-fan-controller/blob/master/fancontrol.py 
 //and run it at load time.  /etc/rc.local
 //
-$node="2955";// Set your node number
 $reportAll = true; // change to false to not talk for normal temp
-
 $nodeName = "server";// What name do you want it to use
 //$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
 //$nodeName = "node";
@@ -75,14 +72,29 @@ date_default_timezone_set(TIMEZONE);
 $phpzone = date_default_timezone_get(); // test it 
 if ($phpzone == $zone ){$phpzone="$phpzone set";}
 else{$phpzone="$phpzone ERROR";}
-
 $phpVersion= phpversion();
 
-$ver="v1.4";
+$path="/etc/asterisk/local/mm-software";
+// automatic node setup
+$file= "$path/mm-node.txt";
+if(!file_exists($file)){create_node ($file);}
+if(file_exists($file)){
+$fileIN= file($file);
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
+$u= explode(",",$line);$node=$u[0];
+}
+if (!$node){
+$datum = date('m-d-Y-H:i:s');
+print"$datum Error loading node number $line Place node number in $file 1988,1988,";die;}
+}
+
+$ver="v1.5";
 $out="";
 print "===================================================
 ";
-print " PI temp Monitor $ver 
+print " PI temp Monitor $ver Node:$node
 "; 
 print "(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ";
@@ -90,7 +102,7 @@ print "$phpzone PHP v$phpVersion
 ";
 print "===================================================
 ";
-chdir("/etc/asterisk/local/");
+chdir($path);
 
 
 $log="/tmp/cpu_temp_log.txt";
@@ -130,7 +142,7 @@ $speak = "/tmp/temp.gsm";
 $vpath ="/var/lib/asterisk/sounds";
 $file=$speak; $cmd="";
 if(file_exists($file)){unlink($file);}
-$fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );
+$fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
 check_name ($nodeName); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 list($whole, $decimal) = explode('.', $temp);
 $oh=false;make_number ($whole);
@@ -145,34 +157,45 @@ if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_content
 
 check_name ("degrees"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 check_name ("celsius"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-$datum   = date('m-d-Y H:i:s');
-print "$datum Playing file to NODE:$node $speak
-";
+
+
+
 $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/temp '",$output,$return_var);
 if(!$status){$status="OK";}
-sleep(1);
+ $datum   = date('m-d-Y H:i:s');
+print "$datum Playing file $speak
+";
 
-// if its high say something.
+// These sounds are ul and can not be stacked into the gsm
+// on a busy system the file may play before or overlay the above.
+
 if ($temp >=$hot){
-if ($temp >=$high){$status="$status >$high WARNING";check_name_cust ("warning");}
-else{$status="$status >$hot HOT";check_name_cust ("hot");} 
-if($file1){$d= exec("sudo asterisk -rx 'rpt localplay $node $file1 '",$output,$return_var);$status="$status $d";sleep(1);}
+ if ($temp >=$high){$status="$status >$high WARNING";check_name_cust ("warning");}
+ else{$status="$status >$hot HOT";check_name_cust ("hot");} 
+  if ($file1){ 
+  $status= exec("sudo asterisk -rx 'rpt localplay $node $file1'",$output,$return_var);
+  $datum   = date('m-d-Y H:i:s');
+print "$datum Playing file $file1
+";
+  }
+}
+if ($throttled){
+check_name_cust ($throttled);$status="$status $throttled";
+  if ($file1){ 
+  $status= exec("sudo asterisk -rx 'rpt localplay $node $file1'",$output,$return_var);
+  $datum   = date('m-d-Y H:i:s');
+print "$datum Playing file $file1
+";
+  }
 }
 
-if ($throttled){
-$status="$status $throttled";
-check_name_cust ($throttled);
-if($file1){
-$d= exec("sudo asterisk -rx 'rpt localplay $node $file1 '",$output,$return_var);
-$status="$status $d";
-sleep(1);
-}
- }
+
+if(!$status){$status="OK";}
+
+
 $datum = date('m-d-Y-H:i:s');
 print "$datum finished  $status $return_var
-"; 
-print "===================================================
+===================================================
 ";
 
 
@@ -201,23 +224,28 @@ if ($in>=90 and $in<100 ){$file1  = "$path/digits/90.gsm";$in=$in-90;}
 if ($in >=1 and $in<20  ){$file2  = "$path/digits/$in.gsm";}           
 }
 
-function check_name ($in){
-global $file1;
-$path ="/var/lib/asterisk/sounds";
-$file1="";
-$fileSound= "$path/$in.gsm"; if (file_exists($fileSound)){$file1 = $fileSound;}
-}
 
+function check_name ($in){
+global $vpath,$file1,$file;
+$file1="";
+$fileSound= "$vpath/$in.gsm";
+if (file_exists($fileSound)){$file1 = "$fileSound/$in";}
+  }
 
 function check_name_cust ($in){
-global $file1;
-$path="/etc/asterisk/local/sounds/";
+global $file1,$path;
+$path="$path/sounds/";
 $file1="";
 if (file_exists("$path/$in.ul")){$file1 = "$path/$in";}
 }
 
 
-
-
-
-
+function create_node ($file){
+global $file,$path;
+$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
+$line = str_replace('"', "", $line);
+$u= explode("=",$line);
+$node=$u[1];
+$file= "$path/mm-node.txt";
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+}
