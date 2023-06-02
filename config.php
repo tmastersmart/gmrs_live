@@ -8,8 +8,7 @@
 // Weather settings
 // find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
 // make sure all DATASETS are turned on and find the code your your station and your closest airport
-$station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
-$level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
+
 // pull temp from mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
 // For persional Weather Stations and Airports
 //
@@ -17,6 +16,10 @@ $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain
 // https://mesowest.utah.edu/
 // https://madis-data.ncep.noaa.gov
 // https://aprs.fi/
+
+$station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
+$level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
+
 
 
 $zipcode="71432";// Zipcode for acuweather 
