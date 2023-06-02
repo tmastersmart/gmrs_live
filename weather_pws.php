@@ -11,6 +11,7 @@
 // https://madis-data.ncep.noaa.gov
 // https://aprs.fi/
 // 
+// v1.6 Released 06/01/2023  This is the first release with a mostly automated setup and installer.
 // 
 // This uses the authors token. At this time only authors need to get tokens
 // not you. This token may change in a later version.
@@ -27,9 +28,6 @@
 //
 // This script replaces a perl and batch file in favor of PHP
 //
-// The timezone in PHP is not setup properly in hamvoip
-//  so you need to set your timezone.
-
 // find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
 // make sure all DATASETS are turned on and find the code your your station and your closest airport
 //
@@ -37,17 +35,25 @@
 // I am testing a new PHP version that will run on a PI..... pws.winnfreenet.com 
 //
 // place in  /etc/asterisk/local
-// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/weather_pws.php
+// wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
+// php install.php
 //
-// chrontab -e add the following for time on the hr between 6am and 11pm
-// 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /tmp/time.txt
+// crontab -e add the following for time on the hr between 6am and 11pm
+// 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /dev/null
+// or this for every hr
+// 0 * * * * php /etc/asterisk/local/weather_pws.php >> /dev/null
 
-$node="2955";
-$station="KIER";// this is your local Station ID (CWOP)  EXXXX  (see map) KIER is the natchitoches La airport
+$station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
 $fc="F";$zipcode="71432";// acuweather will say cloudy or such
 
 $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
-$cputemp= true;// Check if cpu temp exists and run if true
+
+$reportAll = true; //  false= only over temp 
+$nodeName = "server";// What name do you want it to use
+//$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
+//$nodeName = "node";// doesnt really work because it sounds like as node connect
+$high = 60;// 85 is danger
+$hot  = 50;
 
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
@@ -61,8 +67,30 @@ $phpzone = date_default_timezone_get(); // test it
 if ($phpzone == $zone ){$phpzone="$phpzone set";}
 else{$phpzone="$phpzone ERROR";}
 
+$path="/etc/asterisk/local/mm-software";
+// automatic node setup
+$file= "$path/mm-node.txt";
+if(!file_exists($file)){create_node ($file);}
+if(file_exists($file)){
+$fileIN= file($file);
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
+$u= explode(",",$line);$node=$u[0];
+}
+if (!$node){
+$datum = date('m-d-Y-H:i:s');
+print"$datum Error loading node number $line Place node number in $file 1988,1988,";die;}
+}
+
+
+$cond        = "/tmp/conditions.gsm"  ;if(file_exists($cond)){unlink($cond);}
+$condition   = "/tmp/condition.gsm"   ;if(file_exists($condition)){unlink($condition);}    
+$currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($currentTime);}
+$vpath="/var/lib/asterisk/sounds";
+
 $phpVersion= phpversion();
-$ver= "v1.4";  
+$ver= "v1.6";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
@@ -75,7 +103,7 @@ print "mesowest, madis, APRSWXNET(CWOP) $ver
 ";
 print "(c)2013/2023 WRXB288 LAGMRS.com all rights reserved
 ";
-print "$phpzone PHP v$phpVersion
+print "$phpzone PHP v$phpVersion NODE:$node
 ";
 print "===================================================
 ";
@@ -135,7 +163,7 @@ print "$datum $sitename  Temp:$the_temp  humidity:$outhumi% Rain:$rainofdaily Wi
 ";
 
 
-
+// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 if ($level >1){
 // Poll acuweather for the current conditions. Ignore the temp its not local
 // http://rss.accuweather.com/rss/liveweather_rss.asp\?metric\=${FAHRENHEIT}\&locCode\=$1
@@ -191,9 +219,12 @@ if (!$cond3){
 
 $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$the_temp F / $cond1 $cond2 $cond3");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $vpath="/var/lib/asterisk/sounds";
-$cond="/tmp/conditions.gsm";$file=$cond;
+$cond="/tmp/conditions.gsm";$file=$cond;//$condition  = "/tmp/condition.gsm";
 if(file_exists($file)){unlink($file);} // Mostly Cloudy
 $fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );  $cmd="";
+
+
+
 
 $u = explode(" ","$cond1 ");
 if ($cond1){
@@ -212,15 +243,13 @@ check_name ($u[0]);
 check_name ($u[1]); 
 }
 flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-// End of condictions ==============================================================================================
-
-
 
 $datum   = date('m-d-Y H:i:s');
 print "$datum conditions:  ($cond1 $cond2 $cond3)
 ";
 } // end level 2
-// end conditions
+// ------------------------------------------------------------------------
+
 $hour = date('H');
 $day  = date('l');
 $hr =   date('h');
@@ -230,13 +259,11 @@ if ($min == 0 ){$theMin="$vpath/digits/oclock.gsm";$theMin2="";}
 else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;}
 
 $silence1    = "$vpath/silence/1.gsm";
-$silence2    = "$vpath/silence/2.gsm";
-$condition   = "/tmp/condition.gsm";    
-$currentTime = "/tmp/current-time.gsm";
+$silence2    = "$vpath/silence/2.gsm";  // use 2 to prevent dupe messages
 $file=$currentTime; $cmd="";
 if(file_exists($file)){unlink($file);}
-$fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );
-$fileIN = file_get_contents ($silence1);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
+$fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
+$fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
 
 $status ="";
 if ($hour < 12 ) {$status = "good-morning";  check_name ($status);}
@@ -264,10 +291,12 @@ print "$datum $status Time is $hr:$min $pm
 $fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);
 // Weather
 check_name ("weather");
-check_name ("conditions");
-$fileIN = file_get_contents ($cond);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $cond";
-check_name ("temperature");
+// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 
+
+if ($level >1){check_name ("conditions");$fileIN = file_get_contents ($cond);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $cond";}
+//tmp/conditions.gsm)
+check_name ("temperature");
 $oh=false;make_number ($the_temp);
 if($file0){$fileIN = file_get_contents ($file0);file_put_contents($file,$fileIN, FILE_APPEND);}
 if($file1){$fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
@@ -275,7 +304,7 @@ if($file2){$fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN
 if($file3){$fileIN = file_get_contents ($file3);file_put_contents ($file,$fileIN, FILE_APPEND);}
 check_name ("degrees");
 
-if($level>2){
+if($level>2){ // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 check_name ("humidity");
 $oh=false;make_number ($outhumi);
 if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
@@ -290,39 +319,114 @@ if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$file
 check_name ("miles-per-hour");
 }
 
-if ($rainofdaily>1){
-check_name ("rain"); 
-$oh=false;make_number ($rainofdaily);
-if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if ($rainofdaily>0){
+list($whole, $decimal) = explode('.', $rainofdaily);
+$oh=false;make_number ($whole);
+if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if($decimal>=1){
+ check_name ("point"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+ $oh=false;make_number ($decimal);
+ if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+ if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+  }
+ } 
+} // end of level2
+
+// Start the CPU temp warnings here.
+$log="/tmp/cpu_temp_log.txt";
+$datum = date('m-d-Y-H:i:s');
+$line= exec("/opt/vc/bin/vcgencmd measure_temp",$output,$return_var);// SoC BCM2711 temp
+$line = str_replace("'", "", $line);
+$line = str_replace("C", "", $line);
+$u= explode("=",$line);
+$temp=$u[1];
+$tempf = (float)(($temp * 9 / 5) + 32);
+print "$datum $nodeName Temp is $tempf F $temp C
+";
+
+$line= exec("/opt/vc/bin/vcgencmd get_throttled",$output,$return_var);
+//throttled=0x0
+$u= explode("x",$line); 
+$throttled = "";
+if($u[1]== "0"){$throttled = "";}
+if($u[1]== "1"){$throttled = "under-voltage-detected";}
+if($u[1]== "2"){$throttled = "arm-frequency-capped";}
+if($u[1]== "4"){$throttled = "currently-throttled";}
+if($u[1]== "8"){$throttled = "soft-temp-limit-active";}
+if($u[1]== "10000"){$throttled = "under-voltage-detected";}
+if($u[1]== "20000"){$throttled = "arm-frequency-capping";}
+if($u[1]== "80000"){$throttled = "throttling-has-occurred";}
+if($u[1]== "80000"){$throttled = "soft-temp-limit-occurred";}
+
+
+print "$datum $nodeName Throttled:$throttled code: $u[1] 
+";
+$fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+
+if ($reportAll or $temp >=$hot){
+$vpath ="/var/lib/asterisk/sounds";
+$cmd="";
+check_name ($nodeName); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+list($whole, $decimal) = explode('.', $temp);
+$oh=false;make_number ($whole);
+if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if($decimal>=1){
+check_name ("point"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+$oh=false;make_number ($decimal);
+if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
-} 
- 
-flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+
+check_name ("degrees"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+check_name ("celsius"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+
+
+}
+
+
 
 $datum   = date('m-d-Y H:i:s');
-print "$datum Playing file to NODE:$node $currentTime
+print "$datum Playing file $currentTime
 ";
 $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
 if(!$status){$status="OK";}
+
+
+
+// These sounds are ul and can not be stacked into the gsm
+// on a busy system the file may play before or overlay the above.
+
+if ($temp >=$hot){
+ if ($temp >=$high){$status="$status >$high WARNING";check_name_cust ("warning");}
+ else{$status="$status >$hot HOT";check_name_cust ("hot");} 
+  if ($file1){ 
+  $status= exec("sudo asterisk -rx 'rpt localplay $node $file1'",$output,$return_var);
+  $datum   = date('m-d-Y H:i:s');
+print "$datum Playing file $file1
+";
+  }
+}
+if ($throttled){
+check_name_cust ($throttled);$status="$status $throttled";
+  if ($file1){ 
+  $status= exec("sudo asterisk -rx 'rpt localplay $node $file1'",$output,$return_var);
+  $datum   = date('m-d-Y H:i:s');
+print "$datum Playing file $file1
+";
+  }
+}
+
 print "$datum finished  $status $return_var
 ";
 print "===================================================
 ";
-if ($cputemp){
-sleep (2); // make sure time plays first
-// Add on to run temp module 
-$tempScript="/etc/asterisk/local/temp.php";// Download this script from my site
-$tempFile="/tmp/temp-output.txt";
-if (file_exists($tempScript)){      
- $datum   = date('m-d-Y H:i:s');
- $status= exec("sudo php $tempScript > $tempFile",$output,$return_var);
- $fileIN = file_get_contents ($tempFile);
- 
- print "$fileIN
-";
-}
-}
+
+
+
+
+
 function make_number ($in){
 global $vpath,$file0,$file1,$file2,$file3,$negative,$oh;
 // Speak all possible numbers
@@ -355,7 +459,12 @@ if (file_exists($fileSound)){
   }
 }
 
-
+function check_name_cust ($in){
+global $file1,$path;
+$customSound="$path/sounds";
+$file1="";
+if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
+}
 
 
 // copyright by winnfreenet.com  
@@ -441,9 +550,19 @@ if ($Lpos){
 $test = substr($html, $Lpos,$Rpos);
 $Lpos = strpos($test, '<value type');$Rpos = strpos($test, '</value>');
 $outhumi  = substr($test, $Lpos+18,$Rpos-$Lpos-18);
+  }// hum
+  
+ }//start
 }
 
 
-}
+function create_node ($file){
+global $file,$path;
+$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
+$line = str_replace('"', "", $line);
+$u= explode("=",$line);
+$node=$u[1];
+$file= "$path/mm-node.txt";
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 }
 ?>
