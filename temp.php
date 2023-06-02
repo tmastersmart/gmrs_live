@@ -203,40 +203,38 @@ print "$datum finished  $status $return_var
 //
 
 function make_number ($in){
-global $file0,$file1,$file2,$file3,$negative,$oh;
+global $file0,$file1,$file2,$file3,$negative,$oh,$vpath;
 // Speak all possible numbers
 // PHP Number matrix
-$path ="/var/lib/asterisk/sounds";
+
 $file0 = "";$file1 = "";$file2 = "";$file3 = "";$negative="";
-if ($in <0 ){$negative = "$path/digits/minus.gsm";}
+if ($in <0 ){$negative = "$vpath/digits/minus.gsm";}
 $in = abs($in);
 $in = round($in);
-if ($oh){if ($in<10) {    $file1  = "$path/digits/oh.gsm";}}
-if ($in >= 100){          $file3  = "$path/digits/hundred.gsm"; $in = ($in -100); }
-if ($in>=20 and $in<30  ){$file1  = "$path/digits/20.gsm";$in=$in-20;} 
-if ($in>=30 and $in<40  ){$file1  = "$path/digits/30.gsm";$in=$in-30;}
-if ($in>=40 and $in<50  ){$file1  = "$path/digits/40.gsm";$in=$in-40;} 
-if ($in>=50 and $in<60  ){$file1  = "$path/digits/50.gsm";$in=$in-50;}
-if ($in>=60 and $in<70  ){$file1  = "$path/digits/60.gsm";$in=$in-60;} 
-if ($in>=70 and $in<80  ){$file1  = "$path/digits/70.gsm";$in=$in-70;}
-if ($in>=80 and $in<90  ){$file1  = "$path/digits/80.gsm";$in=$in-80;} 
-if ($in>=90 and $in<100 ){$file1  = "$path/digits/90.gsm";$in=$in-90;}
-if ($in >=1 and $in<20  ){$file2  = "$path/digits/$in.gsm";}           
+if ($oh){if ($in<10) {    $file1  = "$vpath/digits/oh.gsm";}}
+if ($in >= 100){          $file3  = "$vpath/digits/hundred.gsm"; $in = ($in -100); }
+if ($in>=20 and $in<30  ){$file1  = "$vpath/digits/20.gsm";$in=$in-20;} 
+if ($in>=30 and $in<40  ){$file1  = "$vpath/digits/30.gsm";$in=$in-30;}
+if ($in>=40 and $in<50  ){$file1  = "$vpath/digits/40.gsm";$in=$in-40;} 
+if ($in>=50 and $in<60  ){$file1  = "$vpath/digits/50.gsm";$in=$in-50;}
+if ($in>=60 and $in<70  ){$file1  = "$vpath/digits/60.gsm";$in=$in-60;} 
+if ($in>=70 and $in<80  ){$file1  = "$vpath/digits/70.gsm";$in=$in-70;}
+if ($in>=80 and $in<90  ){$file1  = "$vpath/digits/80.gsm";$in=$in-80;} 
+if ($in>=90 and $in<100 ){$file1  = "$vpath/digits/90.gsm";$in=$in-90;}
+if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}           
 }
 
 
 function check_name ($in){
 global $vpath,$file1,$file;
 $file1="";
-$fileSound= "$vpath/$in.gsm";
-if (file_exists($fileSound)){$file1 = "$fileSound/$in";}
+if (file_exists("$vpath/$in.gsm")){$file1 = "$vpath/$in.gsm";}
   }
 
 function check_name_cust ($in){
 global $file1,$path;
-$path="$path/sounds/";
 $file1="";
-if (file_exists("$path/$in.ul")){$file1 = "$path/$in";}
+if (file_exists("$path/sounds/$in.ul")){$file1 = "$path/sounds/$in";}
 }
 
 
