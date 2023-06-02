@@ -228,19 +228,19 @@ $fileOUT = fopen($file,'wb');flock ($fileOUT, LOCK_EX );  $cmd="";
 
 $u = explode(" ","$cond1 ");
 if ($cond1){
-check_name ($u[0]);
-check_name ($u[1]); 
+check_name ($u[0]);if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 
 }
 if ($cond2){
 $u = explode(" ",$cond2);
-check_name ($u[0]); 
-check_name ($u[1]); 
+check_name ($u[0]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
 if ($cond3){
 $u = explode(" ",$cond3);
-check_name ($u[0]); 
-check_name ($u[1]); 
+check_name ($u[0]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+check_name ($u[1]); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
 flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 
@@ -266,18 +266,19 @@ $fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
 $fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
 
 $status ="";
-if ($hour < 12 ) {$status = "good-morning";  check_name ($status);}
-if ($hour >= 12 and $hour <18) {$status = "good-afternoon";check_name ($status);}
-if ($hour >= 18) {$status = "good-evening"; ;check_name ($status);}
+if ($hour < 12 ) {$status = "good-morning"; }
+if ($hour >= 12 and $hour <18) {$status = "good-afternoon";}
+if ($hour >= 18) {$status = "good-evening"; }
+save_word ($status);
 $datum   = date('m-d-Y H:i:s');
 
-check_name ("the-time-is");
+save_word ("the-time-is");
 $oh=false;make_number ($hr);$theHR = $file1; $theHR2 = $file2;
 if($theHR){$fileIN = file_get_contents ($theHR);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theHR";}
 if($theHR2){$fileIN = file_get_contents ($theHR2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theHR2";}
 
 
-if ($min == 0 ){check_name ("oclock");$theMin="";$theMin2="";}
+if ($min == 0 ){save_word ("oclock");$theMin="";$theMin2="";}
 else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;
  if ($theMin != ""){$fileIN = file_get_contents ($theMin);file_put_contents($file,$fileIN, FILE_APPEND); $cmd="$cmd $theMin"; }
  if ($theMin2 != "") { $fileIN = file_get_contents ($theMin2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theMin2";}
@@ -290,33 +291,33 @@ print "$datum $status Time is $hr:$min $pm
 
 $fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);
 // Weather
-check_name ("weather");
+save_word ("weather"); 
 // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 
 
-if ($level >1){check_name ("conditions");$fileIN = file_get_contents ($cond);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $cond";}
+if ($level >1){save_word ("conditions");   }
 //tmp/conditions.gsm)
-check_name ("temperature");
+save_word ("temperature"); 
 $oh=false;make_number ($the_temp);
 if($file0){$fileIN = file_get_contents ($file0);file_put_contents($file,$fileIN, FILE_APPEND);}
 if($file1){$fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if($file2){$fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if($file3){$fileIN = file_get_contents ($file3);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ("degrees");
+save_word ("degrees"); 
 
 if($level>2){ // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
-check_name ("humidity");
+save_word ("humidity");
 $oh=false;make_number ($outhumi);
 if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ("percent");
+save_word ("percent"); 
 
 if($avgwind>1){
-check_name ("wind"); 
+save_word ("wind"); 
 $oh=false;make_number ($avgwind); 
 if ($file1){$fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if ($file2){ $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ("miles-per-hour");
+save_word ("miles-per-hour"); 
 }
 
 if ($rainofdaily>0){
@@ -325,7 +326,7 @@ $oh=false;make_number ($whole);
 if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if($decimal>=1){
- check_name ("point"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+ save_word ("point");
  $oh=false;make_number ($decimal);
  if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
  if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
@@ -373,14 +374,14 @@ $oh=false;make_number ($whole);
 if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if($decimal>=1){
-check_name ("point"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+save_word ("point");
 $oh=false;make_number ($decimal);
 if (file_exists($file1)){  $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
 if (file_exists($file2)){  $fileIN = file_get_contents ($file2);file_put_contents ($file,$fileIN, FILE_APPEND);}
 }
 
-check_name ("degrees"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
-check_name ("celsius"); if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+save_word ("degrees");
+save_word ("celsius");
 
 
 }
@@ -451,19 +452,28 @@ if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}
 }
 
 function check_name ($in){
-global $vpath,$file1,$file;
+global $vpath,$file1;
 $file1="";
-$fileSound= "$vpath/$in.gsm";
-if (file_exists($fileSound)){$file1 = "$fileSound/$in";}
+$vpath="/var/lib/asterisk/sounds";
+if (file_exists("$vpath/$in.gsm")){$file1 = "$vpath/$in.gsm";}
+else{print"$vpath/$in.gsm not found";}
   }
-
 
 function check_name_cust ($in){
 global $file1,$path;
 $customSound="$path/sounds";
 $file1="";
 if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
+else{print"$customSound/$in.ul not found";}
 }
+
+
+function save_word ($in){
+global $vpath,$file1,$path,$fileIN,$file;
+check_name ($in);
+if ($file1){ $fileIN = file_get_contents ($file1);file_put_contents ($file,$fileIN, FILE_APPEND);}
+}
+
 
 
 // copyright by lagmrs.com  
