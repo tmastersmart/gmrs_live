@@ -29,28 +29,17 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.1";
+$ver="v1.2";
 $out="";
 // This install is very fast only the last lines are readable
 print "===================================================
 ";
 $path= "/etc/asterisk/local/mm-software";
-chdir($path);
+
 install($out);
 // automatic node setup
 $file= "$path/mm-node.txt";
-if(!file_exists($file)){create_node ($file);}
-if(file_exists($file)){
-$fileIN= file($file);
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$u= explode(",",$line);$node=$u[0];
-}
-if (!$node){
-$datum = date('m-d-Y-H:i:s');
-print"$datum Error loading node number $line Place node number in $file 1988,1988,";die;}
-}
+create_node ($file);
 
 
 
@@ -84,33 +73,40 @@ function install($in){
 $files = "hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";// moved to special dir for dist.
 $path2 = "$path/sounds";
-$repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds/";
+
 $u = explode(",",$files);
+if(!is_dir($path)){ mkdir($path, 0755);}
 chdir($path);
 if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2);
+$repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds";
 $datum = date('m-d-Y-H:i:s');
 print"
 $datum Install sounds
 ";
 
 foreach($u as $file) {
-if (!file_exists("$path2/$file")){ 
-   $d= exec("sudo wget $repo/$file ",$output,$return_var);
+if (!file_exists("$path2/$file")){
+   print "sudo wget $repo/$file
+   "; 
+exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "temp.php,weather_pws.php,check_gmrs.sh";
-$repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/";
+$files = "config.php,temp.php,weather_pws.php,check_gmrs.sh";
+$repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
 chdir($path);
 $datum = date('m-d-Y-H:i:s');
 print"
 $datum Installing scripts
 ";
+$u = explode(",",$files);
 foreach($u as $file) {
 if (!file_exists("$path/$file")){ 
-   $d= exec("sudo wget $repo/$file ",$output,$return_var);
+   print "sudo wget $repo2/$file
+   "; 
+ exec("sudo wget $repo2/$file ",$output,$return_var);
    }
    }
 }
@@ -129,15 +125,14 @@ $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$nod
 // phase 2 import skywarn settings 
 $file="/usr/local/bin/AUTOSKY/AutoSky.ini";
 $file2="$path/skywarn.txt";
-if (file_exists($file)){ 
-$fileIN  = file($file);
-$fileOUT = fopen($file2,'w');flock ($fileOUT, LOCK_EX );
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$pos1 = strpos($line, 'FILE=');if ($pos1=1){fwrite ($fileOUT,"$line\r");}
-$pos2 = strpos($line, 'overage_Area='); if ($pos2=1){fwrite ($fileOUT,"$line\r");}
-}
+$fileOUT = fopen($file2, "w") ;
+$line = exec("cat /usr/local/bin/AUTOSKY/AutoSky.ini  |egrep 'OFILE='",$output,$return_var);
+$line = str_replace('"', "", $line);
+$u= explode("=",$line);
+fwrite ($fileOUT,"$u[0],$u[1]=$u[2]=$u[3]\r");
+$line = exec("cat /usr/local/bin/AUTOSKY/AutoSky.ini  |egrep 'Coverage_Area='",$output,$return_var);
+$line = str_replace('"', "", $line);
+$u= explode("=",$line);
+fwrite ($fileOUT,"$u[0],$u[1]\r");
 flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-}
 }
