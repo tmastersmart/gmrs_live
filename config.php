@@ -6,20 +6,15 @@
 // settings to modify. Allows scripts to be updated at a later date without changing settings.
 
 // Weather settings
-// find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
-// make sure all DATASETS are turned on and find the code your your station and your closest airport
-
 // pull temp from mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
 // For persional Weather Stations and Airports
 //
-// http://www.wxqa.com/  (CWOP) main website
-// https://mesowest.utah.edu/
-// https://madis-data.ncep.noaa.gov
-// https://aprs.fi/
+// find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
+// make sure all DATASETS are turned on and find the code your your station and your closest airport
 
-$station="E6758";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
+$station="KIER";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
 $level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
-
+// example KIER is the airport https://weather.gladstonefamily.net/site/search?site=kier
 
 
 $zipcode="71432";// Zipcode for acuweather 
