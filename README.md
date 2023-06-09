@@ -13,15 +13,10 @@ run the custom installer
 
 php install.php
 
-This will install the following
+ch /etc/asterisk/local/mm-software
 
-temp.php and its sound files
 
-edit the temp file and add your node number
-
-nano temp.php       
-
-run it
+test the temp monitor 
 
 php temp.php 
 
@@ -52,13 +47,33 @@ https://aprs.fi/ These are aprs stations but you cant use station numbers from t
 
 Once you have a station id edit the file
 
-nano weather_pws.php  
+nano config.php  
 
-add your node number and the station ID. Select how much data you want only temp or temp hum rain wind. 
+add your station ID. Select how much data you want only temp or temp hum rain wind. 
 The temp data is more accurate than the stock script which does not allow you to pick the station.
 in addition this allows station owners like me and hams running CWOP stations to use your own local temp.
 
-It also installs a ping checking script custimized for gmrslive. 
+run them
+
+php weather_pws.php
+
+php skywarn.php
+
+I have my cron setup like this.
+
+
+#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$
+
+#*/20 * * * * /usr/local/bin/AUTOSKY/AutoSky
+
+*/15 * * * * php /etc/asterisk/local/mm-software/skywarn.php >> /dev/null
+
+00 7-23 * * * php /etc/asterisk/local/mm-software/weather_pws.php >> /dev/null
+
+the weather_pws.php has the temp warning built into it.
+
+
+
 
 Aditional scripts not in the installer
 
