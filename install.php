@@ -29,11 +29,29 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.2";
+$ver="v1.3";
 $out="";
-// This install is very fast only the last lines are readable
-print "===================================================
+print "
+   _____ __  __ _____   _____   _           _        _ _           
+  / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
+ | |  __| \  / | |__) | (___    _ _ __  ___| |_ __ _| | | ___ _ __ 
+ | | |_ | |\/| |  _  / \___ \  | | '_ \/ __| __/ _` | | |/ _ \ '__|
+ | |__| | |  | | | \ \ ____) | | | | | \__ \ || (_| | | |  __/ |   
+  \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
+
+PHP $phpVersion 
+============================================================
+= Welcome                                                  =
+=                                                          =
+= This installer will install all the php programs and     =
+= sound files.                                             =
+=                                                          =
+= When finished you will have to edit the config.php file  =
+============================================================
 ";
+$a = readline('Press Enter to start the installer: ');
+
+
 $path= "/etc/asterisk/local/mm-software";
 
 install($out);
@@ -53,14 +71,14 @@ $phpzone PHP v$phpVersion
 
 This installer will not update yet. You need to check for updates manualy
 
-type 
-nano temp.php
-and add your node number
 
-type
-nano weather_pws.php
-and set your local weather station and node#.
-see instructions in file.
+update the config.php file
+
+cd mm-software
+ 
+nano config.php
+
+and set your local weather station see instructions in file.
 
 Thank you for downloading........... And have Many nice days
 ";
@@ -70,7 +88,7 @@ Thank you for downloading........... And have Many nice days
 
 function install($in){
 
-$files = "hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";// moved to special dir for dist.
 $path2 = "$path/sounds";
 
@@ -93,7 +111,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "config.php,temp.php,weather_pws.php,check_gmrs.sh";
+$files = "config.php,forcast.php,temp.php,weather_pws.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,skywarn.php";
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
 chdir($path);
@@ -124,15 +142,7 @@ $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$nod
 
 // phase 2 import skywarn settings 
 $file="/usr/local/bin/AUTOSKY/AutoSky.ini";
-$file2="$path/skywarn.txt";
-$fileOUT = fopen($file2, "w") ;
-$line = exec("cat /usr/local/bin/AUTOSKY/AutoSky.ini  |egrep 'OFILE='",$output,$return_var);
-$line = str_replace('"', "", $line);
-$u= explode("=",$line);
-fwrite ($fileOUT,"$u[0],$u[1]=$u[2]=$u[3]\r");
-$line = exec("cat /usr/local/bin/AUTOSKY/AutoSky.ini  |egrep 'Coverage_Area='",$output,$return_var);
-$line = str_replace('"', "", $line);
-$u= explode("=",$line);
-fwrite ($fileOUT,"$u[0],$u[1]\r");
-flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+$file2="$path/autosky_import.ini";
+copy($file, $file2);
+
 }
