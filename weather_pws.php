@@ -98,7 +98,7 @@ $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($cur
 $vpath="/var/lib/asterisk/sounds";
 
 $phpVersion= phpversion();
-$ver= "v1.9";  
+$ver= "v2.0";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
@@ -373,7 +373,7 @@ if($file2){$action = "$action $file2";}
 check_gsm_db ("percent");if($file1){$action = "$action $file1";}
 
 if($avgwind>1){
-save_word ("wind"); 
+check_gsm_db ("wind");if($file1){$action = "$action $file1";} 
 $oh=false;make_number ($avgwind); 
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
