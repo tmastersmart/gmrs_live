@@ -1,35 +1,47 @@
 <?php
 // (c)2023 by WXRB288 lagmrs.com  by pws.winnfreenet.com
-// This script uses some code my weather programs. Member CWOP since 2015 
-// Licensed only for GMRS,Allstar & Hamvoip nodes. All rights reserved. 
-
-// settings to modify. Allows scripts to be updated at a later date without changing settings.
-
-// Weather settings
-// pull temp from mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
-// For persional Weather Stations and Airports
-//
-// find your local MADIS station and airport go to the map https://madis-data.ncep.noaa.gov/MadisSurface/
-// make sure all DATASETS are turned on and find the code your your station and your closest airport
-
-$station="KIER";// this is your local Station ID (CWOP)  EXXXX Starts with a E or a callsign (see map)
-$level = 3 ;// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
-// example KIER is the airport https://weather.gladstonefamily.net/site/search?site=kier
+// data file loader module..
 
 
-$zipcode="71432";// Zipcode for acuweather 
-
-// https://alerts.weather.gov 
-$skywarn="LAC043";// County Code (forcast and warnings. )  
+load("load");
 
 
-// CPU temp settings
-$reportAll = true; //  false= only over temp 
-$nodeName = "server";// What name do you want it to use
-//$nodeName = "system";// must be a file that exists in "/var/lib/asterisk/sounds"
-//$nodeName = "node";// doesnt really work because it sounds like as node connect
-$high = 60;// 85 is danger
-$hot  = 50;
 
 
+function load($in){
+global $saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
+
+
+// read setup file  30 data points
+if (is_readable("$path/setup.txt")) {
+   $fileIN= file("$path/setup.txt");
+   $datum = date('m-d-Y-H:i:s');
+print "$datum Loading settings
+";
+   foreach($fileIN as $line){
+    $u = explode(",",$line);
+//            $path =  $u[0];
+//           $node  =  $u[1];
+          $station  =  $u[2];
+             $level =  $u[3];
+         $zipcode   =  $u[4];
+           $skywarn =  $u[5];
+               $lat =  $u[6];
+               $lon =  $u[7];
+           $sayWarn =  $u[8];
+          $sayWatch =  $u[9];
+       $sayAdvisory = $u[10];
+      $sayStatement = $u[11];
+        $testNewApi = $u[12];
+
+              $high = $u[13]; 
+               $hot = $u[14];
+          $nodeName = $u[15];
+        $reportAll  = $u[16];
+        $saveDate   = $u[17];
+    }
+}
+else {print "Missing settings.txt file, load setup.php program to create!
+";die;}
+}
 ?>
