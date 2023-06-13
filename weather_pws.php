@@ -23,7 +23,8 @@
 // 
 // v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
 // v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
-// v1.8 06/03/2023 No soundfile for thunderstorms rename without s
+// v1.8 06/03/2023 
+// v2.0 06/09/2023 new databases . Rewrite of sound file system. 
 // 
 // This uses the authors token. At this time only authors need to get tokens
 // not you. This token may change in a later version.
@@ -76,44 +77,25 @@ $phpzone = date_default_timezone_get(); // test it
 if ($phpzone == $zone ){$phpzone="$phpzone set";}
 else{$phpzone="$phpzone ERROR";}
 
-// automatic node setup
-$file= "$path/mm-node.txt";
-if(!file_exists($file)){create_node ($file);}
-if(file_exists($file)){
-$fileIN= file($file);
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$u= explode(",",$line);$node=$u[0];
-}
-if (!$node){
-$datum = date('m-d-Y-H:i:s');
-print"$datum Error loading node number";die;}
-}
-$testNewApi=true; // Future use. Still testing. This is for the NWS new system.
-
 $cond        = "/tmp/conditions.gsm"  ;if(file_exists($cond)){unlink($cond);}
 $condition   = "/tmp/condition.gsm"   ;if(file_exists($condition)){unlink($condition);}    
 $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($currentTime);}
 $vpath="/var/lib/asterisk/sounds";
-
+$error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.0";  
+$ver= "v2.1";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
 // You are authorised to use for this script only. 
 $token = "473c0a7b78d24dc99c182f78619d0090";
 //DO NOT COPY!!! Get your own
-print "===================================================
-";
-print "mesowest, madis, APRSWXNET(CWOP) $ver
-";
-print "(c)2013/2023 WRXB288 LAGMRS.com all rights reserved
-";
-print "$phpzone PHP v$phpVersion NODE:$node
-";
-print "===================================================
+print "
+===================================================
+mesowest, madis, APRSWXNET(CWOP) $ver
+(c)2013/2023 WRXB288 LAGMRS.com all rights reserved
+$phpzone PHP v$phpVersion NODE:$node
+===================================================
 ";
 
 // read the station
@@ -131,7 +113,7 @@ print "$datum Polling $station $domain >";
 
 $attime = gmdate('YmdHi');
 $url = "/v2/stations/nearesttime?obtimezone=UTC&$apiString";
-$html = file_get_contents("https://$domain/$url");
+$html = @file_get_contents("https://$domain/$url");
 $file="/tmp/mesowest.xml";
 if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$html);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
@@ -142,37 +124,49 @@ $html = str_replace('"', "", $html);
    $poll_end = $mtime;
 $poll_time = ($poll_end - $poll_start);
 $poll_time = round($poll_time,2);
-$MS_Error = strpos($html, 'error!'); if ($MS_Error){ $error=$html;}
-if ($MS_Error){print "$error
-";
-watchdog ($error);
-die;
-}
-
 
 $test = read_madis($html);
 
-if (!$data_good){
 $datum = date('[H:i:s]');
-$gmdatum = gmdate('[H:i:s]');
-print "*
-$gmdatum $datum $error Aborted
+
+if ($data_good){ // test for stale data
+$month = date('m');
+$year = date('Y');
+$hour = date('H');
+$day = date('d');
+$min = gmdate('i');
+$timeH= gmdate('H');
+$time= gmdate('Hi');
+$dayUTC = gmdate('d');
+$testMin = $min - $CurrTimeMi;
+if ($testMin < 0) {$testMin = $testMin+60;}
+if ($testMin > $min){print "($testMin Mins Old) last hr $timeReading";$data_good = false;}
+if ($CurrTimeD < $day ){print "Wrong day. $CurrTimeD < $day :$dateReading";$data_good=false;}
+if ($CurrTimeY <> $year){print "Wrong year. $dateReading";$data_good=false;}
+if ($testMin > 30){$error= "($testMin Mins Old) $timeReading";$data_good = false; }
+if($data_good){
+$validTemp = true;
+print "<ok> $CurrTime $poll_time Sec. 
 ";
-watchdog ($error);
-die;
+ $action = watchdog ("ok");
+ }
+}
+else{ print "<error>  $poll_time Sec.
+";
+$action = watchdog ("error");
+$validTemp = false;
 }
 
-print "<ok>$poll_time Sec. 
-";
-watchdog ("ok");
+
+
 $the_temp=$outtemp;
 $file="/tmp/temperature.txt";
 if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$the_temp);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $datum   = date('m-d-Y H:i:s');$status="";
-if($avgwind    >0){$status ="$status  Wind:$avgwind";}
-if($rainofdaily>0){$status ="$status  Rain:$rainofdaily ";}
-print "$datum $sitename  Temp:$the_temp  humidity:$outhumi% $status 
+if($avgwind    >0){$status ="$status Wind:$avgwind";}
+if($rainofdaily>0){$status ="$status Rain:$rainofdaily ";}
+$status ="$sitename Temp:$the_temp hum:$outhumi% $status";save_task_log ($status);print "$datum $status
 ";
 
 
@@ -192,9 +186,10 @@ if(file_exists($file)){unlink($file);}
 $datum   = date('m-d-Y H:i:s');
 print "$datum Polling Accuweather $zipcode >";
 
-$html = file_get_contents("http://rss.accuweather.com/rss/liveweather_rss.asp?metric=F&locCode=$zipcode");
-$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$html");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+$html = @file_get_contents("http://rss.accuweather.com/rss/liveweather_rss.asp?metric=F&locCode=$zipcode");
 
+if($html){
+$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$html");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $fileIN= file($file);
 foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
@@ -232,46 +227,49 @@ if (!$cond3){
    continue ;
 }
 }
-
-
-} // end loop
-
+}
 $datum   = date('m-d-Y H:i:s');
 print "<ok>$poll_time Sec. 
 $datum conditions:  ($cond1,$cond2,$cond3)
 ";
+watchdog ("ok");
+} // end if html
+else {
+$datum   = date('m-d-Y H:i:s');
+print "<error> $poll_time Sec. 
+";
+$level = 1;// Drop down level due to error}
+watchdog ("error");
+} // end loop
+
+
 
 $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$the_temp F / $cond1 $cond2 $cond3");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $vpath="/var/lib/asterisk/sounds";
 
 // run a api test
-if ($testNewApi){include("$path/forcast.php");}
+if ($forcast and $beta){ include("$path/forcast.php");}
 
 
 } // end level 2
 // ------------------------------------------------------------------------
-$action="";
+
 $hour = date('H');
 $day  = date('l');
 $hr =   date('h');
 $min  = date('i');
-//$oh=false;make_number ($hr);$theHR = $file1; $theHR2 = $file2;
-//if ($min == 0 ){$theMin="$vpath/digits/oclock.gsm";$theMin2="";}
-//else {$oh=true;make_number ($min);$theMin = $file1;$theMin2=$file2;}
 
 
 $file=$currentTime; $cmd="";
 if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
-//$fileIN = file_get_contents ($silence2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $silence2";
+
 check_gsm_db  ("silence2"); if($file1){$action = "$action $file1";}
 
 $status ="";
-if ($hour < 12 ) {$status = "good-morning"; }
-if ($hour >= 12 and $hour <18) {$status = "good-afternoon";}
-if ($hour >= 18) {$status = "good-evening"; }
-//save_word ($status);
-check_gsm_db  ($status); if($file1){$action = "$action $file1";}
+if ($hour < 12 ) {$status = "good-morning";check_gsm_db  ($status); if($file1){$action = "$action $file1";} }
+else {$status = "good-afternoon";check_gsm_db  ($status); if($file1){$action = "$action $file1";}}
+
 
 $datum   = date('m-d-Y H:i:s');
 check_gsm_db  ("the time is"); if($file1){$action = "$action $file1";}
@@ -279,8 +277,6 @@ check_gsm_db  ("the time is"); if($file1){$action = "$action $file1";}
 $oh=false;make_number ($hr);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
-//if($theHR){$fileIN = file_get_contents ($theHR);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theHR";}
-//if($theHR2){$fileIN = file_get_contents ($theHR2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theHR2";}
 
 
 if ($min == 0 ){
@@ -290,10 +286,6 @@ else {$oh=true;make_number ($min);
    if($file1){$action = "$action $file1";}
    if($file2){$action = "$action $file2";}
 }
-
-//$theMin = $file1;$theMin2=$file2;
-// if ($theMin != ""){$fileIN = file_get_contents ($theMin);file_put_contents($file,$fileIN, FILE_APPEND); $cmd="$cmd $theMin"; }
-// if ($theMin2 != "") { $fileIN = file_get_contents ($theMin2);file_put_contents ($file,$fileIN, FILE_APPEND);$cmd="$cmd $theMin2";}
 
 if ($hour < 12 ){$pm="am";check_gsm_db ("a-m");if($file1){$action = "$action $file1";}} 
 if ($hour >= 12){$pm="pm";check_gsm_db ("p-m");if($file1){$action = "$action $file1";}} 
@@ -309,54 +301,46 @@ check_gsm_db ("weather");if($file1){$action = "$action $file1";}
 
 if ($level >1){
 check_gsm_db ("conditions");if($file1){$action = "$action $file1";}   
+
 $u = explode(" ",$cond1);
-if ($cond1){check_gsm_db ($u[0]);if($file1){$action = "$action $file1";} 
- if (isset ($u[1])){check_gsm_db ($u[1]);if($file1){$action = "$action $file1";}} 
- }
-if ($cond2){
+foreach ($u as $word) {
+ if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
+}
 $u = explode(" ",$cond2);
-check_gsm_db ($u[0]);if($file1){$action = "$action $file1";}
- if (isset ($u[1])){check_gsm_db ($u[1]);if($file1){$action = "$action $file1";}} 
+foreach ($u as $word) {
+ if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
 }
-if ($cond3){
 $u = explode(" ",$cond3);
-check_gsm_db ($u[0]);if($file1){$action = "$action $file1";}
- if (isset ($u[1])){check_gsm_db ($u[1]);if($file1){$action = "$action $file1";}} 
+foreach ($u as $word) {
+ if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
 }
-//$datum   = date('m-d-Y H:i:s');
-//print "$datum conditions:  ($cond1,$cond2,$cond3)
-//";
 
-if ($testNewApi){
-if ($hour >= 18) { check_gsm_db ("tonight");if($file1){$action = "$action $file1";}}
-else{check_gsm_db ("today");if($file1){$action = "$action $file1";}}
 
+
+if ($forcast and $beta){
+if ($shortForcast) {
+$status = "today";
+if ($hour >= 12 and $hour <21) {$status = "evening";}
+
+
+check_gsm_db ($status);if($file1){$action = "$action $file1";}
 
 $shortForcast=strtolower($shortForcast); 
-
 $shortForcast = str_replace('thunderstorms', "thunderstorm", $shortForcast);
 $shortForcast = str_replace('chance', "chance-of", $shortForcast);
 $shortForcast = str_replace('showers', "rain", $shortForcast);
 $shortForcast = str_replace('nws', "national weather service", $shortForcast);
 $shortForcast = str_replace('then', "later", $shortForcast);
- 
-
+$shortForcast = str_replace('slight', "low", $shortForcast);
 $u = explode(" ",$shortForcast);
-if ($shortForcast){
- check_gsm_db ($u[0]);if($file1){$action = "$action $file1";} 
- if (isset ($u[1])){check_gsm_db ($u[1]);if($file1){$action = "$action $file1";}} 
- if (isset ($u[2])){check_gsm_db ($u[2]);if($file1){$action = "$action $file1";}} 
- if (isset ($u[3])){check_gsm_db ($u[3]);if($file1){$action = "$action $file1";}} 
- if (isset ($u[4])){check_gsm_db ($u[4]);if($file1){$action = "$action $file1";}} 
- if (isset ($u[5])){check_gsm_db ($u[5]);if($file1){$action = "$action $file1";}} 
- if (isset ($u[6])){check_gsm_db ($u[6]);if($file1){$action = "$action $file1";}}    
- }
+foreach ($u as $word) {
+ if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
+    }
+   }
+  } // forcast end
+} // if >level 1
 
-}
-
-
-}
-
+if($the_temp) {
 check_gsm_db ("temperature");if($file1){$action = "$action $file1";}
 $oh=false;make_number ($the_temp);
 if($file0){$action = "$action $file0";}
@@ -364,13 +348,16 @@ if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 if($file3){$action = "$action $file3";}
 check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
+}
 
 if($level>2){ // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
+ if($outhumi){
 check_gsm_db ("humidity");if($file1){$action = "$action $file1";}
 $oh=false;make_number ($outhumi);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 check_gsm_db ("percent");if($file1){$action = "$action $file1";}
+}
 
 if($avgwind>1){
 check_gsm_db ("wind");if($file1){$action = "$action $file1";} 
@@ -392,6 +379,7 @@ if($decimal>=1){
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
   }
+ check_gsm_db ("inches");if($file1){$action = "$action $file1";}  
  } 
 } // end of level2
 
@@ -421,14 +409,17 @@ if($u[1]== "20000"){$throttled = "arm-frequency-capping";}
 if($u[1]== "80000"){$throttled = "throttling-has-occurred";}
 if($u[1]== "80000"){$throttled = "soft-temp-limit-occurred";}
 
-
-print "$datum $nodeName Throttled:$throttled code: $u[1] 
+if($throttled){
+$status ="$nodeName $throttled code:$u[1]";save_task_log ($status);print "$datum $status
 ";
+
+}
 $fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 if ($reportAll or $temp >=$hot){
 $vpath ="/var/lib/asterisk/sounds";
 $cmd="";
+check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
 check_gsm_db ($nodeName);if($file1){$action = "$action $file1";} 
 
 list($whole, $decimal) = explode('.', $temp);
@@ -445,6 +436,7 @@ check_gsm_db ("degrees");if($file1){$action = "$action $file1";}
 check_gsm_db ("celsius");if($file1){$action = "$action $file1";} 
 
 if ($temp >=$hot){
+   $status ="CPU HOT $temp";save_task_log ($status);
  if ($temp >=$high){check_gsm_db ("warning");if($file1){$action = "$action $file1";}} 
  else{check_gsm_db ("high");if($file1){$action = "$action $file1";}}
 }
@@ -514,7 +506,10 @@ global $file1,$path;
 $customSound="$path/sounds";
 $file1="";
 if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
-else{print"$customSound/$in.ul not found";}
+else{
+$status ="$customSound/$in.ul not found";save_task_log ($status);print "$datum $status
+";
+}
 }
 
 
@@ -609,46 +604,67 @@ $outhumi  = substr($test, $Lpos+18,$Rpos-$Lpos-18);
  }//start
 }
 
-function watchdog($in){
-global $currentTime,$node;
+function watchdog ($in){
+global $file1,$datum,$soundDbGsm,$node,$datum,$netdown,$action;
+
 // watch the internet
-$file= "/tmp/watchdog.txt";$action="";
+$file= "/tmp/watchdog.txt";
 $counter = file_get_contents($file);
-if ($in <>"ok"){$counter++;}
-else {$counter=0;}
+if ($in <>"ok"){$counter++;$netdown=true;}
+else {$counter=0;$netdown=false;}
 $fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$counter);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 
-if($counter >100){
-$str = exec("ping -c 1 www.google.com");
-if ($result == 0){return;}
-else{
+if($counter >10){
+$status ="WatchDog ---> Network falure $counter";save_task_log ($status);print "$datum $status
+";
+$file1="";$file2="";
 check_gsm_db ("an-error-has-occured");if($file1){$action = "$action $file1";}
-check_gsm_db ("ping");if($file1){$action = "$action $file1";}
+//check_gsm_db ("ping");if($file1){$action = "$action $file1";}
 check_gsm_db ("connection-failed");if($file1){$action = "$action $file1";} 
 // disconnected connection-failed an-error-has-occured
 check_gsm_db ("error-number");if($file1){$action = "$action $file1";}
 $oh=false;make_number ($counter);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
-exec ("sox $action $currentTime",$output,$return_var);
-$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
-if(!$status){$status="OK";}
-// Normaly a reebot would go here. Planning
+
+
 }
 }
 
 
+//
+// $status ="what to log ";save_task_log ($status);print "$datum $status
+//";
+//
+function save_task_log ($status){
+global $path,$error,$datum,$file;
 
+$datum  = date('m-d-Y H:i:s');
+if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
+chdir("$path/logs");
+$file="$path/logs/log.txt";
+$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
+
+// log rotation system
+if (is_readable($file)) {
+   $size= filesize($file);
+   if ($size > 1000){
+    if (file_exists($file2)) {unlink ($file2);}
+    rename ($file, $file2);
+    if (file_exists($file)) {print "error in log rotation";}
+   }
+}
+
+$fileOUT = fopen($file, 'a+') ;
+flock ($fileOUT, LOCK_EX );
+fwrite ($fileOUT, "$datum,$status,,\r\n");
+flock ($fileOUT, LOCK_UN );
+fclose ($fileOUT);
 }
 
 
-function create_node ($file){
-global $file,$path;
-$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
-$line = str_replace('"', "", $line);
-$u= explode("=",$line);
-$node=$u[1];
-$file= "$path/mm-node.txt";
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
-}
+
+
+
+
 ?>
