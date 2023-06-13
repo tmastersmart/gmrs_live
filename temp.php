@@ -82,20 +82,7 @@ else{$phpzone="$phpzone ERROR";}
 $phpVersion= phpversion();
 
 
-// automatic node setup
-$file= "$path/mm-node.txt";
-if(!file_exists($file)){create_node ($file);}
-if(file_exists($file)){
-$fileIN= file($file);
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$u= explode(",",$line);$node=$u[0];
-}
-if (!$node){
-$datum = date('m-d-Y-H:i:s');
-print"$datum Error loading node number $line Place node number in $file 1988,1988,";die;}
-}
+
 
 $ver="v1.6";
 $out="";
@@ -138,8 +125,11 @@ if($u[1]== "80000"){$throttled = "throttling-has-occurred";}
 if($u[1]== "80000"){$throttled = "soft-temp-limit-occurred";}
 
 
-print "$datum $nodeName Status: $throttled code: $u[1] 
+if($throttled){
+$status ="$nodeName $throttled code:$u[1]";save_task_log ($status);
+print "$datum $status 
 ";
+}
 
 $fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
@@ -167,6 +157,7 @@ check_gsm_db ("degrees");if($file1){$action = "$action $file1";}
 check_gsm_db ("celsius");if($file1){$action = "$action $file1";} 
 
 if ($temp >=$hot){
+  $status ="CPU HOT $temp";save_task_log ($status);
  if ($temp >=$high){check_gsm_db ("warning");if($file1){$action = "$action $file1";}} 
  else{check_gsm_db ("high");if($file1){$action = "$action $file1";}}
 }
@@ -236,17 +227,38 @@ global $file1,$path;
 $customSound="$path/sounds";
 $file1="";
 if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
-else{print"$customSound/$in.ul not found";}
+else{
+$status ="$customSound/$in.ul not found";save_task_log ($status);
+print $status;}
 }
 
+ //
+// $status ="what to log ";save_task_log ($status);print "$datum $status
+//";
+//
+function save_task_log ($status){
+global $path,$error,$datum,$file;
 
+$datum  = date('m-d-Y H:i:s');
+if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
+chdir("$path/logs");
+$file="$path/logs/log.txt";
+$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
 
-function create_node ($file){
-global $file,$path;
-$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
-$line = str_replace('"', "", $line);
-$u= explode("=",$line);
-$node=$u[1];
-$file= "$path/mm-node.txt";
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+// log rotation system
+if (is_readable($file)) {
+   $size= filesize($file);
+   if ($size > 1000){
+    if (file_exists($file2)) {unlink ($file2);}
+    rename ($file, $file2);
+    if (file_exists($file)) {print "error in log rotation";}
+   }
 }
+
+$fileOUT = fopen($file, 'a+') ;
+flock ($fileOUT, LOCK_EX );
+fwrite ($fileOUT, "$datum,$status,,\r\n");
+flock ($fileOUT, LOCK_UN );
+fclose ($fileOUT);
+}
+?>
