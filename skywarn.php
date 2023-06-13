@@ -33,13 +33,6 @@
 // a total rewrite allows me to control how my node works. I wrote this for myself but am releaseing it to other GMRS users.
 // This is ground up written from scratch php using
 //
-//NWS notice
-//NWS CAP v1.1 is being terminated. NWS CAP users should instead use CAP v1.2. Please see Service Change Notice
-//(SCN) 17-35 for information about termination. See the NWS Common Alerting Protocol page for NWS sources of 
-//CAP v1.2 and updated documentation. An updated SCN will be released in the second half of 2022 with the 
-//projected termination date.
-//
-//
 // Notice this is only as reliable as the https://alerts.weather.gov server which goes down from time to time & your node.
 // Not responiable for any failed reports use as is at your own risk.
 //
@@ -47,9 +40,7 @@
 
 $path      ="/etc/asterisk/local/mm-software";
 $xml       ="/tmp/skywarn.xml";
-
 $outTmp    ="/tmp/skywarn.wav";
-
 
 //compatibality , after a reboot the path needs resetting 
 $path1="/tmp/AUTOSKY";$path2="/tmp/AUTOSKY/WXA";
@@ -60,7 +51,7 @@ if(!is_dir($path2)){ mkdir($path2, 0755);}
 
 $ver= "v1.3";
 
-$testNewApi=false; // Future use. Still testing. This is for the NWS new system.
+
   
 include ("$path/config.php");
 include ("$path/sound_db.php");
@@ -83,23 +74,6 @@ date_default_timezone_set(TIMEZONE);
 $phpzone = date_default_timezone_get(); // test it 
 if ($phpzone == $zone ){$phpzone="$phpzone set";}
 else{$phpzone="$phpzone ERROR";}
-
-// automatic node setup
-$file= "$path/mm-node.txt";
-if(!file_exists($file)){create_node ($file);}
-if(file_exists($file)){
-$fileIN= file($file);
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$u= explode(",",$line);$node=$u[0];
-}
-if (!$node){
-$datum = date('m-d-Y-H:i:s');
-print"$datum Error loading node number $line Place node number in $file 1988,1988,";die;}
-}
-
-
 
 
 
@@ -155,7 +129,7 @@ if(!file_exists($file)){print "ERROR missing $file";unset ($soundDbWav);die;}
 $clear=false;$test = read_cap($file);
 if (!$data_good){
 $status="data bad";if($poll_time>=10){$status="timeout";}
-$datum  = date('m-d-Y H:i:s');
+$status ="Acuweather ($status)";save_task_log ($status);
 print "<$status>$poll_time Sec. (data bad)
 ===================================================
 ";
@@ -165,9 +139,8 @@ unset ($soundDbWav);die;
 print "<ok>$poll_time Sec. 
 "; 
 
-if ($testNewApi){include("$path/forcast.php");}
 
-
+if ($forcast and $beta){include("$path/forcast.php");}
 
 
 
@@ -213,6 +186,13 @@ $pos = strpos($warn3, $test);if($pos){$warn3="";}
 $pos = strpos($warn4, $test);if($pos){$warn4="";}
 }
 
+// atempt to decode statements
+//$test="Statement";
+//$pos = strpos($warn1, $test);if($pos){
+//$test="Thunderstorm";
+// $pos = strpos($summary1, $test);if($pos){$warn1="Severe Thunderstorm Warning";}
+//}
+
 // we have a CAP now process it
 $newAlert="[";
 if($warn1){print "$datum $warn1  
@@ -234,6 +214,7 @@ $test = file_get_contents($alertTxt);
 ";
 unset ($soundDbWav);die; 
  }
+ $status = $newAlert;save_task_log ($status);
  print "$datum Change detected 
 "; 
 }
@@ -447,9 +428,10 @@ check_wav_db  ("strong click");                if($file1){$action = "$action $fi
 check_wav_db  ("clear");                       if($file1){$action = "$action $file1";}
 check_wav_db  ("star dull");                   if($file1){$action = "$action $file1";}
 exec ("sox $action $outTmp",$output,$return_var);
-$datum   = date('m-d-Y H:i:s');
-print "$datum Playing all clear $file
+
+$status ="Playing all clear $file";save_task_log ($status);print "$datum $status
 ";
+
 $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/skywarn'",$output,$return_var);
 if(!$status){$status="OK";}
 }
@@ -466,14 +448,35 @@ print "$datum tail file reset to silence. $tailfile
 
 }
 
+ //
+// $status ="what to log ";save_task_log ($status);print "$datum $status
+//";
+//
+function save_task_log ($status){
+global $path,$error,$datum,$file;
 
-function create_node ($file){
-global $file,$path;
-$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
-$line = str_replace('"', "", $line);
-$u= explode("=",$line);
-$node=$u[1];
-$file= "$path/mm-node.txt";
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+$datum  = date('m-d-Y H:i:s');
+if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
+chdir("$path/logs");
+$file="$path/logs/log.txt";
+$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
+
+// log rotation system
+if (is_readable($file)) {
+   $size= filesize($file);
+   if ($size > 1000){
+    if (file_exists($file2)) {unlink ($file2);}
+    rename ($file, $file2);
+    if (file_exists($file)) {print "error in log rotation";}
+   }
 }
+
+$fileOUT = fopen($file, 'a+') ;
+flock ($fileOUT, LOCK_EX );
+fwrite ($fileOUT, "$datum,$status,,\r\n");
+flock ($fileOUT, LOCK_UN );
+fclose ($fileOUT);
+}
+
+
 ?>
