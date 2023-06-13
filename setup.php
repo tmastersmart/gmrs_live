@@ -371,7 +371,7 @@ $stripe
  6) CPU Temp setup  HiTemp[$high]  Hot[$hot] All temps[$displayReport]
  7) Node   Auto:[$AutoNode]  Node:[$node]
  8) Forcast [$displayForcast] 
- 9) Bata features [$displayBeta]
+ 9) Beta features [$displayBeta]
  W) Write to file.
  M) Main menu
  E) Exit  
