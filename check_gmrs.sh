@@ -7,9 +7,10 @@
       echo -e "\n\t\e[1mGMRS LIVE\e[0m\n"
 declare -a domain_array=(
         "localhost"
-		"gmrslive.com"
+		"www.texasgmrs.net"
         "www.gmrslive.com"  
         "700.node.gmrslive.com"
+        "1195.node.gmrslive.com"
         "register.gmrslive.com"
 		"google.com"
                )
@@ -78,7 +79,7 @@ do
 	fi
 done    
 # The register server cant be pinged so check port 80      
-    echo -e "\t\e[1mchecking port 80 is open on the register server\e[0m\n"    
+    echo -e "\t\e[1mchecking port 80 is open \e[0m\n"    
     if nc -z -v  register.gmrslive.com 80 >/dev/null 2>&1; then
     echo  -e "\t[register.gmrslive.com port:80 OK]"
     else
@@ -86,7 +87,13 @@ done
 		bad=$((bad + 1)) 
 	fi 
    
-
+ 
+    if nc -z -v  1195.node.gmrslive.com 80 >/dev/null 2>&1; then
+    echo  -e "\t[1195.node.gmrslive.com port:80 OK]"
+    else
+   		echo -e "\t$domain is not reachable"
+		bad=$((bad + 1)) 
+	fi 
 
 if [[ $bad > 0 ]]
     then
@@ -123,5 +130,4 @@ Server_DOMAIN=`dig +short -x $Server_IP`
 
 echo  "Node - $NODE at IP address- $IP, Port- $PORT is $REGISTERED at Server"
 echo "IP- $Server_IP ("$Server_DOMAIN"), Port- $Server_PORT"
-echo
 done
