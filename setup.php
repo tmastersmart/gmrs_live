@@ -492,14 +492,14 @@ start("start");
 }
 
 function create_node ($file){
-global $datum,$file,$path;
+global $AutoNode,$datum,$file,$path;
 // phase 1 import node
 $line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
 $line = str_replace('"', "", $line);
 $u= explode("=",$line);
-$node=$u[1];
-$file= "$path/mm-node.txt"; $status ="Autoset node to $node";save_task_log ($status);
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+$AutoNode=$u[1];
+$file= "$path/mm-node.txt"; $status ="Autoset node to $AutoNode";save_task_log ($status);
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$AutoNode, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 
 // phase 2 import skywarn settings 
