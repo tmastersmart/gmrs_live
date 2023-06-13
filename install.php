@@ -109,7 +109,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "config.php,setup.php,forcast.php,temp.php,skywarn.php,weather_pws.php,sound_db.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
+$files = "supermon.txt,config.php,setup.php,forcast.php,temp.php,skywarn.php,weather_pws.php,sound_db.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
 
 
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
