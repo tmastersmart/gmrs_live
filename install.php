@@ -15,21 +15,10 @@
 //
 // -------------------------------------------------------------
 
-// PHP is in UTC Get in sync with the PI
-$line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
-$line = str_replace(" ", "", $line);
-$pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
-if ($pos1){  $zone   = substr($line, $pos1+1, $pos2-$pos1-1); }
-else {$zone="America/Chicago";}
-define('TIMEZONE', $zone);
-date_default_timezone_set(TIMEZONE);
-$phpzone = date_default_timezone_get(); // test it 
-if ($phpzone == $zone ){$phpzone="$phpzone set";}
-else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
-
-$ver="v1.4";
+$path= "/etc/asterisk/local/mm-software";
+$ver="v1.5";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -39,7 +28,7 @@ print "
  | |__| | |  | | | \ \ ____) | | | | | \__ \ || (_| | | |  __/ |   
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
-PHP $phpVersion 
+PHP:$phpVersion  Installer:$ver
 ============================================================
 = Welcome                                                  =
 =                                                          =
@@ -47,11 +36,15 @@ PHP $phpVersion
 = sound files.                                             =
 =                                                          =
 ============================================================
+Software will be installed to $path
+
+ i) install
+ Any other key to abort 
 ";
-$a = readline('Press Enter to start the installer: ');
+$a = readline('Enter your command: ');
 
+if ($a=="i"){
 
-$path= "/etc/asterisk/local/mm-software";
 
 installa($out);
 // automatic node setup
@@ -67,7 +60,7 @@ print "
 ===================================================
 Custom installer $ver Finished 
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
-$phpzone PHP v$phpVersion
+
 ===================================================
 
 Software Made in loUiSiAna
@@ -75,15 +68,20 @@ Software Made in loUiSiAna
 
 Thank you for downloading........... And have Many nice days
 
+Software was installed to $path
+
 type
 
-cd mm-software
+cd $path
 
 php setup.php
+
 ";
 include ("$path/setup.php");
-
-
+}
+else {print "
+Aborted  Type 'php install.php' to try again
+";}
 
 function installa($in){
 
@@ -98,8 +96,7 @@ if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2);
 $repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds";
 $datum = date('m-d-Y-H:i:s');
-print"
-$datum Install sounds
+print"$datum Install sounds
 ";
 
 foreach($u as $file) {
@@ -117,8 +114,7 @@ $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
 chdir($path);
 $datum = date('m-d-Y-H:i:s');
-print"
-$datum Installing scripts
+print"$datum Installing scripts
 ";
 $u = explode(",",$files);
 foreach($u as $file) {
