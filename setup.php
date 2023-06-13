@@ -2,7 +2,7 @@
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
-// Config program
+// Setup program
 //
 // -------------------------------------------------------------
 
@@ -31,46 +31,39 @@ $fileIN= file($file);
 foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
-$u= explode(",",$line);$node=$u[0];
+$u= explode(",",$line);$AutoNode=$u[0];
 }
-if (!$node){
+if (!$AutoNode){
 $datum = date('m-d-Y-H:i:s');
-print"$datum Error loading node number";die;}
+print"$datum Error loading node number";}
 }
 $stripe="============================================================";
 start("start");
 
 function start($in){
-global $stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
+global $AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
 
 global  $phpzone,$phpVersion; 
   load($in);
 print "
-
-    ___             __ _       
-  / __\___  _ __  / _(_) __ _ 
- / /  / _ \| '_ \| |_| |/ _` |
-/ /__| (_) | | | |  _| | (_| |
-\____/\___/|_| |_|_| |_|\__, |
-                        |___/           
-
 
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 $phpzone PHP v$phpVersion
 $stripe
 Welcome 
   
- Config program will set up the program 
+ Setup.php  program 
           
- 1) Edit Setup 
- 2) 
- 3) Upgrade
- 
+ 1) Edit Setup
+ 2) check if registered and ping everyone
+ 3) Speedtest
+ D) View the Docs
+ U) Upgrade (get the latest version)
  E) Exit  
 $stripe
 ";
 
-//$a = readline('1 2 3 :>');
+
 
 
 $stdin = fopen('php://stdin', 'r');
@@ -79,35 +72,69 @@ $yes   = false;
 while (!$yes)
 {
     $datum = date('m-d-Y-H:i:s');
-	print "$datum Enter :_";
+	print "$datum Enter 1-2 E:_";
 	$input = trim(fgets($stdin));
     if ($input == '1'){edit("edit");}
-//    if ($input == '2'){exit;}
-//   	if ($input == '3'){install($out);} 
-//    if ($input == '4'){exit('EXIT');}
+    if ($input == '2'){ping("ping");}
+    if ($input == '3'){speedtest("speed");}
+    if ($input == 'd'){doc("view");}     
+   	if ($input == 'u'){install($out);} 
 	if ($input == 'e'){quit('EXIT');}
+    if ($input == ''){quit('EXIT');}
 }
 }
 
+function ping($in){
+  global $stripe,$path;
+  print "
+$stripe  
+Please wait for checks to run.......
+Be aware that the register server does not answer to ping
+";
+  exec("sudo bash check_gmrs.sh >$path/ping.txt",$output,$return_var);
+  
+  $out = file_get_contents("$path/ping.txt");
+  print "$out
+  ";
+  
+ 
+}
 
+function speedtest($in){
+  global $stripe,$path;
+  print "
+$stripe  
+Please wait for speedtest to run.......
+Its slow, to run from command line type
+speedtest-cli
+
+";
+  exec("speedtest-cli >$path/ping.txt",$output,$return_var);
+  
+$out = file_get_contents("$path/ping.txt");
+print "$out
+ ";
+  
+ 
+}
 function quit($in){
-
+global $path,$stripe;
+$path= "/etc/asterisk/local/mm-software";
+//if(file_exists("$path/ping.txt")){unlink "$path/ping.txt";}
 print "
 $stripe
-Thank you for downloading.........
+Thank you for downloading.........Made in Louisiana
 
 
 
 * SLMR v2.1 * Have many nice days.
-";
+* ";
 die;
 }
 
-function guidedSetup($in){
-global $node,$path;
-}
+
 function edit($in){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
 
 editmenu();
 
@@ -118,7 +145,7 @@ $yes   = false;
 while (!$yes)
 {
     $datum = date('m-d-Y-H:i:s');
-	print "$datum Enter :_";
+	print "$datum Enter 1-7 M E:_";
 	$input = trim(fgets($stdin));
     if ($input == '1'){madis($station);}
     if ($input == '2'){level($level);}
@@ -126,6 +153,9 @@ while (!$yes)
     if ($input == '4'){warn($zipcode);}
     if ($input == '5'){location($lon);}
     if ($input == '6'){cpu($hot);}
+    if ($input == '7'){setnode($node);}
+    if ($input == '8'){forcast("set");}
+    if ($input == '9'){beta("set");}
     if ($input == 'm'){start("start");}
     if ($input == 'w'){save("save");}
 	if ($input == 'e'){quit('EXIT');}
@@ -133,8 +163,58 @@ while (!$yes)
 
 }
 
+function forcast($in){
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+$displayForcast="false";$displayBeta="false";
+if ($forcast) {    $displayForcast  ="true";}
+if ($beta){        $displayBeta     ="true";}
+print "
+NWS forcast will be played after time if set. Forcast is set to $displayForcast
+(this is still in beta)
+";
+$line = readline("Set to t/f: ");
+if ($line=="t"){$forcast=true;}
+if ($line=="f"){$forcast=false;}
+editmenu();
+}
+
+
+
+function beta($in){
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+$displayForcast="false";$displayBeta="false";
+if ($forcast) {    $displayForcast  ="true";}
+if ($beta){        $displayBeta     ="true";}
+print "
+Beta features are still being tested and may have problems.
+Beta is set to $displayBeta
+";
+$line = readline("Set to t/f: ");
+if ($line=="t"){$beta=true;}
+if ($line=="f"){$beta=false;}
+editmenu();
+}
+
+
+
+function setnode($station){
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
+print "
+Node1 is auto detected on install if you need to change this you can do so here
+
+AutoDetect node:$AutoNode Node set to $node:
+
+";
+$line = readline("Node $node: ");
+if($line){$node=$line;}
+editmenu();
+
+}
+
+
 function madis($station){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 $displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
 print "
 find your local MADIS station at 
@@ -148,7 +228,7 @@ $station = $line;
 editmenu();
 }
 function level($level){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 $displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
 print "
 When the time and temp runs how much detal do you want?
@@ -163,7 +243,7 @@ editmenu();
 }
 
 function zip($level){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 $displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
 print "
  Acuweather gives us conditions, It needs a zipcode [$zipcode] 
@@ -174,7 +254,7 @@ editmenu();
 }
 
 function cpu($level){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 $displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
 if ($reportAll)   {$displayReport   ="true";}
 print "
@@ -197,7 +277,7 @@ editmenu();
 }
 
 function location($in){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 
 print "
  Location for new NWS api  [$lat]/[$lon] 
@@ -210,8 +290,27 @@ $lon = $line;
 
 editmenu();
 }
+
+function doc($in){
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$stripe;
+$i=0;
+$file="$path/readme.txt";
+print "
+ Loading the readme.txt file
+";
+$fileIN= file($file);
+foreach($fileIN as $line){
+print $line; $i++ ;
+if ($i >42){$line = readline("Hit return to Cont: ");$i=0;print "$stripe
+";}
+}
+
+$line = readline("Hit return to Cont: ");
+start("start");
+}
+
 function warn($skywarn){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 $displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false"; 
 if ($sayWatch)    {$displayWatch =   "true";}
 if ($sayWarn)     {$displayWarn     ="true";}
@@ -250,15 +349,17 @@ editmenu();
 
 
 function editmenu(){
-global $stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
-$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";
+global $forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; $displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";
 if ($sayWatch)    {$displayWatch =   "true";}
 if ($sayWarn)     {$displayWarn     ="true";}
 if ($sayAdvisory) {$displayAdvisory ="true";}
 if ($sayStatement){$displayStatement="true";}
-
+if ($forcast) {    $displayForcast  ="true";}
+if ($beta){        $displayBeta     ="true";}
 if ($reportAll)   {$displayReport   ="true";}
 print"
+
 $stripe
  Setup editor.   Last write date:$saveDate
       
@@ -268,7 +369,9 @@ $stripe
  4) Skywarn [$skywarn] SayWatch:$displayWatch SayAdvisory:$displayAdvisory SayStatement:$displayStatement 
  5) Location Lat:[$lat]/Lon:[$lon] for NWS
  6) CPU Temp setup  HiTemp[$high]  Hot[$hot] All temps[$displayReport]
-
+ 7) Node   Auto:[$AutoNode]  Node:[$node]
+ 8) Forcast [$displayForcast] 
+ 9) Bata features [$displayBeta]
  W) Write to file.
  M) Main menu
  E) Exit  
@@ -280,18 +383,18 @@ $stripe
 }
 
 function load($in){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
+global $datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
 
-// read setup file  30 data points
+
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
-   $datum = date('m-d-Y-H:i:s');
-print "$datum Loading settings
-";
+//$datum = date('m-d-Y-H:i:s');
+//print "$datum Loading settings
+//";
    foreach($fileIN as $line){
     $u = explode(",",$line);
 //            $path =  $u[0];
-//           $node  =  $u[1];
+             $node  =  $u[1];
           $station  =  $u[2];
              $level =  $u[3];
          $zipcode   =  $u[4];
@@ -303,52 +406,48 @@ print "$datum Loading settings
        $sayAdvisory = $u[10];
       $sayStatement = $u[11];
         $testNewApi = $u[12];
-
               $high = $u[13]; 
                $hot = $u[14];
           $nodeName = $u[15];
-        $reportAll  = $u[16];
-        $saveDate   = $u[17];
+         $reportAll = $u[16];
+          $saveDate = $u[17];
+           $forcast = $u[18];
+              $beta = $u[19];
     }
 }
+
+
+
 else {
 // set default
-$datum = date('m-d-Y-H:i:s');
-print "$datum Building default settings
+$status ="Building default settings";save_task_log ($status);
+print "$datum $status
 ";
-$reportAll = false;
-$nodeName = "server";
-$high = 60;
-$hot  = 50;
-$station="KIER";
-$level = 3 ;
-$zipcode="71432";
-$skywarn    ="LAC043";
-$lat ="31.7669"; $lon="-92.3888";
-$sayWarn=true;
-$sayWatch=true;
-$sayAdvisory=true;
-$sayStatement =true;
+
+$reportAll = false;$nodeName = "server";$high = 60;$hot  = 50;
+$station="KIER";$level = 3 ;
+$zipcode="71432"; $skywarn ="LAC043"; $lat ="31.7669"; $lon="-92.3888";
+$sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;$node = $AutoNode;$forcast= false;$beta = false;
 save ("save");
 }
 }
 
 
 function save($in){
-global $path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
+global $datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
 $fileOUT = fopen("$path/setup.txt", "w");
-   $datum = date('m-d-Y-H:i:s');
-print "$datum Writing settings
+$status ="Writing settings";save_task_log ($status);
+print "$datum $status
 ";
-fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$datum,,,,,,");
+fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,,,,,,");
 fclose ($fileOUT);
 }
 
 
 function install($in){
-
+global $datum,$file,$path;
 $files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
-$path  = "/etc/asterisk/local/mm-software";// moved to special dir for dist.
+$path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
 $u = explode(",",$files);
@@ -359,7 +458,7 @@ chdir($path2);
 $repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds";
 $datum = date('m-d-Y-H:i:s');
 print"
-$datum Install sounds
+$datum Checking for missing sounds
 ";
 
 foreach($u as $file) {
@@ -370,32 +469,36 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "config.php,temp.php,weather_pws.php,check_gmrs.sh,sound_wav_db.csv,sound_gsm_db.csv,skywarn.php";
+$files = "config.php,setup.php,forcast.php,temp.php,skywarn.php,weather_pws.php,sound_db.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
 chdir($path);
-$datum = date('m-d-Y-H:i:s');
+$status ="Reinstalling scripts to current version";save_task_log ($status);
 print"
-$datum Installing scripts
+$datum $status
 ";
 $u = explode(",",$files);
 foreach($u as $file) {
-if (!file_exists("$path/$file")){ 
+//if (!file_exists("$path/$file")){  // just reinstall them all. 
    print "sudo wget $repo2/$file
    "; 
  exec("sudo wget $repo2/$file ",$output,$return_var);
    }
-   }
+ exec("sudo chmod +x *.php",$output,$return_var);
+ 
+
+
+start("start");
 }
 
 function create_node ($file){
-global $file,$path;
+global $datum,$file,$path;
 // phase 1 import node
 $line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
 $line = str_replace('"', "", $line);
 $u= explode("=",$line);
 $node=$u[1];
-$file= "$path/mm-node.txt";
+$file= "$path/mm-node.txt"; $status ="Autoset node to $node";save_task_log ($status);
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 
@@ -404,4 +507,34 @@ $file="/usr/local/bin/AUTOSKY/AutoSky.ini";
 $file2="$path/autosky_import.ini";
 copy($file, $file2);
 
+}
+
+ //
+// $status ="what to log ";save_task_log ($status);print "$datum $status
+//";
+//
+function save_task_log ($status){
+global $path,$error,$datum,$file;
+
+$datum  = date('m-d-Y H:i:s');
+if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
+chdir("$path/logs");
+$file="$path/logs/log.txt";
+$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
+
+// log rotation system
+if (is_readable($file)) {
+   $size= filesize($file);
+   if ($size > 1000){
+    if (file_exists($file2)) {unlink ($file2);}
+    rename ($file, $file2);
+    if (file_exists($file)) {print "error in log rotation";}
+   }
+}
+
+$fileOUT = fopen($file, 'a+') ;
+flock ($fileOUT, LOCK_EX );
+fwrite ($fileOUT, "$datum,$status,,\r\n");
+flock ($fileOUT, LOCK_UN );
+fclose ($fileOUT);
 }
