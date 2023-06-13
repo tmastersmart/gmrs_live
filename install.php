@@ -29,7 +29,7 @@ else{$phpzone="$phpzone ERROR";}
 
 $phpVersion= phpversion();
 
-$ver="v1.3";
+$ver="v1.4";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -62,6 +62,8 @@ create_node ($file);
 
 
 
+
+
 print "
 ===================================================
 Custom installer $ver Finished 
@@ -69,18 +71,14 @@ Custom installer $ver Finished
 $phpzone PHP v$phpVersion
 ===================================================
 
-This installer will not update yet. You need to check for updates manualy
+Software Made in loUiSiAna
 
-
-update the config.php file
-
-cd mm-software
- 
-nano config.php
-
-and set your local weather station see instructions in file.
 
 Thank you for downloading........... And have Many nice days
+
+type
+
+php config.php
 ";
 
 
@@ -89,7 +87,7 @@ Thank you for downloading........... And have Many nice days
 function install($in){
 
 $files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
-$path  = "/etc/asterisk/local/mm-software";// moved to special dir for dist.
+$path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
 $u = explode(",",$files);
@@ -111,7 +109,9 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "config.php,forcast.php,temp.php,weather_pws.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,skywarn.php";
+$files = "config.php,setup.php,forcast.php,temp.php,skywarn.php,weather_pws.php,sound_db.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
+
+
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
 chdir($path);
@@ -127,6 +127,7 @@ if (!file_exists("$path/$file")){
  exec("sudo wget $repo2/$file ",$output,$return_var);
    }
    }
+  exec("sudo chmod +x *.php",$output,$return_var);  
 }
 
 function create_node ($file){
