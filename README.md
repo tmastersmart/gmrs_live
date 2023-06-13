@@ -16,9 +16,9 @@ php install.php
 ch /etc/asterisk/local/mm-software
 
 
-test the temp monitor 
+load the setup program
+php setup.php
 
-php temp.php 
 
 you can now add it to cron
 
@@ -45,9 +45,7 @@ https://madis-data.ncep.noaa.gov
 
 https://aprs.fi/ These are aprs stations but you cant use station numbers from this map.
 
-Once you have a station id edit the file
-
-nano config.php  
+  
 
 add your station ID. Select how much data you want only temp or temp hum rain wind. 
 The temp data is more accurate than the stock script which does not allow you to pick the station.
@@ -72,7 +70,7 @@ I have my cron setup like this.
 
 the weather_pws.php has the temp warning built into it.
 
-
+super mon. Read supermon.txt file you need to change some code.
 
 
 Aditional scripts not in the installer
