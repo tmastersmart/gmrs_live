@@ -83,19 +83,22 @@ $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($cur
 $vpath="/var/lib/asterisk/sounds";
 $error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.1";  
+$ver= "v2.2";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by pws.winnfreenet.com
 // You are authorised to use for this script only. 
 $token = "473c0a7b78d24dc99c182f78619d0090";
 //DO NOT COPY!!! Get your own
+$datum   = date('m-d-Y H:i:s');
+$gmdatum = gmdate('m-d-Y H:i:s');
 print "
 ===================================================
 mesowest, madis, APRSWXNET(CWOP) $ver
 (c)2013/2023 WRXB288 LAGMRS.com all rights reserved
-$phpzone PHP v$phpVersion NODE:$node
+$phpzone PHP v$phpVersion
 ===================================================
+$datum Node:$node UTC:$gmdatum
 ";
 
 // read the station
@@ -140,13 +143,13 @@ $time= gmdate('Hi');
 $dayUTC = gmdate('d');
 $testMin = $min - $CurrTimeMi;
 if ($testMin < 0) {$testMin = $testMin+60;}
-if ($testMin > $min){print "($testMin Mins Old) last hr $timeReading";$data_good = false;}
+//if ($testMin > $min){print "($testMin Mins Old) $timeReading";$data_good = false;}
 if ($CurrTimeD < $day ){print "Wrong day. $CurrTimeD < $day :$dateReading";$data_good=false;}
 if ($CurrTimeY <> $year){print "Wrong year. $dateReading";$data_good=false;}
-if ($testMin > 30){$error= "($testMin Mins Old) $timeReading";$data_good = false; }
+if ($testMin > 40){print "($testMin Mins Old) $timeReading";$data_good = false; }
 if($data_good){
 $validTemp = true;
-print "<ok> $CurrTime $poll_time Sec. 
+print "<ok> UTC:$CurrTime $poll_time Sec. 
 ";
  $action = watchdog ("ok");
  }
