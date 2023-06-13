@@ -46,7 +46,6 @@ PHP $phpVersion
 = This installer will install all the php programs and     =
 = sound files.                                             =
 =                                                          =
-= When finished you will have to edit the config.php file  =
 ============================================================
 ";
 $a = readline('Press Enter to start the installer: ');
@@ -54,10 +53,10 @@ $a = readline('Press Enter to start the installer: ');
 
 $path= "/etc/asterisk/local/mm-software";
 
-install($out);
+installa($out);
 // automatic node setup
 $file= "$path/mm-node.txt";
-create_node ($file);
+create_nodea ($file);
 
 
 
@@ -78,13 +77,15 @@ Thank you for downloading........... And have Many nice days
 
 type
 
-php config.php
+cd mm-software
+
+php setup.php
 ";
+include ("$path/setup.php");
 
 
 
-
-function install($in){
+function installa($in){
 
 $files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";
@@ -130,7 +131,7 @@ if (!file_exists("$path/$file")){
   exec("sudo chmod +x *.php",$output,$return_var);  
 }
 
-function create_node ($file){
+function create_nodea ($file){
 global $file,$path;
 // phase 1 import node
 $line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
