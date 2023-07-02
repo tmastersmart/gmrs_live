@@ -1,4 +1,4 @@
-# gmrslive.com Time Temp Weather Replacement PROGRAM
+# gmrslive.com Time Temp Weather Replacement PROGRAM v2
 
 This software replaces the time and temp scripts and the warning scripts.
 It upgrades them to the new weather service servers with the new API. 
