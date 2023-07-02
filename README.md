@@ -1,7 +1,11 @@
-# gmrslive.com Time Temp Weather PROGRAM
+# gmrslive.com Time Temp Weather Replacement PROGRAM
 
 This software replaces the time and temp scripts and the warning scripts.
-It upgrades them to the new weather service servers with the new API. It also adds detection for cpu temp and more.
+It upgrades them to the new weather service servers with the new API. 
+It also adds detection for cpu temp and more.
+Written from scratch in PHP no shell scripts.
+
+This software uses a NWS licensed API code 
 
 download the installer.
 
