@@ -59,14 +59,13 @@
 //https://github.com/Howchoo/pi-fan-controller/blob/master/fancontrol.py 
 //and run it at load time.  /etc/rc.local
 //
+$mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_start = $mtime;
 
 $path="/etc/asterisk/local/mm-software";
-include ("$path/config.php");
+include ("$path/load.php");
 include ("$path/sound_db.php");
-$file="$path/sound_gsm_db.csv";
-$soundDbWav ="";
-$soundDbGsm = file($file);
-$soundDbUlaw="";
+
+
 
 // PHP is in UTC Get in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
@@ -84,11 +83,11 @@ $phpVersion= phpversion();
 
 
 
-$ver="v1.6";
+$ver="v1.8";
 $out="";
 print "===================================================
 ";
-print " PI temp Monitor $ver Node:$node
+print " PI temp Monitor  $coreVersion-t$ver 
 "; 
 print "(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ";
@@ -133,15 +132,14 @@ print "$datum $status
 
 $fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
-if (!$reportAll and $temp <=$hot){die;}
-
-$vpath ="/var/lib/asterisk/sounds";
-
-$cpufile="/tmp/cpu.gsm";$file=$cpufile;
-$cmd=""; 
-if(file_exists($file)){unlink($file);}
+if (!$reportAll and $temp <=$hot){line_end("NORMAL Temp.");}
+$cmd=""; $action="";
+$cpufile="/tmp/cpu.gsm";$file=$cpufile;if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
-check_gsm_db ($nodeName);if($file1){$action = $file1;} 
+
+check_wav_db("star dull");if($file1){$action = "$action $file1";}
+
+check_gsm_db ($nodeName);if($file1){$action = "$action $file1";} 
 
 list($whole, $decimal) = explode('.', $temp);
 $oh=false;make_number ($whole);
@@ -161,104 +159,25 @@ if ($temp >=$hot){
  if ($temp >=$high){check_gsm_db ("warning");if($file1){$action = "$action $file1";}} 
  else{check_gsm_db ("high");if($file1){$action = "$action $file1";}}
 }
+if ($throttled){check_ulaw_db ($throttled);if($file1){$action = "$action $file1";}  }
+check_wav_db("star dull");if($file1){$action = "$action $file1";}
 
 $datum   = date('m-d-Y H:i:s');
 print "$datum Playing file $cpufile 
 ";
+
+
+
+
+
 exec ("sox $action $cpufile",$output,$return_var);
 $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/cpu'",$output,$return_var);
-if(!$status){$status="OK";}
 
-// These sounds are ul and can not be stacked into the gsm
-// on a busy system the file may play before or overlay the above.
-
-
-if ($throttled){
-$file="/tmp/throttled.ul";
-$datum   = date('m-d-Y H:i:s');
-print "$datum Playing file $file
-";
-check_name_cust ($throttled);
-  if ($file1){ 
-  $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/throttled'",$output,$return_var);
-  }
-}
-
-
-if(!$status){$status="OK";}
-
-
-$datum = date('m-d-Y-H:i:s');
-print "$datum finished  $status $return_var
-===================================================
-";
-unset ($soundDbGsm);die;
-
-// v1 modules 
-//
-
-function make_number ($in){
-global $vpath,$file0,$file1,$file2,$file3,$negative,$oh;
-// Speak all possible numbers
-// PHP Number matrix
-
-$file0 = "";$file1 = "";$file2 = "";$file3 = "";$negative="";
-if ($in <0 ){$negative = "$vpath/digits/minus.gsm";}
-$in = abs($in);
-$in = round($in);
-if ($oh){if ($in<10) {    $file1  = "$vpath/digits/oh.gsm";}}
-if ($in >= 100){          $file3  = "$vpath/digits/hundred.gsm"; $in = ($in -100); }
-if ($in>=20 and $in<30  ){$file1  = "$vpath/digits/20.gsm";$in=$in-20;} 
-if ($in>=30 and $in<40  ){$file1  = "$vpath/digits/30.gsm";$in=$in-30;}
-if ($in>=40 and $in<50  ){$file1  = "$vpath/digits/40.gsm";$in=$in-40;} 
-if ($in>=50 and $in<60  ){$file1  = "$vpath/digits/50.gsm";$in=$in-50;}
-if ($in>=60 and $in<70  ){$file1  = "$vpath/digits/60.gsm";$in=$in-60;} 
-if ($in>=70 and $in<80  ){$file1  = "$vpath/digits/70.gsm";$in=$in-70;}
-if ($in>=80 and $in<90  ){$file1  = "$vpath/digits/80.gsm";$in=$in-80;} 
-if ($in>=90 and $in<100 ){$file1  = "$vpath/digits/90.gsm";$in=$in-90;}
-
-if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}           
-}
+line_end("Finished");
 
 
 
-function check_name_cust ($in){
-global $file1,$path;
-$customSound="$path/sounds";
-$file1="";
-if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
-else{
-$status ="$customSound/$in.ul not found";save_task_log ($status);
-print $status;}
-}
 
- //
-// $status ="what to log ";save_task_log ($status);print "$datum $status
-//";
-//
-function save_task_log ($status){
-global $path,$error,$datum,$file;
 
-$datum  = date('m-d-Y H:i:s');
-if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
-chdir("$path/logs");
-$file="$path/logs/log.txt";
-$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
 
-// log rotation system
-if (is_readable($file)) {
-   $size= filesize($file);
-   if ($size > 1000){
-    if (file_exists($file2)) {unlink ($file2);}
-    rename ($file, $file2);
-    if (file_exists($file)) {print "error in log rotation";}
-   }
-}
-
-$fileOUT = fopen($file, 'a+') ;
-flock ($fileOUT, LOCK_EX );
-fwrite ($fileOUT, "$datum,$status,,\r\n");
-flock ($fileOUT, LOCK_UN );
-fclose ($fileOUT);
-}
 ?>
