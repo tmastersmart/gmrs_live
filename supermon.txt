@@ -10,10 +10,8 @@ if (isset($LOCALZIP)) {
 and replace all that with this code
 
 
-if (file_exists("/tmp/conditions.txt")) {
-    if (filesize("/tmp/conditions.txt")) {
-        $WX = file_get_contents ("/tmp/conditions.txt");
-    print "<p style=\"margin-top:0px;\">[ Local Weather conditions: ";
-    print "<span style=\"margin-top:0px; background-color: GAINSBORO;\">&nbsp;$WX&nbsp;</span> ]";
-    }
-}
+include ("/etc/asterisk/local/mm-software/supermon_weather.php");
+
+
+
+This will be added to the installer in later versions. 
