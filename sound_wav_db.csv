@@ -41,6 +41,7 @@
 /usr/local/bin/AUTOSKY/SOUNDS/asn41,Wind Advisory,
 /usr/local/bin/AUTOSKY/SOUNDS/asn42,Tornado Watch,
 /usr/local/bin/AUTOSKY/SOUNDS/asn43,Storm Warning,
+/etc/asterisk/local/mm-software/sounds/heat_advisory,Heat Advisory,
 /usr/local/bin/AUTOSKY/SOUNDS/asn44,Heat Advisory,
 /usr/local/bin/AUTOSKY/SOUNDS/asn45,Flood Warning,
 /usr/local/bin/AUTOSKY/SOUNDS/asn46,Gale Warning,
