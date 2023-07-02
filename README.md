@@ -1,36 +1,24 @@
-# gmrslive.com scripts
+# gmrslive.com Time Temp Weather PROGRAM
 
-
-A collection of scripts that will work on gmrslive nodes
+This software replaces the time and temp scripts and the warning scripts.
+It upgrades them to the new weather service servers with the new API. It also adds detection for cpu temp and more.
 
 download the installer.
 
-ch /etc/asterisk/local/
+Drop to a shell
+type
 
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 
-run the custom installer
+run the installer
 
 php install.php
 
-ch /etc/asterisk/local/mm-software
+
+This will install and place you in the setup program.
 
 
-load the setup program
-php setup.php
-
-
-you can now add it to cron
-
-crontab -e add the following for time on the hr between 6am and 11pm
-
-at 30 mins on the hr to prevent overrun with time.
-
-30 7-23 * * * php /etc/asterisk/local/temp.php >> /dev/null
-
-weather_pws.php
-
-This is a custom time and temp system that reads data from 
+The software is a custom time and temp system that reads data from 
 mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
 It allows you to pick a station closest to you. 
 find your local MADIS station and airport go to the map 
@@ -46,16 +34,15 @@ https://madis-data.ncep.noaa.gov
 https://aprs.fi/ These are aprs stations but you cant use station numbers from this map.
 
   
-
-add your station ID. Select how much data you want only temp or temp hum rain wind. 
-The temp data is more accurate than the stock script which does not allow you to pick the station.
-in addition this allows station owners like me and hams running CWOP stations to use your own local temp.
+Select how much data you want only temp or temp hum rain wind. The temp data is more accurate than the 
+stock script which does not allow you to pick the station. in addition this allows station owners 
+like me and hams running CWOP stations to use your own local temp.
 
 run them
 
 php weather_pws.php
 
-php skywarn.php
+php cap_warn.php
 
 I have my cron setup like this.
 
@@ -79,13 +66,13 @@ weather_hubitat.php
 
 This script is for hubitat smart hub owners it pulls the temp from a sensor on your hub. See instructions in script
 
-port_rotate.php
 
+Reg fix.
+
+This version has auto reg detection and if you want will run the reg fix to automaticaly place you back online.
 I created this script to get arround a problem with my isp ATT FIXED WIRELESS. After a while a day or 2 you become unregestered
-and rebooting will not solve the problem. I have discovered that changing the port will allow you to register, this
-script changes you port to a random number. You set a range in the script. You can run as you like I do it once a day. 
-The port wont actualy cange until asterisk is restarted. This is a beta script Im working on a automated script.
-If your node works for days then stops. Try running this script then reboot.
+and rebooting will not solve the problem. This fixes that by rotating the port then placing it back on the next boot.
+Beware dv switch wont be able to connect to you node while the port is not standard.
 
 
 
