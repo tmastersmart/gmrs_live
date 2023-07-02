@@ -1,4 +1,4 @@
-#!/usr/bin/php
+  #!/usr/bin/php
 <?php
 // (c)2015/2023 by The Master lagmrs.com  by pws.winnfreenet.com
 // This script uses some code my weather programs. Member CWOP since 2015 
@@ -20,11 +20,6 @@
 // https://mesowest.utah.edu/
 // https://madis-data.ncep.noaa.gov
 // https://aprs.fi/
-// 
-// v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
-// v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
-// v1.8 06/03/2023 
-// v2.0 06/09/2023 new databases . Rewrite of sound file system. 
 // 
 // This uses the authors token. At this time only authors need to get tokens
 // not you. This token may change in a later version.
@@ -56,13 +51,14 @@
 // or this for every hr
 // 0 * * * * php /etc/asterisk/local/weather_pws.php >> /dev/null
 
+$mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_start = $mtime;
+
 $path="/etc/asterisk/local/mm-software";
-include ("$path/config.php");
+include ("$path/load.php");
 include ("$path/sound_db.php");
-$file="$path/sound_gsm_db.csv";
-$soundDbWav ="";
-$soundDbGsm = file($file);
-$soundDbUlaw="";
+include ("$path/check_reg.php");
+
+
 
 
 // Get php timezone in sync with the PI
@@ -80,26 +76,40 @@ else{$phpzone="$phpzone ERROR";}
 $cond        = "/tmp/conditions.gsm"  ;if(file_exists($cond)){unlink($cond);}
 $condition   = "/tmp/condition.gsm"   ;if(file_exists($condition)){unlink($condition);}    
 $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($currentTime);}
-$vpath="/var/lib/asterisk/sounds";
+
+$clash="/tmp/mmweather-task.txt";
 $error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.2";  
+$ver= "v2.6";  
 $time= date('H:i');
 $date =  date('m-d-Y');
-// Token generated for this script. owned by pws.winnfreenet.com
-// You are authorised to use for this script only. 
+// Token generated for this script. owned by LAGMRS.com
+// I license you to use this on your copy of this software only.
+// Not for use on anything but GMRS  
 $token = "473c0a7b78d24dc99c182f78619d0090";
-//DO NOT COPY!!! Get your own
 $datum   = date('m-d-Y H:i:s');
 $gmdatum = gmdate('m-d-Y H:i:s');
 print "
 ===================================================
-mesowest, madis, APRSWXNET(CWOP) $ver
+mesowest, madis, APRSWXNET(CWOP) $coreVersion-w$ver
 (c)2013/2023 WRXB288 LAGMRS.com all rights reserved
 $phpzone PHP v$phpVersion
 ===================================================
-$datum Node:$node UTC:$gmdatum
+$datum Node:$node UTC:$gmdatum Level:$level
 ";
+
+// test for clash (only 1 thread allowed)
+if(file_exists($clash)){unlink($clash);
+ $out="Program thread already running Aborting";
+ save_task_log($out);line_end($out);
+}
+
+$fileOUT = fopen($clash,'w');fwrite ($fileOUT,$datum);fclose ($fileOUT);
+
+if($beta){
+ include ("$path/nodelist_process.php");
+ sort_nodes ("nodes");
+ }
 
 // read the station
 $apiString = "stid=$station&token=$token&units=english&output=xml";
@@ -109,38 +119,39 @@ $gmdatum = gmdate('[H:i:s]');
 $domain ="api.mesowest.net";
 $datum   = date('m-d-Y H:i:s');
 print "$datum Polling $station $domain >";
-   $mtime = microtime();
-   $mtime = explode(" ",$mtime);
-   $mtime = $mtime[1] + $mtime[0];
-   $poll_start = $mtime;
+$mtime = microtime(); $mtime = explode(" ",$mtime); $mtime = $mtime[1] + $mtime[0];$poll_start = $mtime;
 
 $attime = gmdate('YmdHi');
 $url = "/v2/stations/nearesttime?obtimezone=UTC&$apiString";
+
+$options = array(
+    'http'=>array(
+        'timeout' => 30,  
+        'method'=>"GET",
+        'header'=>"Accept-language: en\r\n" .
+                  "Cookie: foo=bar\r\n" .
+                  "User-Agent: Allstar Node lagmrs.com \r\n" 
+));
+$context = stream_context_create($options);
 $html = @file_get_contents("https://$domain/$url");
 $file="/tmp/mesowest.xml";
 if(file_exists($file)){unlink($file);}
-$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$html);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+
+
+$out = str_replace("</", "
+</", $html); // make easer to debug
+$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"https://$domain/$url $out");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+
 $html = str_replace('"', "", $html);
-   $mtime = microtime();
-   $mtime = explode(" ",$mtime);
-   $mtime = $mtime[1] + $mtime[0];
-   $poll_end = $mtime;
-$poll_time = ($poll_end - $poll_start);
-$poll_time = round($poll_time,2);
+$mtime = microtime(); $mtime = explode(" ",$mtime); $mtime = $mtime[1] + $mtime[0];$poll_end = $mtime;
+$poll_time = ($poll_end - $poll_start);$poll_time = round($poll_time,2);
 
 $test = read_madis($html);
 
 $datum = date('[H:i:s]');
 
 if ($data_good){ // test for stale data
-$month = date('m');
-$year = date('Y');
-$hour = date('H');
-$day = date('d');
-$min = gmdate('i');
-$timeH= gmdate('H');
-$time= gmdate('Hi');
-$dayUTC = gmdate('d');
+$month = date('m');$year = date('Y');$hour = date('H');$day = date('d');$min = gmdate('i');$timeH= gmdate('H');$time= gmdate('Hi');$dayUTC = gmdate('d');
 $testMin = $min - $CurrTimeMi;
 if ($testMin < 0) {$testMin = $testMin+60;}
 //if ($testMin > $min){print "($testMin Mins Old) $timeReading";$data_good = false;}
@@ -151,29 +162,37 @@ if($data_good){
 $validTemp = true;
 print "<ok> UTC:$CurrTime $poll_time Sec. 
 ";
- $action = watchdog ("ok");
- }
-}
-else{ print "<error>  $poll_time Sec.
-";
-$action = watchdog ("error");
-$validTemp = false;
-}
-
-
-
+$action = watchdog ("oknet");
 $the_temp=$outtemp;
-$file="/tmp/temperature.txt";
-if(file_exists($file)){unlink($file);}
-$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$the_temp);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-$datum   = date('m-d-Y H:i:s');$status="";
+//$file="/tmp/temperature.txt";if(file_exists($file)){unlink($file);}
+//$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$the_temp);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+$datum   = date('m-d-Y H:i:s');$status="$sitename Temp:$the_temp";
+if($heatIndex){$status ="$status HeatIndex:$heatIndex";}
+if($WindChill){$status ="$status WindChill:$WindChill";}
+if($outhumi){$status ="$status hum:$outhumi%";}
 if($avgwind    >0){$status ="$status Wind:$avgwind";}
-if($rainofdaily>0){$status ="$status Rain:$rainofdaily ";}
-$status ="$sitename Temp:$the_temp hum:$outhumi% $status";save_task_log ($status);print "$datum $status
+if($rainofdaily>0){$status ="$status Rain:$rainofdaily";}
+$condWX=$status;save_task_log ($condWX);//print "$datum $condWX";
+ } // good data
+}
+
+
+else{ 
+$datum   = date('m-d-Y H:i:s');
+$status="<error>";if($poll_time>=10){$status="$status timeout";}
+save_task_log ("MesoWest error $status $poll_time Sec.");
+print "$datum $status $poll_time Sec.
 ";
+$action = watchdog ("net");
+$validTemp = false;
+$condWX=""; $the_temp="";
+} // bad data
+
+// END WX
 
 
-// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
+
+// 1 temp 2=cond 3=wind humi rain 4=forcast
 if ($level >1){
    $mtime = microtime();
    $mtime = explode(" ",$mtime);
@@ -186,8 +205,17 @@ $poll_time = round($poll_time,2);
 $file="/tmp/accuweather.xml";  $cond1="";$cond2="";$cond3="";
 if(file_exists($file)){unlink($file);}
 
-$datum   = date('m-d-Y H:i:s');
-print "$datum Polling Accuweather $zipcode >";
+$datum   = date('m-d-Y H:i:s');print "$datum Polling Accuweather $zipcode >";
+
+$options = array(
+    'http'=>array(
+        'timeout' => 10,  
+        'method'=>"GET",
+        'header'=>"Accept-language: en\r\n" .
+                  "Cookie: foo=bar\r\n" .
+                  "User-Agent: Allstar Node lagmrs.com \r\n" 
+));
+$context = stream_context_create($options);
 
 $html = @file_get_contents("http://rss.accuweather.com/rss/liveweather_rss.asp?metric=F&locCode=$zipcode");
 
@@ -207,71 +235,52 @@ if (!$cond1){
   $temp = substr($test, 0, $pos2);
   $datum   = date('m-d-Y H:i:s');
   $cond1=strtolower($temp);
-   continue ;
 }
 }
-if (!$cond2){
- if ($pos1){
-  $test = substr($line, $pos2+2,40);
-  $pos2 = strpos($test, ':');
-  $temp = substr($test, 0, $pos2);
-  $datum   = date('m-d-Y H:i:s');
-  $cond2=strtolower($temp);
-   continue ;
-}
-}
-if (!$cond3){
- if ($pos1){
-  $test = substr($line, $pos2+2,40);
-  $pos2 = strpos($test, ':');
-  $temp = substr($test, 0, $pos2);
-  $datum   = date('m-d-Y H:i:s');
-  $cond3=strtolower($temp);
-   continue ;
-}
-}
+
 }
 $datum   = date('m-d-Y H:i:s');
 print "<ok>$poll_time Sec. 
-$datum conditions:  ($cond1,$cond2,$cond3)
 ";
-watchdog ("ok");
+watchdog ("oknet");
 } // end if html
-else {
+else { 
 $datum   = date('m-d-Y H:i:s');
-print "<error> $poll_time Sec. 
+$status="<error>";if($poll_time>=10){$status="$status timeout";}
+save_task_log ("Acuweather error $url $status $poll_time Sec.");
+print "$datum $status $poll_time Sec.
 ";
 $level = 1;// Drop down level due to error}
-watchdog ("error");
+watchdog ("net");
 } // end loop
 
 
-
-$file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$the_temp F / $cond1 $cond2 $cond3");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
+$file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$condWX $cond1 $cond2 $cond3");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $vpath="/var/lib/asterisk/sounds";
 
-// run a api test
-if ($forcast and $beta){ include("$path/forcast.php");}
+// run the forcast
+if ($forcast){ include("$path/forcast.php");}
 
-
+if ($shortForcast){$out ="$cond1 | $shortForcast";}
+else {$out=$cond1;}
+save_task_log ($out);
 } // end level 2
+
+
 // ------------------------------------------------------------------------
-
-$hour = date('H');
-$day  = date('l');
-$hr =   date('h');
-$min  = date('i');
-
-
+$hour = date('H');$day  = date('l');$hr =   date('h');$min  = date('i');
 $file=$currentTime; $cmd="";
 if(file_exists($file)){unlink($file);}
 $fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
 
-check_gsm_db  ("silence2"); if($file1){$action = "$action $file1";}
-
+check_wav_db("star dull");if($file1){$action = "$action $file1";} 
+//check_gsm_db  ("silence2"); if($file1){$action = "$action $file1";}
+//good,good-afternoon,good-evening,good-morning, (need good night)
 $status ="";
-if ($hour < 12 ) {$status = "good-morning";check_gsm_db  ($status); if($file1){$action = "$action $file1";} }
-else {$status = "good-afternoon";check_gsm_db  ($status); if($file1){$action = "$action $file1";}}
+if ($hour < 12)                {check_gsm_db("good-morning");  if($file1){$action="$action $file1";}}
+if ($hour >=12 and $hour <=18) {check_gsm_db("good-afternoon");if($file1){$action="$action $file1";}}
+if ($hour >=19)                {check_gsm_db("good-evening");  if($file1){$action="$action $file1";}}
+
 
 
 $datum   = date('m-d-Y H:i:s');
@@ -282,10 +291,10 @@ if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 
 
-if ($min == 0 ){
-check_gsm_db ("oclock");if($file1){$action = "$action $file1";} 
-}
-else {$oh=true;make_number ($min);
+//if ($min == 0 ){check_gsm_db ("oclock");if($file1){$action = "$action $file1";}}  // this just doesnt sound right with am/pm after it
+
+if ($min>=1){
+$oh=true;make_number ($min);
    if($file1){$action = "$action $file1";}
    if($file2){$action = "$action $file2";}
 }
@@ -293,65 +302,174 @@ else {$oh=true;make_number ($min);
 if ($hour < 12 ){$pm="am";check_gsm_db ("a-m");if($file1){$action = "$action $file1";}} 
 if ($hour >= 12){$pm="pm";check_gsm_db ("p-m");if($file1){$action = "$action $file1";}} 
 
-print "$datum $status Time is $hr:$min $pm   
+$datum   = date('m-d-Y H:i:s');
+print "$datum The time is $hr:$min $pm   
 ";
 check_gsm_db ("silence2");if($file1){$action = "$action $file1";}
-check_gsm_db ("weather");if($file1){$action = "$action $file1";}
-// Weather
-//save_word ("weather"); 
-// 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
 
 
+
+
+
+// 1 temp 2=cond 3=wind humi rain 4=forcast 
 if ($level >1){
+$datum   = date('m-d-Y H:i:s');
+print "$datum Conditions: $cond1
+";
+
+check_gsm_db ("weather"); if($file1){$action = "$action $file1";}
 check_gsm_db ("conditions");if($file1){$action = "$action $file1";}   
 
 $u = explode(" ",$cond1);
 foreach ($u as $word) {
  if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
 }
-$u = explode(" ",$cond2);
-foreach ($u as $word) {
- if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
-}
-$u = explode(" ",$cond3);
-foreach ($u as $word) {
- if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
-}
 
 
 
-if ($forcast and $beta){
-if ($shortForcast) {
+// -----------------------forcast --------------------
+// 1 temp 2=cond 3=wind humi rain 4=forcast
+if ($level >=4){
+ if ($forcast){
+  if ($shortForcast) {
 $status = "today";
-if ($hour >= 12 and $hour <21) {$status = "evening";}
-
+if ($hour >= 12 and $hour <19) {$status = "evening";}  
+if ($hour >= 19 and $hour <21) {$status = "tonight";} 
 
 check_gsm_db ($status);if($file1){$action = "$action $file1";}
-
-$shortForcast=strtolower($shortForcast); 
-$shortForcast = str_replace('thunderstorms', "thunderstorm", $shortForcast);
-$shortForcast = str_replace('chance', "chance-of", $shortForcast);
-$shortForcast = str_replace('showers', "rain", $shortForcast);
-$shortForcast = str_replace('nws', "national weather service", $shortForcast);
-$shortForcast = str_replace('then', "later", $shortForcast);
-$shortForcast = str_replace('slight', "low", $shortForcast);
-$u = explode(" ",$shortForcast);
+$test = strtolower($shortForcast); 
+$test = str_replace('thunderstorms', "thunderstorm", $test);
+$test = str_replace('chance', "chance-of", $test);
+$test = str_replace('showers', "rain", $test);
+$test = str_replace('nws', "national weather service", $test);
+$test = str_replace('then', "later", $test);
+$test = str_replace('slight', "low", $test);
+$u = explode(" ",$test);
 foreach ($u as $word) {
  if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
     }
    }
   } // forcast end
-} // if >level 1
+ } // level 4 end
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+if ($level>=2){
+// Events are in a diffrent database
+if ($event and $beta){
+
+check_gsm_db ("alert");if($file1){$action = "$action $file1";} 
+check_wav_db ("light click"); if($file1){$action = "$action $file1";} 
+//$event = str_replace(",", " ", $event);
+$u = explode(",",$event);
+foreach ($u as $line) {
+//$word = strtolower($word);
+if($line){ check_wav_db($line);if($file1){$action = "$action $file1";} } // star dull
+ 
+// check for major warrnings.
+// persons in path of 
+if($line=="Tornado Warning"){
+check_gsm_db ("persons in path of");if($file1){$action = "$action $file1";}
+check_gsm_db ("tornado");if($file1){$action = "$action $file1";}
+check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
+}
+
+if($line=="Severe Thunderstorm Warning"){
+check_gsm_db ("persons in path of");if($file1){$action = "$action $file1";}
+check_gsm_db ("thunderstorm");if($file1){$action = "$action $file1";}
+check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
+}
+
+if($line=="Hurricane Warning"){
+check_gsm_db ("persons in path of");if($file1){$action = "$action $file1";}
+check_gsm_db ("hurricane");if($file1){$action = "$action $file1";}
+check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
+}
+if($line=="Blizzard Warning"){
+check_gsm_db ("persons in path of");if($file1){$action = "$action $file1";}
+check_gsm_db ("blizzard");if($file1){$action = "$action $file1";}
+check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
+}
+
+
+}
+//check_gsm_db ("wow");if($file1){$action = "$action $file1"; }
+//check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
+}
+}
+ 
+} // level 1 end
+
 
 if($the_temp) {
+$datum   = date('m-d-Y H:i:s');
+print "$datum $condWX
+"; 
 check_gsm_db ("temperature");if($file1){$action = "$action $file1";}
-$oh=false;make_number ($the_temp);
+list($whole, $decimal) = explode('.', $the_temp);
+$oh=false;make_number ($whole);
 if($file0){$action = "$action $file0";}
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 if($file3){$action = "$action $file3";}
-check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
+if($decimal>=1){
+ check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+ $oh=true;make_number ($decimal);
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
 }
+check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
+// make a comment on the temp
+if ($the_temp >90 or $the_temp <20){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
+}
+
+//$heatIndex
+$test=$the_temp+15;
+if($heatIndex >$test) {
+check_gsm_db ("heat index");if($file1){$action = "$action $file1";}
+list($whole, $decimal) = explode('.', $heatIndex);
+$oh=false;make_number ($whole);
+if($file0){$action = "$action $file0";}
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+if($file3){$action = "$action $file3";}
+if($decimal>=1){
+ check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+ $oh=false;make_number ($decimal);
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+}
+check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
+// make a comment on the temp
+if ($heatIndex >90 ){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
+}
+
+
+
+if($WindChill) {
+check_gsm_db ("wind chill");if($file1){$action = "$action $file1";}
+list($whole, $decimal) = explode('.', $WindChill);
+$oh=false;make_number ($whole);
+if($file0){$action = "$action $file0";}
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+if($file3){$action = "$action $file3";}
+if($decimal>=1){
+ check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+ $oh=false;make_number ($decimal);
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+}
+check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
+// make a comment on the temp
+if ($WindChill <20 ){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
+}
+
 
 if($level>2){ // 1 temp only 2=temp,cond 3= temp,cond,wind humi rain 
  if($outhumi){
@@ -362,23 +480,33 @@ if($file2){$action = "$action $file2";}
 check_gsm_db ("percent");if($file1){$action = "$action $file1";}
 }
 
-if($avgwind>1){
+if($avgwind>0){
 check_gsm_db ("wind");if($file1){$action = "$action $file1";} 
-$oh=false;make_number ($avgwind); 
+
+list($whole, $decimal) = explode('.', $avgwind);
+$oh=false;make_number ($whole);
+if($file0){$action = "$action $file0";}
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
+if($file3){$action = "$action $file3";}
+if($decimal>=1){
+ check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+$oh=false;make_number ($decimal);
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+}
 check_gsm_db ("miles-per-hour");if($file1){$action = "$action $file1";} 
 }
 
 if ($rainofdaily>0){
-check_gsm_db ("rain");if($file1){$action = "$action $file1";} 
+check_gsm_db ("rainfall");if($file1){$action = "$action $file1";} 
 list($whole, $decimal) = explode('.', $rainofdaily);
 $oh=false;make_number ($whole);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 if($decimal>=1){
  check_gsm_db ("point");if($file1){$action = "$action $file1";} 
- $oh=false;make_number ($decimal);
+ $oh=true;make_number ($decimal);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
   }
@@ -388,7 +516,7 @@ if($file2){$action = "$action $file2";}
 
 // Start the CPU temp warnings here.
 $log="/tmp/cpu_temp_log.txt";
-$datum = date('m-d-Y-H:i:s');
+$datum = date('m-d-Y H:i:s');
 $line= exec("/opt/vc/bin/vcgencmd measure_temp",$output,$return_var);// SoC BCM2711 temp
 $line = str_replace("'", "", $line);
 $line = str_replace("C", "", $line);
@@ -420,7 +548,7 @@ $status ="$nodeName $throttled code:$u[1]";save_task_log ($status);print "$datum
 $fileOUT = fopen($log, "a") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$datum,$temp, \n");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 if ($reportAll or $temp >=$hot){
-$vpath ="/var/lib/asterisk/sounds";
+//$vpath ="/var/lib/asterisk/sounds";
 $cmd="";
 check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
 check_gsm_db ($nodeName);if($file1){$action = "$action $file1";} 
@@ -443,12 +571,58 @@ if ($temp >=$hot){
  if ($temp >=$high){check_gsm_db ("warning");if($file1){$action = "$action $file1";}} 
  else{check_gsm_db ("high");if($file1){$action = "$action $file1";}}
 }
+if ($throttled){check_ulaw_db ($throttled);if($file1){$action = "$action $file1";}  }
+} // end temp
+
+
+// Check the reg
+reg_check ("check");// $node1 $ip $port2 $registered
+if($registered !="Registered"){
+watchdog ("reg");// add to counter
+check_gsm_db ("an-error-has-occured");if($file1){$action = "$action $file1";}
+check_gsm_db ("node");if($file1){$action = "$action $file1";} 
+$oh=false;
+$x = (string)$node1;
+for($i=0;$i<strlen($x);$i++)
+ { 
+make_number ($x[$i]); 
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+}
+check_gsm_db ("is-not-registered");if($file1){$action = "$action $file1";} 
+
+$pos1 = strpos("-$registered", 'Refused');
+if($pos1){
+check_gsm_db ("rejected");if($file1){$action = "$action $file1";} 
+}
+}
+if ($registered =="Registered"){watchdog ("okreg");}
+
+// testing say node registered.
+$test=false;
+if ($test and $registered =="Registered"){
+check_gsm_db ("node");if($file1){$action = "$action $file1";} 
+$oh=false;
+ $x = (string)$node1;
+ for($i=0;$i<strlen($x);$i++)
+ { 
+make_number ($x[$i]); 
+if($file1){$action = "$action $file1";}
+if($file2){$action = "$action $file2";}
+}
+
+check_gsm_db ("is-registered");if($file1){$action = "$action $file1";} 
 }
 
 
+
+ 
+// ---------------------------------------------------play the file---------------------
 $datum   = date('m-d-Y H:i:s');
 print "$datum Playing file $currentTime
 ";
+check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
+check_wav_db("star dull");if($file1){$action = "$action $file1";}
 
 exec ("sox $action $currentTime",$output,$return_var);
 
@@ -458,62 +632,29 @@ if(!$status){$status="OK";}
 
 
 
-
-if ($throttled){
-$file="/tmp/throttled.ul";
-$datum   = date('m-d-Y H:i:s');
-print "$datum Playing file $file
+// check the working port -- Put it back to default on next reboot
+if (!$NotReg){
+$port = find_port ("find");
+if ($port != "4569"){
+$out="Port $port in use"; save_task_log ($out);print "$datum $out
 ";
-check_name_cust ($throttled);
-  if ($file1){ 
-  $status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/throttled'",$output,$return_var);
-  }
-}
-$datum   = date('m-d-Y H:i:s');
-print "$datum finished  $status $return_var
-";
-print "===================================================
-";
-
-unset ($soundDbGsm);die;
-
-
-
-function make_number ($in){
-global $vpath,$file0,$file1,$file2,$file3,$negative,$oh;
-// Speak all possible numbers
-// PHP Number matrix
-
-$file0 = "";$file1 = "";$file2 = "";$file3 = "";$negative="";
-if ($in <0 ){$negative = "$vpath/digits/minus.gsm";}
-$in = abs($in);
-$in = round($in);
-if ($oh){if ($in<10) {    $file1  = "$vpath/digits/oh.gsm";}}
-if ($in >= 100){          $file3  = "$vpath/digits/hundred.gsm"; $in = ($in -100); }
-if ($in>=20 and $in<30  ){$file1  = "$vpath/digits/20.gsm";$in=$in-20;} 
-if ($in>=30 and $in<40  ){$file1  = "$vpath/digits/30.gsm";$in=$in-30;}
-if ($in>=40 and $in<50  ){$file1  = "$vpath/digits/40.gsm";$in=$in-40;} 
-if ($in>=50 and $in<60  ){$file1  = "$vpath/digits/50.gsm";$in=$in-50;}
-if ($in>=60 and $in<70  ){$file1  = "$vpath/digits/60.gsm";$in=$in-60;} 
-if ($in>=70 and $in<80  ){$file1  = "$vpath/digits/70.gsm";$in=$in-70;}
-if ($in>=80 and $in<90  ){$file1  = "$vpath/digits/80.gsm";$in=$in-80;} 
-if ($in>=90 and $in<100 ){$file1  = "$vpath/digits/90.gsm";$in=$in-90;}
-
-if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}           
+ $newPort=4569;
+ rotate_port("rotate");
+ }
 }
 
-
-
-function check_name_cust ($in){
-global $file1,$path;
-$customSound="$path/sounds";
-$file1="";
-if (file_exists("$customSound/$in.ul")){$file1 = "$customSound/$in";}
-else{
-$status ="$customSound/$in.ul not found";save_task_log ($status);print "$datum $status
-";
+if($counter >$watchdog and $NotReg){
+reg_fix ("check");
+if(!$NotReg){
+$out="We are back online"; // Yep I fixed it.
+save_task_log ($out);print "$datum $out
+"; 
+ }
 }
-}
+unlink($clash);
+line_end("Finished");
+
+//---------------------------------------------------------------------------------------------
 
 
 
@@ -523,9 +664,9 @@ $status ="$customSound/$in.ul not found";save_task_log ($status);print "$datum $
 // Source code may not be used in other programs pws.winnfreenet.com
 // scrapper  v3 
 function read_madis ($html) {
-global $dateReading, $timeReading,$sitename,$data_good,$CurrTimeR,$CurrTimeMi,$CurrTimeHr,$CurrTime,$CurrTimeD,$CurrTimeM,$CurrTimeY,$html,$outtemp,$outhumi,$avgwind,$gustspeed,$rainofdaily,$rainofyearly;
+global $WindChill,$heatIndex, $dateReading, $timeReading,$sitename,$data_good,$CurrTimeR,$CurrTimeMi,$CurrTimeHr,$CurrTime,$CurrTimeD,$CurrTimeM,$CurrTimeY,$html,$outtemp,$outhumi,$avgwind,$gustspeed,$rainofdaily,$rainofyearly;
 $data_good = false;
-$norain=true;
+$norain=true; $WindChill="";$heatIndex="";
 $ver ="MADIS";
 
 $posname= strpos($html, '<NAME');
@@ -575,8 +716,6 @@ $Lpos = strpos($test, '>');$Rpos = strpos($test, '<');
 $outtemp  = substr($test, $Lpos+1,$Rpos-$Lpos-1);
 //print "$outtemp
 
-
-
 // pull the date from the temp value
 $test=$datecheck;
 $posDate = strpos($test, '<date_time');
@@ -596,6 +735,35 @@ if ($posDate){
      $CurrTime  = $timeReading;
 }
 
+
+
+
+
+// Heat Index
+$Lpos = strpos($html, '<heat_index_value_1d');$Rpos = strpos($html, '</heat_index_value_1d>');
+$test = substr($html, $Lpos,$Rpos-$Lpos+1);  $datecheck=$test;
+// print "($test)$Lpos,$Rpos
+$Lpos = strpos($test, 'float>');$Rpos = strpos($test, '</value');
+$test = substr($test, $Lpos,$Rpos-$Lpos+1);
+//print "($test)$Lpos,$Rpos
+$Lpos = strpos($test, '>');$Rpos = strpos($test, '<');
+$heatIndex  = substr($test, $Lpos+1,$Rpos-$Lpos-1);
+
+
+
+// wind_chill
+$Lpos = strpos($html, '<wind_chill_value_1d');$Rpos = strpos($html, '</wind_chill_value_1d'); // </wind_chill_value_1d></wind_chill>
+$test = substr($html, $Lpos,$Rpos-$Lpos+1);  $datecheck=$test;
+// print "($test)$Lpos,$Rpos
+$Lpos = strpos($test, 'float>');$Rpos = strpos($test, '</value');
+$test = substr($test, $Lpos,$Rpos-$Lpos+1);
+//print "($test)$Lpos,$Rpos
+$Lpos = strpos($test, '>');$Rpos = strpos($test, '<');
+$WindChill  = substr($test, $Lpos+1,$Rpos-$Lpos-1);
+
+
+
+
 //relative_humidity_value_1
 $Lpos = strpos($html, '<relative_humidity_value_1');$Rpos = strpos($html, '</relative_humidity_value_1>');
 if ($Lpos){
@@ -607,63 +775,6 @@ $outhumi  = substr($test, $Lpos+18,$Rpos-$Lpos-18);
  }//start
 }
 
-function watchdog ($in){
-global $file1,$datum,$soundDbGsm,$node,$datum,$netdown,$action;
-
-// watch the internet
-$file= "/tmp/watchdog.txt";
-$counter = file_get_contents($file);
-if ($in <>"ok"){$counter++;$netdown=true;}
-else {$counter=0;$netdown=false;}
-$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$counter);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
-
-if($counter >10){
-$status ="WatchDog ---> Network falure $counter";save_task_log ($status);print "$datum $status
-";
-$file1="";$file2="";
-check_gsm_db ("an-error-has-occured");if($file1){$action = "$action $file1";}
-//check_gsm_db ("ping");if($file1){$action = "$action $file1";}
-check_gsm_db ("connection-failed");if($file1){$action = "$action $file1";} 
-// disconnected connection-failed an-error-has-occured
-check_gsm_db ("error-number");if($file1){$action = "$action $file1";}
-$oh=false;make_number ($counter);
-if($file1){$action = "$action $file1";}
-if($file2){$action = "$action $file2";}
-
-
-}
-}
-
-
-//
-// $status ="what to log ";save_task_log ($status);print "$datum $status
-//";
-//
-function save_task_log ($status){
-global $path,$error,$datum,$file;
-
-$datum  = date('m-d-Y H:i:s');
-if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
-chdir("$path/logs");
-$file="$path/logs/log.txt";
-$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
-
-// log rotation system
-if (is_readable($file)) {
-   $size= filesize($file);
-   if ($size > 1000){
-    if (file_exists($file2)) {unlink ($file2);}
-    rename ($file, $file2);
-    if (file_exists($file)) {print "error in log rotation";}
-   }
-}
-
-$fileOUT = fopen($file, 'a+') ;
-flock ($fileOUT, LOCK_EX );
-fwrite ($fileOUT, "$datum,$status,,\r\n");
-flock ($fileOUT, LOCK_UN );
-fclose ($fileOUT);
-}
 
 
 
