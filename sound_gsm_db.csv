@@ -36,6 +36,7 @@
 /var/lib/asterisk/sounds,added-to,added-to,.
 /var/lib/asterisk/sounds,address,address,.
 /var/lib/asterisk/sounds,advised-to-seek-shelter,advised to seek shelter,.
+/etc/asterisk/local/mm-software/sounds/,advisory,advisory,
 /var/lib/asterisk/sounds,afternoon,afternoon,.
 /var/lib/asterisk/sounds,airport,airport,.
 /var/lib/asterisk/sounds,alabama,alabama,.
@@ -58,30 +59,30 @@
 /var/lib/asterisk/sounds,arkansas,arkansas,.
 /var/lib/asterisk/sounds,arlington,arlington,.
 /var/lib/asterisk/sounds/wx,around,around,.
-/var/lib/asterisk/sounds/letters,ascii123,ascii123,.
-/var/lib/asterisk/sounds/letters,ascii124,ascii124,.
-/var/lib/asterisk/sounds/letters,ascii125,ascii125,.
-/var/lib/asterisk/sounds/letters,ascii126,ascii126,.
-/var/lib/asterisk/sounds/letters,ascii34,ascii34,.
-/var/lib/asterisk/sounds/letters,ascii36,ascii36,.
-/var/lib/asterisk/sounds/letters,ascii37,ascii37,.
-/var/lib/asterisk/sounds/letters,ascii38,ascii38,.
-/var/lib/asterisk/sounds/letters,ascii39,ascii39,.
-/var/lib/asterisk/sounds/letters,ascii40,ascii40,.
-/var/lib/asterisk/sounds/letters,ascii41,ascii41,.
-/var/lib/asterisk/sounds/letters,ascii42,ascii42,.
-/var/lib/asterisk/sounds/letters,ascii44,ascii44,.
-/var/lib/asterisk/sounds/letters,ascii58,ascii58,.
-/var/lib/asterisk/sounds/letters,ascii59,ascii59,.
-/var/lib/asterisk/sounds/letters,ascii60,ascii60,.
-/var/lib/asterisk/sounds/letters,ascii62,ascii62,.
-/var/lib/asterisk/sounds/letters,ascii63,ascii63,.
-/var/lib/asterisk/sounds/letters,ascii91,ascii91,.
-/var/lib/asterisk/sounds/letters,ascii92,ascii92,.
-/var/lib/asterisk/sounds/letters,ascii93,ascii93,.
-/var/lib/asterisk/sounds/letters,ascii94,ascii94,.
-/var/lib/asterisk/sounds/letters,ascii95,ascii95,.
-/var/lib/asterisk/sounds/letters,ascii96,ascii96,.
+/var/lib/asterisk/sounds/letters,ascii123,{,.
+/var/lib/asterisk/sounds/letters,ascii124,|,.
+/var/lib/asterisk/sounds/letters,ascii125,},.
+/var/lib/asterisk/sounds/letters,ascii126,~,.
+/var/lib/asterisk/sounds/letters,ascii34,",.
+/var/lib/asterisk/sounds/letters,ascii36,$,.
+/var/lib/asterisk/sounds/letters,ascii37,%,.
+/var/lib/asterisk/sounds/letters,ascii38,&,.
+/var/lib/asterisk/sounds/letters,ascii39,',.
+/var/lib/asterisk/sounds/letters,ascii40,(,.
+/var/lib/asterisk/sounds/letters,ascii41,),.
+/var/lib/asterisk/sounds/letters,ascii42,*,.
+/var/lib/asterisk/sounds/letters,ascii44,comma1,.
+/var/lib/asterisk/sounds/letters,ascii58,:,.
+/var/lib/asterisk/sounds/letters,ascii59,;,.
+/var/lib/asterisk/sounds/letters,ascii60,<,.
+/var/lib/asterisk/sounds/letters,ascii62,>,.
+/var/lib/asterisk/sounds/letters,ascii63,?,.
+/var/lib/asterisk/sounds/letters,ascii91,[,.
+/var/lib/asterisk/sounds/letters,ascii92,\,.
+/var/lib/asterisk/sounds/letters,ascii93,],.
+/var/lib/asterisk/sounds/letters,ascii94,^,.
+/var/lib/asterisk/sounds/letters,ascii95,_,.
+/var/lib/asterisk/sounds/letters,ascii96,`,.
 /var/lib/asterisk/sounds/digits,at,at,.
 /var/lib/asterisk/sounds,at-any-time,at-any-time,.
 /var/lib/asterisk/sounds,athletics,athletics,.
@@ -180,13 +181,6 @@
 /var/lib/asterisk/sounds/letters,dash,dash,.
 /var/lib/asterisk/sounds,date,date,.
 /var/lib/asterisk/sounds,day,day,.
-/var/lib/asterisk/sounds/digits,day-0,sunday,.
-/var/lib/asterisk/sounds/digits,day-1,monday,.
-/var/lib/asterisk/sounds/digits,day-2,tuesday,.
-/var/lib/asterisk/sounds/digits,day-3,wednesday,.
-/var/lib/asterisk/sounds/digits,day-4,thursday,.
-/var/lib/asterisk/sounds/digits,day-5,friday,.
-/var/lib/asterisk/sounds/digits,day-6,saterday,.
 /var/lib/asterisk/sounds,daylight,daylight,.
 /var/lib/asterisk/sounds,days,days,.
 /var/lib/asterisk/sounds/ha,dc,dc,.
@@ -290,6 +284,7 @@
 /var/lib/asterisk/sounds,freezing,freezing,.
 /var/lib/asterisk/sounds,frequency,frequency,.
 /var/lib/asterisk/sounds,fresno,fresno,.
+/var/lib/asterisk/sounds/digits,day-5,friday,.
 /var/lib/asterisk/sounds,from,from,.
 /var/lib/asterisk/sounds/ha,front,front,.
 /var/lib/asterisk/sounds,ftp,ftp,.
@@ -392,6 +387,7 @@
 /var/lib/asterisk/sounds,initiated,initiated,.
 /var/lib/asterisk/sounds,initiating,initiating,.
 /var/lib/asterisk/sounds,in-service,in-service,.
+/etc/asterisk/local/mm-software/sounds/,intermittent,intermittent,
 /var/lib/asterisk/sounds,interstate,interstate,.
 /var/lib/asterisk/sounds,in-the,in-the,.
 /var/lib/asterisk/sounds,invalid,invalid,.
@@ -401,6 +397,9 @@
 /var/lib/asterisk/sounds,iowa,iowa,.
 /var/lib/asterisk/sounds,is,is,.
 /var/lib/asterisk/sounds/ha,is,is,.
+/usr/local/sbin/sounds/,is-not-registered,is-not-registered,.
+/usr/local/sbin/sounds/,is-registered,is-registered,.
+/usr/local/sbin/sounds/,is-rejected,is-rejected, .
 /var/lib/asterisk/sounds/letters,j,j,.
 /var/lib/asterisk/sounds/phonetic,j_p,j_p,.
 /var/lib/asterisk/sounds,jacksonville,jacksonville,.
@@ -502,6 +501,7 @@
 /var/lib/asterisk/sounds/digits,mon-7,mon-7,.
 /var/lib/asterisk/sounds/digits,mon-8,mon-8,.
 /var/lib/asterisk/sounds/digits,mon-9,mon-9,.
+/var/lib/asterisk/sounds/digits,day-1,monday,.
 /var/lib/asterisk/sounds,monitored,monitored,.
 /var/lib/asterisk/sounds,montana,montana,.
 /var/lib/asterisk/sounds,month,month,.
@@ -535,6 +535,8 @@
 /var/lib/asterisk/sounds,ninth,ninth,.
 /var/lib/asterisk/sounds,node,node,.
 /var/lib/asterisk/sounds/rpt,node,node,.
+/usr/local/sbin/sounds/,node,node2, .
+/usr/local/sbin/sounds/,no-nodes-registered,no-nodes-registered, .
 /var/lib/asterisk/sounds,north,north,.
 /var/lib/asterisk/sounds,north-carolina,north-carolina,.
 /var/lib/asterisk/sounds,north-dakota,north-dakota,.
@@ -564,12 +566,12 @@
 /var/lib/asterisk/sounds,on,on,.
 /var/lib/asterisk/sounds/ha,on,on,.
 /var/lib/asterisk/sounds,on-busy,on-busy,.
+/var/lib/asterisk/sounds,oops1,oops1,.
 /var/lib/asterisk/sounds,oops2,oops2,.
 /var/lib/asterisk/sounds,oops3,oops3,.
 /var/lib/asterisk/sounds/ha,open,open,.
 /var/lib/asterisk/sounds,open-parenthesis,open-parenthesis,.
 /var/lib/asterisk/sounds,operations,operations,.
-/var/lib/asterisk/sounds,opps1,opps1,.
 /var/lib/asterisk/sounds,option-not-implemented,option-not-implemented,.
 /var/lib/asterisk/sounds/followme,options,options,.
 /var/lib/asterisk/sounds,or,or,.
@@ -644,6 +646,7 @@
 /var/lib/asterisk/sounds,receiving,receiving,.
 /var/lib/asterisk/sounds,recorded,recorded,.
 /var/lib/asterisk/sounds,registrar,registrar,.
+/usr/local/sbin/sounds/,rejected,rejected,.
 /var/lib/asterisk/sounds,removed,removed,.
 /var/lib/asterisk/sounds,repair,repair,.
 /var/lib/asterisk/sounds,repeater,repeater,.
@@ -664,6 +667,7 @@
 /var/lib/asterisk/sounds,san-diego,san-diego,.
 /var/lib/asterisk/sounds,san-francisco,san-francisco,.
 /var/lib/asterisk/sounds,san-jose,san-jose,.
+/var/lib/asterisk/sounds/digits,day-6,saterday,.
 /var/lib/asterisk/sounds,scattered,scattered,.
 /var/lib/asterisk/sounds,sciences,sciences,.
 /var/lib/asterisk/sounds,seattle,seattle,.
@@ -731,6 +735,7 @@
 /var/lib/asterisk/sounds,sterling,sterling,.
 /var/lib/asterisk/sounds,storm,storm,.
 /var/lib/asterisk/sounds,sun,sun,.
+/var/lib/asterisk/sounds/digits,day-0,sunday,.
 /var/lib/asterisk/sounds,sunny,sunny,.
 /var/lib/asterisk/sounds,support,support,.
 /var/lib/asterisk/sounds,swap,swap,.
@@ -739,6 +744,10 @@
 /var/lib/asterisk/sounds,system-crashed,system-crashed,.
 /var/lib/asterisk/sounds,systems,systems,.
 /var/lib/asterisk/sounds/ha,systems,systems,.
+/usr/local/sbin/sounds/,system-update-could-not-take-place,system-update-could-not-take-place,.
+/usr/local/sbin/sounds/,system-updated,system-updated,.
+/usr/local/sbin/sounds/,system-update-in-progress,system-update-in-progress, .
+/usr/local/sbin/sounds/,system-was-up-to-date,system-was-up-to-date,.
 /var/lib/asterisk/sounds/letters,t,t,.
 /var/lib/asterisk/sounds/phonetic,t_p,t_p,.
 /var/lib/asterisk/sounds,tcp,tcp,.
@@ -762,6 +771,7 @@
 /var/lib/asterisk/sounds,thousandth,thousandth,.
 /var/lib/asterisk/sounds,through,through,.
 /var/lib/asterisk/sounds,thunderstorm,thunderstorm,.
+/var/lib/asterisk/sounds/digits,day-4,thursday,.
 /var/lib/asterisk/sounds,tide,tide,.
 /var/lib/asterisk/sounds,time,time,.
 /var/lib/asterisk/sounds,times,times,.
@@ -781,6 +791,7 @@
 /var/lib/asterisk/sounds,training,training,.
 /var/lib/asterisk/sounds,transfer,transfer,.
 /var/lib/asterisk/sounds,tucson,tucson,.
+/var/lib/asterisk/sounds/digits,day-2,tuesday,.
 /var/lib/asterisk/sounds,tulsa,tulsa,.
 /var/lib/asterisk/sounds,turning-to,turning-to,.
 /var/lib/asterisk/sounds,twelveth,twelveth,.
@@ -828,6 +839,7 @@
 /var/lib/asterisk/sounds,weather,weather,.
 /var/lib/asterisk/sounds,weather-station,weather-station,.
 /var/lib/asterisk/sounds,web,web,.
+/var/lib/asterisk/sounds/digits,day-3,wednesday,.
 /var/lib/asterisk/sounds,weeks,weeks,.
 /var/lib/asterisk/sounds,welcome,welcome,.
 /var/lib/asterisk/sounds,west,west,.
@@ -844,6 +856,7 @@
 /var/lib/asterisk/sounds,with,with,.
 /var/lib/asterisk/sounds,within,within,.
 /var/lib/asterisk/sounds,work,work,.
+/etc/asterisk/local/mm-software/sounds/,wow,wow,
 /var/lib/asterisk/sounds,wyoming,wyoming,.
 /var/lib/asterisk/sounds/letters,x,x,.
 /var/lib/asterisk/sounds/phonetic,x_p,x_p,.
