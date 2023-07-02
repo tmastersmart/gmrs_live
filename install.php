@@ -18,7 +18,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.5";
+$ver="v1.6";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -85,7 +85,7 @@ Aborted  Type 'php install.php' to try again
 
 function installa($in){
 
-$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul,advisory.gsm";
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
@@ -107,8 +107,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "supermon.txt,config.php,setup.php,forcast.php,temp.php,skywarn.php,weather_pws.php,sound_db.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
-
+$files = "supermon.txt,supermon_weather.php,config.php,setup.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv";
 
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
@@ -122,25 +121,52 @@ if (!file_exists("$path/$file")){
    print "sudo wget $repo2/$file
    "; 
  exec("sudo wget $repo2/$file ",$output,$return_var);
+ exec("sudo chmod +x $file",$output,$return_var); 
    }
    }
-  exec("sudo chmod +x *.php",$output,$return_var);  
+   
 }
 
 function create_nodea ($file){
 global $file,$path;
-// phase 1 import node
-$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
+// phase 1 import node - call
+//$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
+$file ="/usr/local/etc/allstar_node_info.conf";
+$fileIN= file($file);
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
 $line = str_replace('"', "", $line);
-$u= explode("=",$line);
-$node=$u[1];
-$file= "$path/mm-node.txt";
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node, , , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+$pos = strpos($line, 'ODE1=');
+if ($pos){$u= explode("=",$line);
+$node=$u[1];}
+$pos2 = strpos($line, 'CALL='); 
+if ($pos2){$u= explode("=",$line);
+$call=$u[1];}
+}
 
 
-// phase 2 import skywarn settings 
-$file="/usr/local/bin/AUTOSKY/AutoSky.ini";
-$file2="$path/autosky_import.ini";
-copy($file, $file2);
+$file= "$path/mm-node.txt";// This will be the AutoNode varable
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call, , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+
+
+// phase 2 build the admin menu
+$file ="/usr/local/sbin/firsttime/adm01-shell.sh";
+$file2="/usr/local/sbin/firsttime/mmsoftware.sh";
+copy($file, $file2);// copy existing to get correct permissions
+$file= $file2;
+$out='#/!bin/bash
+#MENUFT%055%Time Temp Weather Alert Setup/ MM Software Setup
+
+$SON
+reset
+
+php /etc/asterisk/local/mm-software/setup.php
+
+exit 0
+';
+// overwrite with our menu.
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+ 
 
 }
