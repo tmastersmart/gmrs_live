@@ -63,7 +63,7 @@
 /var/lib/asterisk/sounds/letters,ascii124,|,.
 /var/lib/asterisk/sounds/letters,ascii125,},.
 /var/lib/asterisk/sounds/letters,ascii126,~,.
-/var/lib/asterisk/sounds/letters,ascii34,",.
+/var/lib/asterisk/sounds/letters,ascii34,",."
 /var/lib/asterisk/sounds/letters,ascii36,$,.
 /var/lib/asterisk/sounds/letters,ascii37,%,.
 /var/lib/asterisk/sounds/letters,ascii38,&,.
