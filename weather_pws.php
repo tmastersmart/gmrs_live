@@ -60,6 +60,8 @@ include ("$path/check_reg.php");
 
 
 
+$muteTime1= 2; $muteTime2=5;// if($hour>=$MuteTime1 and $hour <=$muteTime2){  MUTE SOUND from 2-5 am 
+
 
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
@@ -80,7 +82,7 @@ $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($cur
 $clash="/tmp/mmweather-task.txt";
 $error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.6";  
+$ver= "v2.8";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by LAGMRS.com
@@ -260,6 +262,7 @@ $vpath="/var/lib/asterisk/sounds";
 
 // run the forcast
 if ($forcast){ include("$path/forcast.php");}
+if ($event="clear"){$event="";} // Skip if clear
 
 if ($shortForcast){$out ="$cond1 | $shortForcast";}
 else {$out=$cond1;}
@@ -324,7 +327,7 @@ $u = explode(" ",$cond1);
 foreach ($u as $word) {
  if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
 }
-
+} // level 1 end
 
 
 // -----------------------forcast --------------------
@@ -361,8 +364,8 @@ foreach ($u as $word) {
 
 if ($level>=2){
 // Events are in a diffrent database
-if ($event and $beta){
-
+if ($event){
+//print "DEBUG $event";
 check_gsm_db ("alert");if($file1){$action = "$action $file1";} 
 check_wav_db ("light click"); if($file1){$action = "$action $file1";} 
 //$event = str_replace(",", " ", $event);
@@ -403,7 +406,7 @@ check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
 }
 }
  
-} // level 1 end
+
 
 
 if($the_temp) {
@@ -438,12 +441,12 @@ if($file0){$action = "$action $file0";}
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 if($file3){$action = "$action $file3";}
-if($decimal>=1){
- check_gsm_db ("point");if($file1){$action = "$action $file1";} 
- $oh=false;make_number ($decimal);
-if($file1){$action = "$action $file1";}
-if($file2){$action = "$action $file2";}
-}
+//if($decimal>=1){
+// check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+// $oh=false;make_number ($decimal);
+//if($file1){$action = "$action $file1";}
+//if($file2){$action = "$action $file2";}
+//}
 check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
 // make a comment on the temp
 if ($heatIndex >90 ){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
@@ -459,12 +462,12 @@ if($file0){$action = "$action $file0";}
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 if($file3){$action = "$action $file3";}
-if($decimal>=1){
- check_gsm_db ("point");if($file1){$action = "$action $file1";} 
- $oh=false;make_number ($decimal);
-if($file1){$action = "$action $file1";}
-if($file2){$action = "$action $file2";}
-}
+//if($decimal>=1){
+// check_gsm_db ("point");if($file1){$action = "$action $file1";} 
+// $oh=false;make_number ($decimal);
+//if($file1){$action = "$action $file1";}
+//if($file2){$action = "$action $file2";}
+//}
 check_gsm_db ("degrees");if($file1){$action = "$action $file1";} 
 // make a comment on the temp
 if ($WindChill <20 ){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
@@ -618,16 +621,22 @@ check_gsm_db ("is-registered");if($file1){$action = "$action $file1";}
 
  
 // ---------------------------------------------------play the file---------------------
-$datum   = date('m-d-Y H:i:s');
+$datum   = date('m-d-Y H:i:s'); $hour = date('H');
+if($sleep){
+ if($hour>=$MuteTime1 and $hour <=$muteTime2){
+$out="Night time Muted"; save_task_log ($out);print "$datum $out
+";
+}
+}
+else{
 print "$datum Playing file $currentTime
 ";
 check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
 check_wav_db("star dull");if($file1){$action = "$action $file1";}
 
-exec ("sox $action $currentTime",$output,$return_var);
-
-$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
-if(!$status){$status="OK";}
+exec("sox $action $currentTime",$output,$return_var);//print "DEBUG $action";
+exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
+}
 
 
 
@@ -651,7 +660,7 @@ save_task_log ($out);print "$datum $out
 "; 
  }
 }
-unlink($clash);
+if(file_exists($clash)){unlink($clash);
 line_end("Finished");
 
 //---------------------------------------------------------------------------------------------
