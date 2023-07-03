@@ -46,10 +46,7 @@
 // wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 // php install.php
 //
-// crontab -e add the following for time on the hr between 6am and 11pm
-// 00 7-23 * * * php /etc/asterisk/local/weather_pws.php >> /dev/null
-// or this for every hr
-// 0 * * * * php /etc/asterisk/local/weather_pws.php >> /dev/null
+
 
 $mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_start = $mtime;
 
@@ -660,7 +657,7 @@ save_task_log ($out);print "$datum $out
 "; 
  }
 }
-if(file_exists($clash)){unlink($clash);
+if(file_exists($clash)){unlink($clash);}
 line_end("Finished");
 
 //---------------------------------------------------------------------------------------------
