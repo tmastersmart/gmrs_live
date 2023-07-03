@@ -5,7 +5,7 @@
 //
 //https://api.weather.gov  module not to be called direct 
 //
-//   v1.2
+//   v1.3
 //================================test=================
 //
 //   Accept: application/cap+xml
@@ -129,14 +129,16 @@ $i++;
 $pos = strpos("-$line", "Watch");    if (!$sayWatch and $pos){ continue;}
 $pos = strpos("-$line", "Advisory"); if (!$sayAdvisory and $pos){ continue;}
 $pos = strpos("-$line", "Statement");if (!$sayStatement and $pos){continue;}
-$pos = strpos("-$clean", $line);     if ($pos){continue;}// Get rid of the dupes. 
 
+if ($clean){$pos = strpos("-$clean", $line);     if ($pos){continue;}}// Get rid of the dupes. 
 
 if($clean){
 $clean="$clean,$line";
 $clean2="$clean2,$d[$i]";
 }
 else {$clean=$line;$clean2=$d[$i];}
+
+
 }
 if ($event){print "$datum Raw Event(s): $event
 $datum Cleaned Event(s): $clean
@@ -311,7 +313,7 @@ $pos = strpos($line, 'number: 2,');if ($pos) { return;}
 
 function build_week ($file){
 global $iconWeek,$forcastWeek;
-
+$forcastWeek="";
 $testI= file($file); 
 foreach($testI as $line){
 
@@ -336,12 +338,12 @@ if ($pos) {
      }
 $line = str_replace('"', "", $line);        
      
-//$pos = strpos($line, 'shortForecast:');
+//detailedForecast
 $pos = strpos($line, 'detailedForecast:');   
 if ($pos) {
      $test = $line;
-     $Lpos = strpos($test, ':');$Rpos = strpos($test, ',');
-     $forcast  = substr($test, $Lpos+2,($Rpos-$Lpos)-2);
+     $Lpos = strpos($test, ':');$Rpos = strpos($test, ',}');
+     $forcast  = substr($test, $Lpos+2,($Rpos-$Lpos)-1);
      $forcast = str_replace(',', "", $forcast);// just in case TWS breaks things with ,
      $forcast = trim($forcast," ");
       if($forcastWeek and $forcast){
