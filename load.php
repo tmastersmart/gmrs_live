@@ -3,28 +3,6 @@
 // data file loader module..
 
 
-// v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
-// v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
-// v1.8 06/03/2023 
-// v2.0 06/09/2023 new databases . Rewrite of sound file system.
-// v2.3 06/13/2023 Major finished release with setup and installer 
-// v2.4 06/21/2023 many add ons reg fix new api alerts decoding
-// 
-// stage 1
-// v2.0 06/29/2023 new core released  with seperate module versions#s
-//                 Automated Reg down detection and automated fix
-//                 Many changes to alerts,Alerts now play with time,Reg down notification is in cap_warn and weather_pws               
-//                 Many changes to setup program. Auto install of super mon is a work in progress and wont be released until fully tested.
-
-
-// stage 2
-//                 First stages of a GMRS directory are working see the nodelist being created each day.
-//                 The future plan is to create my own supermon front end once stage 1 is perfected. 
-
-// stage 3
-//                Stage 3 is to get the cost of the PI down by getting the node software to run on a $35 clone board
-//                Bringing the cost of a node down under $100. with bf888 radio. I beleive there is a need for a low cost node
-
   
 $coreVersion = "v2.0";
 
@@ -34,7 +12,7 @@ $logRotate = 30000;// size to rotate at
 
 
 function load($in){
-global $IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
@@ -55,7 +33,7 @@ if (is_readable("$path/setup.txt")) {
           $sayWatch =  $u[9];
        $sayAdvisory = $u[10];
       $sayStatement = $u[11];
-//      $spare      = $u[12];
+             $sleep = $u[12];
               $high = $u[13]; 
                $hot = $u[14];
           $nodeName = $u[15];
@@ -87,16 +65,32 @@ php temp.php
 
 
 function line_end($in){
-global $script_start,$datum,$soundDbWav,$soundDbGsm;
+global $path,$script_start,$datum,$soundDbWav,$soundDbGsm;
 $mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_end = $mtime;$script_time = ($script_end - $script_start);$script_time = round($script_time,2);
 $datum  = date('m-d-Y H:i:s');
 $memory = memory_get_usage() ;$memory =formatBytes($memory);
 print "$datum $in [Line end] Used:$memory $script_time Sec
-===================================================
 ";
 unset ($soundDbWav);
 unset ($soundDbGsm);
 unset ($soundDbUlaw);
+
+
+// finish any upgrade in progress
+$path2 = "$path/update";
+$file  = "$path2/setup.php";
+$file2 = "$path/setup.php";
+if (file_exists($file)) {
+print "$datum Cleaning up after upgrade
+";
+copy($file2, "$path2/setup_old_php.bak");
+copy($file, $file2); 
+if (file_exists($file2)){unlink($file);}
+}
+
+print"===================================================
+";
+
 die;
 }
 
