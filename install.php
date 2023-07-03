@@ -15,6 +15,27 @@
 //
 // -------------------------------------------------------------
 
+// v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
+// v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
+// v1.8 06/03/2023 
+// v2.0 06/09/2023 new databases . Rewrite of sound file system.
+// v2.3 06/13/2023 Major finished release with setup and installer 
+// v2.4 06/21/2023 many add ons reg fix new api alerts decoding
+// 
+// stage 1
+// v2.0 06/29/2023 new core released  with seperate module versions#s
+//                 Automated Reg down detection and automated fix
+//                 Many changes to alerts,Alerts now play with time,Reg down notification is in cap_warn and weather_pws               
+//                 Many changes to setup program. Auto install of super mon is a work in progress and wont be released until fully tested.
+
+
+// stage 2
+//                 First stages of a GMRS directory are working see the nodelist being created each day.
+//                 The future plan is to create my own supermon front end once stage 1 is perfected. 
+
+// stage 3
+//                 much much more..............................
+
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
