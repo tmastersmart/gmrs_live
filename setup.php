@@ -122,7 +122,6 @@ Welcome $call
  Setup.php  program 
           
  1) Edit Setup
- 2) cron install/remove
  3) Speedtest
  F) Force Register Fix
  S) Supermon Setup
@@ -135,9 +134,9 @@ $stripe
  
 
 function editmenu(){
-global $debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog;
+global $sleep,$debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog;
 $displayIconBlock="false";$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; 
-$displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";$displaydebug="false";
+$displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";$displaydebug="false"; $displaySleep    ="false";
 if ($sayWatch)    {$displayWatch =   "true";}
 if ($sayWarn)     {$displayWarn     ="true";}
 if ($sayAdvisory) {$displayAdvisory ="true";}
@@ -146,7 +145,8 @@ if ($forcast) {    $displayForcast  ="true";}
 if ($beta){        $displayBeta     ="true";}
 if ($reportAll)   {$displayReport   ="true";}
 if ($IconBlock)   {$displayIconBlock="true";}
-if ($debug)       {$displaydebug   ="true";}
+if ($debug)       {$displaydebug    ="true";}
+if ($sleep)       {$displaySleep    ="true";}
 print"
 
 $stripe
@@ -163,7 +163,9 @@ $stripe
  9) Beta features [$displayBeta]
  0) Watchdog limit [$watchdog]
  d) Debugging info [$displaydebug]
- c) make changes to cron.
+ s) Dont say time when Sleeping 1-6 [$displaySleep]
+ c) Install into cron.
+ u) Uninstall from cron.
  W) Write to file.
  M) Main menu
  E) Exit  
@@ -179,10 +181,8 @@ global $forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$sk
 print"
 $stripe
  Supermon installer and GMRS modifications:
-      
+     
  1) Setup supermon for first time. 
-
-
  M) Main menu
  E) Exit  
 $stripe
@@ -249,7 +249,9 @@ while (!$yes)
     if ($input == '9'){beta("set");}
     if ($input == 'd'){debug("set");}
     if ($input == '0'){watchdog("set");}
+    if ($input == 's'){sleep("set");}
     if ($input == 'c'){setUpcron("set");}
+    if ($input == 'u'){unSetcron("set");}
     if ($input == 'm'){start_menu($in);start("start");}
     if ($input == 'w'){save("save");}
 	if ($input == 'e'){quit('EXIT');}
@@ -391,7 +393,20 @@ if ($line=="f"){$forcast=false;}
 editmenu();
 }
 
-
+function sleep($in){
+global $sleep ;
+$displaySleep="false";
+if ($sleep){$displaySleep="true";}
+print "
+Speep mode [$displayBeta]
+When in sleep mode will not talk between 1 and 6. 
+Allows script to run ever hr but not function at night  
+";
+$line = readline("Set to t/f: ");
+if ($line=="t"){$sleep=true;}
+if ($line=="f"){$sleep=false;}
+editmenu();
+}
 
 function beta($in){
 global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
@@ -596,7 +611,7 @@ editmenu();
 
 
 function load($in){
-global $IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
@@ -617,7 +632,7 @@ if (is_readable("$path/setup.txt")) {
           $sayWatch =  $u[9];
        $sayAdvisory = $u[10];
       $sayStatement = $u[11];
-//      $spare      = $u[12];
+        $sleep      = $u[12];
               $high = $u[13]; 
                $hot = $u[14];
           $nodeName = $u[15];
@@ -640,7 +655,7 @@ print "$datum $status
 
 $reportAll = false;$nodeName = "server";$high = 60;$hot  = 50;
 $station="KIER";$level = 3 ;
-$zipcode="71432"; $IconBlock= true; $skywarn =""; $lat ="31.7669"; $lon="-92.3888";
+$zipcode="71432"; $IconBlock= true; $skywarn =""; $lat ="31.7669"; $lon="-92.3888";$sleep=true;
 $sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;$node = $AutoNode;$forcast= false;$beta = false; $debug=false; $watchdog = 5;
 save ("save");
 }
@@ -697,8 +712,8 @@ if (!file_exists("$path2/$file")){
 exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
-// install other
-$files = "supermon.txt,supermon_weather.php,load.php,setup.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
+// install other  - setup.php is running so download to temp file - setup.php,
+$files = "supermon.txt,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
 $repo2 = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error = "";
 chdir($path);
@@ -712,13 +727,26 @@ foreach($u as $file) {
    print "sudo wget $repo2/$file
    "; 
  exec("sudo wget $repo2/$file ",$output,$return_var);
-   }
- exec("sudo chmod +x *.php",$output,$return_var);
+ exec("sudo chmod +x $file",$output,$return_var); 
+ }
+
+// special download of setup because its running. Will install elsewhere 
+$path2 = "$path/update";
+if(!is_dir($path2)){ mkdir($path2, 0755);}
+chdir($path2); 
+exec("sudo wget $repo2/setup.php ",$output,$return_var);
+exec("sudo chmod +x setup.php",$output,$return_var); 
+
+// make backups
+$cur   = date('mdyhis');
+$file = "$path/setup.txt";  $file2= "$path2/setup-$cur.txt";  copy($file, $file2);
+$file = "$path/mm-node.txt";$file2= "$path2/mm-node-$cur.txt";copy($file, $file2);
+$file = "$path/logs/log.txt";$file2= "$path2/log-$cur.txt"   ;copy($file, $file2);
+
+
 } 
 
-start_menu("start");
-
-start("start");
+start_menu("start");start("start");
 }
 
 function create_node ($file){
@@ -1021,32 +1049,37 @@ $status ="Del from cron $in";save_task_log ($status);
 else{save_task_log ("Del from chron (not found) $in");}
 
 }
+// remove from chron
+function unSetcron($in){
+$search="weather_pws.php";$in="";cronDel($in);
+$search="weather_pws.php";$in="";cronDel($in);
+$search="cap_warn.php"   ;$in="";cronDel($in);
+$search="temp.php"       ;$in="";cronDel($in);
 
-function setUpcron($in){
+
+// add back the orginal
+$search="/usr/local/sbin/saytime";$in="00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$";cronAdd($in);
+}
 // sets up cron and removes old scripts.
-
+function setUpcron($in){
 // comment out existing time string. 
 //#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$
 $search="/usr/local/sbin/saytime";$in="#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$";
 cronAdd($in);
 
 // add the new time string
-$search="weather_pws.php";$in="00 * * * * php /etc/asterisk/local/mm-software/weather_pws.php >/dev/null";
-cronAdd($in);
+$search="weather_pws.php";$in="00 * * * * php /etc/asterisk/local/mm-software/weather_pws.php >/dev/null";cronAdd($in);
 
 // Remove autosky
 //#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky
-$search="AutoSky";$in="#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky";
-cronAdd($in);
+$search="AutoSky";$in="#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky";cronAdd($in);
 
 // add skywarn
-$search="cap_warn.php";$in="00 * * * * php /etc/asterisk/local/mm-software/cap_warn.php >/dev/null";
-cronAdd($in);
+$search="cap_warn.php";$in="00 * * * * php /etc/asterisk/local/mm-software/cap_warn.php >/dev/null";cronAdd($in);
 
 
-// add skywarn  (This is optional)
-//$search="temp.php";$in="*/27 * * * * php /etc/asterisk/local/mm-software/temp.php >/dev/null";
-//cronAdd($in)
+$search="temp.php";$in="*/27 * * * * php /etc/asterisk/local/mm-software/temp.php >/dev/null";
+cronAdd($in) ;
 
 
 //stop the looping script from being in memory
