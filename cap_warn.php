@@ -152,7 +152,7 @@ if(!$NotReg){$out="We are back online"; save_task_log ($out);print "$datum $out
 
 
 
-if ($event=="clear"){line_end("There are no active events");}
+if ($event=="clear"){all_clear("ok");line_end("There are no active events");}
 if (!$event){$out="Error Bad CAP data";save_task_log ($out);line_end($out);}
 
 
