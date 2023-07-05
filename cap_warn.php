@@ -122,12 +122,12 @@ make_number ($x[$i]);
 if($file1){$action = "$action $file1";}
 if($file2){$action = "$action $file2";}
 }
-check_gsm_db ("is-not-registered");if($file1){$action = "$action $file1";} 
 
-$pos1 = strpos("-$registered", 'Refused');
-if($pos1){
-check_gsm_db ("rejected");if($file1){$action = "$action $file1";} 
-}
+//  "Auth. Sent"  "Registered"    rejected: 'Registration Refused' // Request,Auth.,
+$pos1 = strpos("-$registered", 'Unregistered');if($pos1){check_gsm_db ("is-not-registered");if($file1){$action = "$action $file1";}}
+$pos1 = strpos("-$registered", 'Refused');     if($pos1){check_gsm_db ("is-rejected");      if($file1){$action = "$action $file1";}}
+$pos1 = strpos("-$registered", 'Auth');        if($pos1){check_gsm_db ("connecting");       if($file1){$action = "$action $file1";}}
+$pos1 = strpos("-$registered", 'Request');     if($pos1){check_gsm_db ("not-yet-connected");if($file1){$action = "$action $file1";}}
 
 // if no events we need to talk seperate from alert.
 if($event=="clear"){
