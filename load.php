@@ -12,7 +12,7 @@ $logRotate = 30000;// size to rotate at
 
 
 function load($in){
-global $sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
