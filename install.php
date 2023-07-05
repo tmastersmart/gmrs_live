@@ -21,7 +21,8 @@
 // v2.0 06/09/2023 new databases . Rewrite of sound file system.
 // v2.3 06/13/2023 Major finished release with setup and installer 
 // v2.4 06/21/2023 many add ons reg fix new api alerts decoding
-// 
+// v2.5 07/05/2023 
+//
 // stage 1
 // v2.0 06/29/2023 new core released  with seperate module versions#s
 //                 Automated Reg down detection and automated fix
@@ -39,7 +40,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.6";
+$ver="v2.4";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -149,7 +150,7 @@ if (!file_exists("$path/$file")){
 }
 
 function create_nodea ($file){
-global $file,$path;
+global $file,$path,$tts;
 // phase 1 import node - call
 //$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
 $file ="/usr/local/etc/allstar_node_info.conf";
@@ -167,9 +168,22 @@ $call=$u[1];}
 }
 
 
-$file= "$path/mm-node.txt";// This will be the AutoNode varable
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call, , , ");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
+// /usr/local/etc/tts.conf 
+// Get any tss key if exists
+$file ="/usr/local/etc/tts.conf";
+$fileIN= file($file);
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
+$line = str_replace('"', "", $line);
+$pos = strpos("-$line", 'tts_key=');
+if ($pos){$u= explode("=",$line);
+$tts=$u[1];}
+}
+
+$file= "$path/mm-node.txt";// This will be the AutoNode varable
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call,$tts, , ,");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 // phase 2 build the admin menu
 $file ="/usr/local/sbin/firsttime/adm01-shell.sh";
