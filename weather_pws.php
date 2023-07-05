@@ -258,7 +258,8 @@ $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX
 $vpath="/var/lib/asterisk/sounds";
 
 // run the forcast
-if ($forcast){ include("$path/forcast.php");}
+//if ($forcast){
+include("$path/forcast.php");
 if ($event="clear"){$event="";} // Skip if clear
 
 if ($shortForcast){$out ="$cond1 | $shortForcast";}
