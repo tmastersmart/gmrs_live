@@ -10,10 +10,6 @@
 
 
 
-
-
-
-
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
 $pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
@@ -46,11 +42,11 @@ $logger       = "/etc/asterisk/logger.conf";
 $file="";
 create_node ($file);// testing create it everytime 
 
-$file= "$path/mm-node.txt";
+$file= "$path/mm-node.txt"; 
 if(file_exists($file)){
 $line = file_get_contents($file);
-
-$u= explode(",",$line);$AutoNode=$u[0];$call=$u[1];
+$u= explode(",",$line);
+$AutoNode=$u[0];$call=$u[1];$autotts=$u[2];
 }
 
 include ("$path/check_reg.php");
@@ -134,7 +130,7 @@ $stripe
  
 
 function editmenu(){
-global $sleep,$debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog;
+global $tts,$sleep,$debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog;
 $displayIconBlock="false";$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; 
 $displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";$displaydebug="false"; $displaySleep    ="false";
 if ($sayWatch)    {$displayWatch =   "true";}
@@ -151,7 +147,7 @@ print"
 
 $stripe
  Setup editor.   Last write date:$saveDate
-      
+
  1) Station [$station] (MADIS/CWOP) Station  
  2) Level Time [$level] 1=temp 2=cond 3=wind,hum,rain 4=Forcast (Levels to speak)
  3) Zipcode [$zipcode] for Acuweather conditions
@@ -164,6 +160,7 @@ $stripe
  0) Watchdog limit [$watchdog]
  d) Debugging info [$displaydebug]
  s) Dont say time when Sleeping 1-6 [$displaySleep]
+  ) text to speach key [$tts]
  c) Install into cron.
  u) Uninstall from cron.
  W) Write to file.
@@ -249,7 +246,7 @@ while (!$yes)
     if ($input == '9'){beta("set");}
     if ($input == 'd'){debug("set");}
     if ($input == '0'){watchdog("set");}
-    if ($input == 's'){sleep("set");}
+    if ($input == 's'){sleep1("set");}
     if ($input == 'c'){setUpcron("set");}
     if ($input == 'u'){unSetcron("set");}
     if ($input == 'm'){start_menu($in);start("start");}
@@ -393,10 +390,10 @@ if ($line=="f"){$forcast=false;}
 editmenu();
 }
 
-function sleep($in){
+function sleep1(){
 global $sleep ;
-$displaySleep="false";
-if ($sleep){$displaySleep="true";}
+
+$displaySleep="false";if ($sleep){$displaySleep="true";}
 print "
 Speep mode [$displayBeta]
 When in sleep mode will not talk between 1 and 6. 
@@ -611,7 +608,7 @@ editmenu();
 
 
 function load($in){
-global $sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $autotts,$tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
@@ -641,7 +638,8 @@ if (is_readable("$path/setup.txt")) {
            $forcast = $u[18];
               $beta = $u[19];
           $watchdog = $u[20];
-             $debug = $u[21];   
+             $debug = $u[21];
+               $tts = $u[22];   
     }
 }
 
@@ -655,7 +653,7 @@ print "$datum $status
 
 $reportAll = false;$nodeName = "server";$high = 60;$hot  = 50;
 $station="KIER";$level = 3 ;
-$zipcode="71432"; $IconBlock= true; $skywarn =""; $lat ="31.7669"; $lon="-92.3888";$sleep=true;
+$zipcode="71432"; $IconBlock= true; $skywarn =""; $lat ="31.7669"; $lon="-92.3888";$sleep=true;$tts=$autotts;
 $sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;$node = $AutoNode;$forcast= false;$beta = false; $debug=false; $watchdog = 5;
 save ("save");
 }
@@ -663,12 +661,12 @@ save ("save");
 
 
 function save($in){
-global $debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $tts,$debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$watchdog;
 $fileOUT = fopen("$path/setup.txt", "w");
 $status ="Writing settings";save_task_log ($status);
 print "$datum $status
 ";
-fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,,,,,");
+fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,$tts,,,,");
 fclose ($fileOUT);
 }
 
