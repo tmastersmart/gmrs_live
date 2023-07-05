@@ -79,7 +79,7 @@ $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($cur
 $clash="/tmp/mmweather-task.txt";
 $error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.8";  
+$ver= "v2.9";  
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by LAGMRS.com
@@ -258,11 +258,11 @@ $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX
 $vpath="/var/lib/asterisk/sounds";
 
 // run the forcast
-//if ($forcast){
-include("$path/forcast.php");
+//if ($forcast){  
+include("$path/forcast.php");// mandatory to get alerts
 if ($event="clear"){$event="";} // Skip if clear
 
-if ($shortForcast){$out ="$cond1 | $shortForcast";}
+if ($shortForcast ){$out ="$cond1 | $shortForcast";}
 else {$out=$cond1;}
 save_task_log ($out);
 } // end level 2
