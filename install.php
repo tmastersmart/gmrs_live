@@ -202,6 +202,15 @@ exit 0
 ';
 // overwrite with our menu.
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+ exec("sudo chmod +x $file",$output,$return_var);
  
-
+$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02";
+if(!file_exists($file)){ 
+ print"$datum We need the sound files from AUTOSKY so installing them.
+ ";  
+ exec("pacman -Sy hamvoip-autosky",$output,$return_var);
+}
+ 
+ 
+ 
 }
