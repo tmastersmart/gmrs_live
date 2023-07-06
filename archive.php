@@ -2,6 +2,9 @@
 <?php
 // (c)2023 by WRXB288 and LAgmrs.com
 // beta version1      Sound archive backup to a FTP server and erase
+//
+// Must have a full install to work because it uses the audio database system
+//
 // Not supported by auto installer yet must manualy install
 //
 // must install ffmpeg into the node before use
