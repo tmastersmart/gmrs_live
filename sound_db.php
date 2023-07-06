@@ -95,6 +95,7 @@ if ($in>=70 and $in<80  ){$file1  = "$vpath/digits/70.gsm";$in=$in-70;}
 if ($in>=80 and $in<90  ){$file1  = "$vpath/digits/80.gsm";$in=$in-80;} 
 if ($in>=90 and $in<100 ){$file1  = "$vpath/digits/90.gsm";$in=$in-90;}
 
+if ($in==0 and !$file1)  {$file2  = "$vpath/digits/0.gsm";}
 if ($in >=1 and $in<20  ){$file2  = "$vpath/digits/$in.gsm";}  
 
 if ($file3){$temp=$file2;$file2=$file3;$file3=$temp;}// Rearange for 100
