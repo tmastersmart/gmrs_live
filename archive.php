@@ -2,7 +2,28 @@
 <?php
 // (c)2023 by WRXB288 and LAgmrs.com
 // beta version1      Sound archive backup to a FTP server and erase
+// Not supported by auto installer yet must manualy install
+//
+// must install ffmpeg into the node before use
+// sudo pacman -Sy ffmpeg x264 x265   (select optiopn 1 default options)
+//
 
+
+// set rpt.conf as follows
+//archivedir = /etc/asterisk/local/log/
+//				; defines and enables activity recording
+//				; into specified directory (optional)
+//;archiveaudio=0
+//				; Disable saving audio files when
+//				; archiving. Use with caution on SDcards
+//				; This write a lot of data.
+//archivetype=gsm
+//				; Allows the selection of gsm (.wav) or
+//				; pcm (.ul) for archiving audio files
+
+// Set your ftp server. Im using filzilla on a win10 system.
+// Uploading to the net has not been tested. There is no verify.Before erasing
+//
 $user= "user"; $pass= "pass"; $ftp="192.168.0.xxx";
 
 $path         = "/etc/asterisk/local/mm-software";
