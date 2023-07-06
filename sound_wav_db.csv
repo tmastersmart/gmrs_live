@@ -53,7 +53,7 @@
 /usr/local/bin/AUTOSKY/SOUNDS/asn96,clear,
 /usr/local/bin/AUTOSKY/SOUNDS/asn97,updated weather information,
 /usr/local/bin/AUTOSKY/SOUNDS/asn98,star dull,
-/usr/local/bin/AUTOSKY/SOUNDS/silence1,silence1,silence1.wav
+/usr/local/bin/AUTOSKY/SOUNDS/silence1,silence1,
 /usr/local/bin/AUTOSKY/SOUNDS/silence2,silence2,
 /usr/local/bin/AUTOSKY/SOUNDS/silence3,silence3,
 /etc/asterisk/local/mm-software/sounds/flood_advisory,Flood Advisory,
