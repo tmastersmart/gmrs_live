@@ -1,5 +1,4 @@
 #!/usr/bin/php
-
 <?php
 // (c)2023 by WRXB288 and LAgmrs.com  
 //
@@ -54,7 +53,7 @@ $tailfile  ="$path2/wx-tail.wav";
 if(!is_dir($path1)){ mkdir($path1, 0755);}
 if(!is_dir($path2)){ mkdir($path2, 0755);}
 
-$ver= "v1.9";
+$ver= "v2.0";
   
 include ("$path/load.php");
 include ("$path/sound_db.php");
@@ -86,6 +85,7 @@ Cap Warn CAP 1.1/1.2 NWS API    $coreVersion-c$ver
 (c)2023 WRXB288 LAGMRS.com all rights reserved
 $phpzone PHP v$phpVersion
 ===================================================
+$datum Model: $piVersion
 $datum Node:$node UTC:$gmdatum 
 ";
 $action=""; 
