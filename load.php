@@ -5,10 +5,9 @@
 
   
 $coreVersion = "v2.0";
-
 load("load");
-
 $logRotate = 30000;// size to rotate at
+$piVersion = file_get_contents ("/proc/device-tree/model");
 
 
 function load($in){
