@@ -1,8 +1,12 @@
-  #!/usr/bin/php
+#!/usr/bin/php
 <?php
 // (c)2015/2023 by The Master lagmrs.com  by pws.winnfreenet.com
 // This script uses some code my weather programs. Member CWOP since 2015 
-// Licensed only for GMRS,Allstar & Hamvoip nodes. All rights reserved. 
+
+// I license you to use this on your copy of this software only.
+// Not for use on anything but GMRS.  GMRS ONLY! 
+
+// No part of this code is opensource 
 //
 // _______ _                 __          __        _   _                  _____             
 //|__   __(_)                \ \        / /       | | | |                / ____|            
@@ -42,7 +46,6 @@
 // Contact me if you have a local station running AmbientWeather ObserverIP and wish to submit weather data to CWOP.
 // I am testing a new PHP version that will run on a PI..... pws.winnfreenet.com 
 //
-// place in  /etc/asterisk/local
 // wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 // php install.php
 //
@@ -54,12 +57,8 @@ $path="/etc/asterisk/local/mm-software";
 include ("$path/load.php");
 include ("$path/sound_db.php");
 include ("$path/check_reg.php");
-
-
-
-$muteTime1= 2; $muteTime2=5;// if($hour>=$MuteTime1 and $hour <=$muteTime2){  MUTE SOUND from 2-5 am 
-
-
+$ver= "v3.0";  
+$muteTime1= 1; $muteTime2=6;//  MUTE SOUND from 2-5 am 
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -69,31 +68,28 @@ else {$zone="America/Chicago";}
 define('TIMEZONE', $zone);
 date_default_timezone_set(TIMEZONE);
 $phpzone = date_default_timezone_get(); // test it 
-if ($phpzone == $zone ){$phpzone="$phpzone set";}
+if ($phpzone == $zone ){$phpzone=$phpzone;}
 else{$phpzone="$phpzone ERROR";}
 
-$cond        = "/tmp/conditions.gsm"  ;if(file_exists($cond)){unlink($cond);}
-$condition   = "/tmp/condition.gsm"   ;if(file_exists($condition)){unlink($condition);}    
 $currentTime = "/tmp/current-time.gsm";if(file_exists($currentTime)){unlink($currentTime);}
-
 $clash="/tmp/mmweather-task.txt";
 $error="";$action="";
 $phpVersion= phpversion();
-$ver= "v2.9";  
+
 $time= date('H:i');
 $date =  date('m-d-Y');
 // Token generated for this script. owned by LAGMRS.com
 // I license you to use this on your copy of this software only.
-// Not for use on anything but GMRS  
+// Not for use on anything but GMRS.  GMRS ONLY! 
 $token = "473c0a7b78d24dc99c182f78619d0090";
-$datum   = date('m-d-Y H:i:s');
-$gmdatum = gmdate('m-d-Y H:i:s');
+$datum   = date('m-d-Y H:i:s');$gmdatum = gmdate('m-d-Y H:i:s');
 print "
 ===================================================
 mesowest, madis, APRSWXNET(CWOP) $coreVersion-w$ver
 (c)2013/2023 WRXB288 LAGMRS.com all rights reserved
 $phpzone PHP v$phpVersion
 ===================================================
+$datum Model: $piVersion
 $datum Node:$node UTC:$gmdatum Level:$level
 ";
 
@@ -105,10 +101,8 @@ if(file_exists($clash)){unlink($clash);
 
 $fileOUT = fopen($clash,'w');fwrite ($fileOUT,$datum);fclose ($fileOUT);
 
-if($beta){
- include ("$path/nodelist_process.php");
- sort_nodes ("nodes");
- }
+// will be part of custom GMRS_Supermon 
+if($beta){ include ("$path/nodelist_process.php"); sort_nodes ("nodes"); }
 
 // read the station
 $apiString = "stid=$station&token=$token&units=english&output=xml";
@@ -270,9 +264,7 @@ save_task_log ($out);
 
 // ------------------------------------------------------------------------
 $hour = date('H');$day  = date('l');$hr =   date('h');$min  = date('i');
-$file=$currentTime; $cmd="";
-if(file_exists($file)){unlink($file);}
-$fileOUT = fopen($file,'wb');fclose ($fileOUT);// create the file
+$cmd="";
 
 check_wav_db("star dull");if($file1){$action = "$action $file1";} 
 //check_gsm_db  ("silence2"); if($file1){$action = "$action $file1";}
@@ -620,11 +612,12 @@ check_gsm_db ("is-registered");if($file1){$action = "$action $file1";}
  
 // ---------------------------------------------------play the file---------------------
 $datum   = date('m-d-Y H:i:s'); $hour = date('H');
+
 if($sleep){
- if($hour>=$MuteTime1 and $hour <=$muteTime2){
-$out="Night time Muted"; save_task_log ($out);print "$datum $out
-";
-}
+ if($hour>$MuteTime1 and $hour <$muteTime2){
+$out="Night time Muted $hour"; save_task_log ($out);
+print "$datum $out
+";}
 }
 else{
 print "$datum Playing file $currentTime
@@ -634,6 +627,7 @@ check_wav_db("star dull");if($file1){$action = "$action $file1";}
 
 exec("sox $action $currentTime",$output,$return_var);//print "DEBUG $action";
 exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
+
 }
 
 
