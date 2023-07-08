@@ -8,6 +8,8 @@
 // We dont pull this we let the node do it 
 // /var/log/asterisk/astdb.txt <-using this one
 
+
+// v1.2 Beta
 function sort_nodes ($in){
 global $beta,$path,$node,$datum;
 
