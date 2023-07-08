@@ -27,15 +27,38 @@
 // Set your ftp server. Im using filzilla on a win10 system.
 // Uploading to the net has not been tested. There is no verify.Before erasing
 //
-$user= "user"; $pass= "pass"; $ftp="192.168.0.xxx";
+
+
 
 $path         = "/etc/asterisk/local/mm-software";
+
 include ("$path/load.php");
 include ("$path/sound_db.php");
 $cur   = date('mdyhis');
 $archiveDir= "/etc/asterisk/local/log/$node";
 
+
+ // Get php timezone in sync with the PI
+$line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
+$line = str_replace(" ", "", $line);
+$pos1 = strpos($line, ':');$pos2 = strpos($line, '(');
+if ($pos1){  $zone   = substr($line, $pos1+1, $pos2-$pos1-1); }
+else {$zone="America/Chicago";}
+define('TIMEZONE', $zone);
+date_default_timezone_set(TIMEZONE);
+$phpzone = date_default_timezone_get(); // test it 
+if ($phpzone == $zone ){$phpzone=$phpzone;}
+else{$phpzone="$phpzone ERROR";}
+
+
+
+
+
+
+$user= ""; $pass= ""; $ftp="";
+
 check_gsm_db ("silence2");$silence=$file1; $archive="";$action="";
+
 $datum   = date('m-d-Y H:i:s');
 $yesterday = date('l m d Y',strtotime("-1 days"));
 $today = date('l m d Y');
@@ -47,6 +70,16 @@ Archive backup
 Today:$today Yesterday: $yesterday 
 ===================================================
 ";
+
+
+
+
+
+
+
+
+
+
 // build audio timestamp
 $action="";
 $date_string= explode(' ', $date_y); // Tuesday July 04 2023
@@ -81,41 +114,24 @@ foreach (glob("*.WAV") as $file) {
     if($file == '.' || $file == '..') continue;
     $ii++;$ct++;
     $size=filesize($file);if($size==0){print "$file = $size ";continue;}
+    print ".";
     $action ="$action $silence $file"; if ($ii>=500){ 
      $cur= date('mdyhis');$archive   = "/etc/asterisk/local/log/archive-$cur.gsm";
-     exec("sox $action $archive",$output,$return_var);print"$archive $ii files added,";$ii=0; $action="";}
+     exec("sox $action $archive",$output,$return_var);print"
+$archive $ii files added,";$ii=0; $action="";}
     }
 
   
 $cur=date('mdyhis');$archive   = "/etc/asterisk/local/log/archive-$cur.gsm";  
 exec("sox $action $archive",$output,$return_var);
-print"$archive $ii files added <ok>
+print"
+$archive $ii files added <ok>
 ";
-
 save_task_log ("$archive $ii files added");
-
-print"killing all old files
-";
-$threshold = strtotime('-1 day');  
-foreach (glob("*.WAV") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) {
-//        if ($threshold >= filemtime($file)) { unlink($file);print"-";}
-       unlink($file);print"-";
-    }
-}
-foreach (glob("*.txt") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) {
-//        if ($threshold >= filemtime($file)) { unlink($file);print"-";}
-        unlink($file);print"-";
-    }
-}
-
-
-    
+ 
 $datum   = date('m-d-Y H:i:s');
-print"$datum found $ct files
+print"
+$datum found $ct files
 --------------------------------------------------
 ";
 
@@ -126,12 +142,13 @@ chdir("/etc/asterisk/local/log/");
 $ii=0;$ct=0;$size=0;$action=""; $file="";
 foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
-    $ii++;$ct++;
+    $ii++;
     $size=filesize($file);if($size==0){print "$file = $size ";continue;}
+    $ct++;
     $action ="$action $silence $file"; 
     }
 $datum   = date('m-d-Y H:i:s');    
-print "$datum Converting and Compressing
+print "$datum Converting and Compressing $ct files
 ";   
 // Audio PCM uncompressed 16bit 8khz mono(1 channel)
 // Stream #0:0: Audio: gsm, 8000 Hz, mono, s16, 13 kb/s
@@ -152,20 +169,51 @@ $datum   = date('m-d-Y H:i:s');
 print"$datum upload  $ct files $file
 ";
 $datum   = date('m-d-Y H:i:s');
-print"$datum Erasing"; 
+
+print"$datum Cleaning up"; 
 // make sure all archives are removed
 foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
-    unlink ($file); print "-";
+    if (is_file($file)) { unlink($file);print"del $file
+    ";  }
     } 
 foreach (glob("*.mp3") as $file) {
     if($file == '.' || $file == '..') continue;
-    unlink ($file); print "-";
+    if (is_file($file)) { unlink($file);print"del $file
+    ";  }
     }       
+
+chdir($archiveDir);
+print"killing all old files
+";
+//$threshold = strtotime('-1 day');  
+foreach (glob("*.WAV") as $file) {
+    if($file == '.' || $file == '..') continue;
+    unlink($file);print"-";
+    if(file_exists($file)){print"error del fail
+    ";unlink($file);}
+}
+
+foreach (glob("*.txt") as $file) {
+    if($file == '.' || $file == '..') continue;
+    unlink($file);print"-";
+    if(file_exists($file)){print"error del fail
+    ";unlink($file);}
+}
+
+sleep(4);//  wait for it
+
+$count=0;
+foreach (glob("*.WAV") as $file) {
+    if($file == '.' || $file == '..') continue;
+    $count++;  
+}
+
+
 
 $datum   = date('m-d-Y H:i:s');
 print"
-$datum Finished
+$datum Finished  $count files not deleted
 ";
 save_task_log ("Uploaded $archive to $ftp");
 
