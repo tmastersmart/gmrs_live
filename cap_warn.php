@@ -35,25 +35,22 @@
 // Notice this is only as reliable as the weather.gov server which goes down from time to time & your node.
 // Not responiable for any failed reports use as is at your own risk.
 //
+// Notes the tailfile is shorter for repeated use in tail file settings
 //
-
+// skywarn-tm.wav is temp file the program creates on a update. This should not be used as a tail file. it should be autodeleted
+//
 
 $mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_start = $mtime;
 
 $path      ="/etc/asterisk/local/mm-software";
-$outTmp    ="/tmp/skywarn.wav"; if (file_exists($outTmp)){unlink($outTmp);} 
+$outTmp    ="/tmp/skywarn-tmp.wav"; if (file_exists($outTmp)){unlink($outTmp);} 
 $alertTxt  ="/tmp/skywarn.txt"; 
 $alertTxtHeadline ="/tmp/skywarn_headline.txt"; 
 $clash     ="/tmp/mmweather-task.txt";
+$tailfile  ="/tmp/skywarn-tail.wav";  
 
-//compatibality  
-$path1="/tmp/AUTOSKY";$path2="/tmp/AUTOSKY/WXA";
-$tailfile  ="$path2/wx-tail.wav";  
 
-if(!is_dir($path1)){ mkdir($path1, 0755);}
-if(!is_dir($path2)){ mkdir($path2, 0755);}
-
-$ver= "v2.0";
+$ver= "v2.1";
   
 include ("$path/load.php");
 include ("$path/sound_db.php");
@@ -236,8 +233,8 @@ $action="";
 $datum   = date('m-d-Y H:i:s');
 print "$datum Processing all Clear
 ";
-$outTmp="/tmp/skywarn.wav"; // dupe
-$file= $outTmp;if (file_exists($file)){unlink($file);}
+$outTmp    ="/tmp/skywarn-tmp.wav"; if (file_exists($outTmp)){unlink($outTmp);} 
+
 
 if (file_exists($alertTxt)){unlink($alertTxt); // There has been a past alert so we need to clear it and notify
 if (file_exists($tailfile)){unlink($tailfile);}
@@ -251,7 +248,7 @@ exec ("sox $action $outTmp",$output,$return_var);
 $status ="Playing all clear $file";save_task_log ("All Events now Clear");print "$datum $status
 ";
 
-$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/skywarn'",$output,$return_var);
+$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/skywarn-tmp'",$output,$return_var);
 if(!$status){$status="OK";}
 }
 
