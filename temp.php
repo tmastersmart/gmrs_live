@@ -82,18 +82,16 @@ $phpVersion= phpversion();
 
 
 
-
-$ver="v1.8";
+$datum = date('m-d-Y-H:i:s');
+$ver="v1.9";
 $out="";
-print "===================================================
-";
-print " PI temp Monitor  $coreVersion-t$ver 
-"; 
-print "(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
-";
-print "$phpzone PHP v$phpVersion
-";
-print "===================================================
+print "
+===================================================
+ PI temp Monitor  $coreVersion-t$ver 
+(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
+$phpzone PHP v$phpVersion
+===================================================
+$datum Model: $piVersion
 ";
 chdir($path);
 
@@ -161,6 +159,7 @@ if ($temp >=$hot){
 }
 if ($throttled){check_ulaw_db ($throttled);if($file1){$action = "$action $file1";}  }
 check_wav_db("star dull");if($file1){$action = "$action $file1";}
+check_gsm_db ("silence2");if($file1){$action = "$action $file1";}
 
 $datum   = date('m-d-Y H:i:s');
 print "$datum Playing file $cpufile 
