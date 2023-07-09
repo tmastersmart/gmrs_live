@@ -1,4 +1,4 @@
-#!/usr/bin/php
+  #!/usr/bin/php
 <?php
 // (c)2015/2023 by The Master lagmrs.com  by pws.winnfreenet.com
 // This script uses some code my weather programs. Member CWOP since 2015 
@@ -156,7 +156,8 @@ $validTemp = true;
 print "<ok> UTC:$CurrTime $poll_time Sec. 
 ";
 $action = watchdog ("oknet");
-$the_temp=$outtemp;
+//$the_temp=$outtemp;
+$the_temp=number_format($outtemp, 2);
 //$file="/tmp/temperature.txt";if(file_exists($file)){unlink($file);}
 //$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$the_temp);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);
 $datum   = date('m-d-Y H:i:s');$status="$sitename Temp:$the_temp";
@@ -404,6 +405,7 @@ $datum   = date('m-d-Y H:i:s');
 print "$datum $condWX
 "; 
 check_gsm_db ("temperature");if($file1){$action = "$action $file1";}
+
 list($whole, $decimal) = explode('.', $the_temp);
 $oh=false;make_number ($whole);
 if($file0){$action = "$action $file0";}
