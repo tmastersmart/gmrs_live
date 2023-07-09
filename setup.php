@@ -8,7 +8,7 @@
 
 // PHP is in UTC Get in sync with the PI
 
-
+$ver="v1.3";
 
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -24,7 +24,7 @@ else{$phpzone="$phpzone ERROR";}
 $phpVersion= phpversion();
 
 $logRotate = 30000;// size to rotate at
-$ver="v1.2";
+
 $in="";
 $path         = "/etc/asterisk/local/mm-software";
 $iax          = "/etc/asterisk/iax.conf";
@@ -51,7 +51,8 @@ $AutoNode=$u[0];$call=$u[1];$autotts=$u[2];
 
 include ("$path/check_reg.php");
 
-reg_check ($in);
+reg_check ($in);$file="";
+
 
 load($in);
 
@@ -89,19 +90,23 @@ global $counter,$watchdog,$NotReg,$datum;
 
 print"
 Success rate for me is 100%. Your milage may vary. 
-This works if your Router, Gateway, Modem or ISP Corrupts your open port so it cant reach the reg server.
+This is only for the following problem.
+Your Router, Gateway, Modem or ISP Corrupts your open port so
+it cant reach the reg server. 
 I fix this by rotating the port# This forces a new path to the server.
 Normaly registration is restored in a few seconds. 
+
 After your back online the port will rotate back to default. On the next reboot.
 
-Note: If you are using IAX client it wont be able to reconnect. 
+Note: If you are using IAX client it wont be able to reconnect while on the alt port.
+
+Watchdog can be set to run this fix automaticaly. 
 ";
 reg_check ($in);
-//if($NotReg){
-reg_fix ("check");
-//}
-//else {print"$datum This can only be run manualy if you are not registered.
-//"; }
+if($NotReg){reg_fix ("check");}
+else {print"$datum This can only be run manualy if you are not registered.
+"; }
+
 start_menu($in);
 }
 
@@ -109,6 +114,12 @@ function start_menu($in){
 global $call,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
 global  $phpzone,$phpVersion; 
 print "
+
+
+
+
+
+
 $stripe
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 $phpzone PHP v$phpVersion
@@ -148,7 +159,7 @@ print"
 $stripe
  Setup editor.   Last write date:$saveDate
 
- 1) Station [$station] (MADIS/CWOP) Station  
+ 1) Station [$station] Weather Station MADIS,APRSWXNET,Citizen Weather Observer Program (CWOP)
  2) Level Time [$level] 1=temp 2=cond 3=wind,hum,rain 4=Forcast (Levels to speak)
  3) Zipcode [$zipcode] for Acuweather conditions
  4) Location Lat:[$lat]/Lon:[$lon] needed for NWS API 
@@ -157,10 +168,10 @@ $stripe
  7) Node   Auto:[$AutoNode]  Node:[$node]
  8) Forcast [$displayForcast] 
  9) Beta features [$displayBeta]
- 0) Watchdog limit [$watchdog]
+ 0) Watchdog limit. will fix reg automaticaly after [$watchdog] falures 99=disable
  d) Debugging info [$displaydebug]
  s) Dont say time when Sleeping 1-6 [$displaySleep]
-  ) text to speach key [$tts]
+
  c) Install into cron.
  u) Uninstall from cron.
  W) Write to file.
@@ -177,9 +188,14 @@ function supermonMenu(){
 global $forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
 print"
 $stripe
- Supermon installer and GMRS modifications:
+ Supermon installer and GMRS modifications: BETA
+ 
+ If you already have it customized you may wish to wait for the next version
+ this customizes the menus and adds favorites.  
+ 
      
- 1) Setup supermon for first time. 
+ 1) Setup supermon for first time. (dont use if already setup) 
+  
  M) Main menu
  E) Exit  
 $stripe
@@ -215,6 +231,19 @@ print "
 $stripe
 Thank you for downloading.........Made in Louisiana
 
+
+to test type
+
+cd $path
+
+php weather_pws.php
+php temp.php
+php cap_warn.php
+
+
+this program is located in $path 
+And can be run from the admin menu or by typing
+php setup.php
 
 
 * SLMR v2.1 * Have many nice days.
@@ -284,7 +313,7 @@ while (!$yes)
 
 // -------------------------------------------------------------supermon ----------------------------------------------
 function supermonGo($in){
-global $call,$password,$forcast,$beta,$AutoNode,$path,$node,$iax,$rpi,$manager,$supermonPath,$allmon,$favorites,$global,$tmpFile,$logger,$watchdog ;
+global $call,$password,$forcast,$beta,$AutoNode,$path,$node,$iax,$rpi,$manager,$supermonPath,$allmon,$favorites,$global,$tmpFile,$logger,$watchdog,$name,$location ;
 print "
 ---------------------------------------------------------------
 This will set up supermon for the first time to node: $node
@@ -292,6 +321,8 @@ It also adds GMRSLive links. Existing files will be backed up.
 
 NOTICE: This is still in beta make backups of your CARD first!
         Just in case of bugs you can undo changes.....
+        
+        
 ---------------------------------------------------------------
         
 
@@ -302,56 +333,59 @@ NOTICE: This is still in beta make backups of your CARD first!
 $a = readline('Enter your command: ');
 if ($a=="i"){
 // first 
-print "[Entering return anytime will abort]";
+print "[Entering return anytime will abort]
+";
 save_task_log ("Installing Supermon");
-$password = getRandomString(10);
-print " Using random password of $password on IAX connections.";
-// /etc/asterisk/manager.conf
-$file=$manager;$search= "secret ="; $in="secret =$password";
-edit_config($in); 
-print " Password entered in $manager  
+
+print"
+The supermon page will display this info its not used anywhere else.
+=================================================================
+";
+$name = readline('Your Name for supermon page: ');
+$location = readline('Your Location for supermon page: ');
+print "Zipcode = $zipcode
+=================================================================
+";
+$password = getRandomString(5);
+print " Using random password of $password on IAX connections.
+";
+$manager      = "/etc/asterisk/manager.conf"; 
+
+$file=$manager;$search= "secret ="; edit_config("secret =$password"); 
+print " Password $password entered in $manager  
 ";
 buildAllmon($node);
 print " Password entered in $allmon  with custom links to GMRSLive
 ";
 
-$line = readline("Enter Password for Supermon: ");
-if ($line==""){start('go');}
-
-chdir("$supermonPath"); $file="$supermonPath/.htpasswd";
+chdir("$supermonPath");
+$file="$supermonPath/.htpasswd";
 if (file_exists($file)){ unlink($file); }
 
-$username = 'admin';
-$encrypted_passwordD = crypt($password, base64_encode($password));
-$encrypted_passwordB = password_hash($password, PASSWORD_BCRYPT);
-print "
-$username . ':' . $encrypted_passwordB
-";
-$fileOUT = fopen("$supermonPath/.htpasswd",'w');fwrite ($fileOUT,"$username . ':' . $encrypted_passwordB");fclose ($fileOUT);
 
-print "Building globalfor $call
+print " Enter a password for supermon access. Username will be admin.
+";
+exec ("htpasswd -cB .htpasswd admin",$output,$return_var);
+
+
+print "Building global.ini  $call
 ";
 buildGlobal($node);
-
+$file=$rpi; 
 $search="connpgm=";edit_config("connpgm=/usr/local/sbin/supermon/smlogger 1");
 $search="discpgm=";edit_config("discpgm=/usr/local/sbin/supermon/smlogger 0"); 
 
 // /etc/asterisk/logger.conf
-$file=$logger;$search= "messages =>"; $in="messages => notice,warning,error,verbose";
-edit_config($in);
+$file=$logger;$search= "messages =>"; edit_config("messages => notice,warning,error,verbose");
 
 // cronDel($in) cronAdd($in)  $search
-$in="10,25,40,55 * * * * /usr/local/sbin/trimlog.sh /var/log/asterisk/messages 1000"; $search="trimlog.sh /var/log/asterisk/messages";
-cronAdd($in);
-print "cron $in
+$in="10,25,40,55 * * * * /usr/local/sbin/trimlog.sh /var/log/asterisk/messages 1000"; 
+$search="trimlog.sh";cronAdd($in);
+print "adding to cron $in
 ";
 
 $file="/srv/http/index.php";
-
 $fileOUT = fopen($file, "w"); 
-
-
-
 $out = "<?php
 header('Location: /supermon/link.php?nodes=$node');
 die();
@@ -360,6 +394,8 @@ die();
 fwrite ($fileOUT, $out);
 fclose ($fileOUT);
 
+print"Requesting restart
+";
 
 exec ("astres.sh",$output,$return_var);  // Run restart
 
@@ -534,11 +570,18 @@ function watchdog($in){
 global $watchdog;
 
 print "
-Watchdog timmer.  [$watchdog] On this many falures take action.
-In case of Not Registered it will activate my reg fix. Which bypasses a port block on your modem router or ISP.
+Watchdog timmer.  On this many falures [$watchdog] take action.
 
+In case you get Not Registered abd it wont come back online it will rotate
+the port to a random port and restart ast. This solves my ATT Fixed Wireless problem 
 
-Net down. error logs only.
+Which is designed to bypasses a port block on your modem, router or ISP.
+
+3 or 4 recomended 
+
+If you are having problems staying registered after a few days you can try this. 
+If it doesnt work o well its something to try works for me....
+
 Set to 99 to disable.   
 ";
 $line = readline("Watchdog timmer $watchdog: ");
@@ -650,11 +693,15 @@ else {
 $status ="Building default settings";save_task_log ($status);
 print "$datum $status
 ";
-
-$reportAll = false;$nodeName = "server";$high = 60;$hot  = 50;
-$station="KIER";$level = 3 ;
-$zipcode="71432"; $IconBlock= true; $skywarn =""; $lat ="31.7669"; $lon="-92.3888";$sleep=true;$tts=$autotts;
-$sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;$node = $AutoNode;$forcast= false;$beta = false; $debug=false; $watchdog = 5;
+$reportAll = false;$nodeName = "server";$high=60;$hot=50;
+// https://madis-data.ncep.noaa.gov/MadisSurface/
+$station="KAEX";$level = 3 ;  // Alexandria International Airport (AEX)
+$zipcode="71432"; $IconBlock= true; $skywarn ="";
+$lat ="31.3273"; $lon="-92.5485"; // Alexandria International Airport	31.3273717,-92.5485558
+$sleep=true;$tts=$autotts;
+$sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;
+$node = $AutoNode;$forcast= false;$beta = false; $debug=false;
+$watchdog = 10;
 save ("save");
 }
 }
@@ -687,8 +734,8 @@ This will update to the software to the current version
 $a = readline('Enter your command: ');
 
 if ($a == "u"){
+$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 
-$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul,advisory.gsm";
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
@@ -711,7 +758,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other  - setup.php is running so download to temp file - setup.php,
-$files = "supermon.txt,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
+$files = "supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
 $repo2 = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error = "";
 chdir($path);
@@ -726,6 +773,16 @@ foreach($u as $file) {
    "; 
  exec("sudo wget $repo2/$file ",$output,$return_var);
  exec("sudo chmod +x $file",$output,$return_var); 
+ }
+
+
+// non chmod files to install
+$files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
+$u = explode(",",$files);
+foreach($u as $file) {
+ print "sudo wget $repo2/$file
+   "; 
+ exec("sudo wget $repo2/$file ",$output,$return_var);
  }
 
 // special download of setup because its running. Will install elsewhere 
@@ -794,25 +851,25 @@ $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$nod
 //";
 //
 function save_task_log ($status){
-global $path,$error,$datum,$file,$logRotate;
+global $path,$error,$datum,$logRotate;
 
 $datum  = date('m-d-Y H:i:s');
 if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
 chdir("$path/logs");
-$file="$path/logs/log.txt";
-$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
+$log="$path/logs/log.txt";
+$log2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
 
 // log rotation system
-if (is_readable($file)) {
-   $size= filesize($file);
+if (is_readable($log)) {
+   $size= filesize($log);
    if ($size > $logRotate){
-    if (file_exists($file2)) {unlink ($file2);}
-    rename ($file, $file2);
-    if (file_exists($file)) {print "error in log rotation";}
+    if (file_exists($log2)) {unlink ($log2);}
+    rename ($file, $log2);
+    if (file_exists($log)) {print "error in log rotation";}
    }
 }
 
-$fileOUT = fopen($file, 'a+') ;
+$fileOUT = fopen($log, 'a+') ;
 flock ($fileOUT, LOCK_EX );
 fwrite ($fileOUT, "$datum,$status,,\r\n");
 flock ($fileOUT, LOCK_UN );
@@ -826,20 +883,25 @@ fclose ($fileOUT);
 // function search and replace
 //
 function edit_config($in){
-global $search,$path,$file,$tmpFile,$ok;
-$ok=false;
-if (file_exists($file)){
+global $search,$path,$file,$ok;
 
+print "Edit $file";
+$ok=false;$line="";
+if (file_exists($file)){print"-";
 $fileBu = "$file-.bak"; if (file_exists($fileBu)){ unlink($fileBu); }
-copy($file,$fileBu);if(!file_exists($fileBu)){ print "Unable to make a BackUP.";}
+$tmpFile="/tmp/editing.txt";
 
+copy($file,$fileBu);if(!file_exists($fileBu)){ print "Unable to make a BackUP.";}
+print"$file > $fileBu
+";
 $fileIN= file($file);
 $fileOUT = fopen($tmpFile, "w") or die ("Error $tmpFile Write falure\n");
 foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
-$pos = strpos("-$line", $search); if ($pos == 1){$line=$in;$ok=true;}  // Replace the found line with a new one.
-fwrite ($fileOUT, "$line\n");
+$pos = strpos("-$line", $search); if ($pos){$line=$in;$ok=true;}  // Replace the found line with a new one.
+fwrite ($fileOUT, "$line\n");print"$line
+";
 }
 
 fclose ($fileOUT);
@@ -863,7 +925,7 @@ if (file_exists($tmpFile)){ unlink($file);
 
 // global.inc'
 function buildGlobal($in){
-global $global,$path,$file,$tmpFile,$ok,$password,$node;
+global $zipcode,$global,$path,$file,$tmpFile,$ok,$password,$node,$call,$name,$location;
 
 $file = $global;
 
@@ -876,41 +938,29 @@ $fileOUT = fopen($tmpFile, "w") or die ("Error $tmpFile Write falure\n");  //
 
 $formated="
 <?php
-// Set the values to your parameters
-// ONLY change text between quotes
-//
-// Your callsign
 #CALL = '$call';
-//
-// Your name
-#NAME = 'YOUR NAME';
-//
-// Your location
-#LOCATION = 'YOUR LOCATION';
-//
-// Second line header title
+#NAME = '$name';
+#LOCATION = '$location';
 #TITLE2 = 'RPi2-3 Node';
-//
-// Third line header title
-#TITLE3 = 'Allstar/IRLP/Echolink System Manager';
-//
-// Background image - specify path if not /srv/http/supermon
-// Leaving BACKGROUND null results in BACKGROUND_COLOR
+#TITLE3 = 'GMRS Live System Node Manager';
 #BACKGROUND = 'background.jpg';
-//
-// Background color if no image
 #BACKGROUND_COLOR = 'blue';
-//
-// Height of background - matches image height
 #BACKGROUND_HEIGHT = '124px';
+#REFRESH_DELAY = '21600';
+#SHOW_COREDUMPS = 'yes';
+#LOCALZIP = '$zipcode';
+
 ?>
 ";//  <?php
 $formated = str_replace("'", '"', $formated);
 $formated = str_replace('#', '$', $formated);
 
 fwrite ($fileOUT, $formated);
-
 fclose ($fileOUT);
+
+print "saving
+$formated
+";
 
 save_task_log ("$file saved");
 
@@ -927,9 +977,11 @@ if (file_exists($file)){
 $fileBu = "$file-.bak"; if (file_exists($fileBu)){ unlink($fileBu); }
 copy($file,$fileBu);if(!file_exists($fileBu)){ print "Unable to make a BackUP.";}
 
-$fileOUT = fopen($tmpFile, "w") or die ("Error $tmpFile Write falure\n");  // 
+$fileOUT = fopen($file, "w") or die ("Error $file Write falure\n");  // 
 
-$formated="host=127.0.0.1:5038
+$formated="
+[$node]
+host=127.0.0.1:5038
 user=admin
 passwd=$password
 menu=yes
@@ -946,7 +998,7 @@ url='/cgi-bin/lsnodes_web?node=$node'
 menu=yes
 
 [GMRSLive]
-url=/http://gmrslive.com/status/link.php?nodes=700,900'
+url='/http://gmrslive.com/status/link.php?nodes=700,900'
 menu=yes
 
 [RoadKill]
@@ -989,13 +1041,19 @@ menu=yes
 $formated = str_replace("'", '"', $formated);
 fwrite ($fileOUT, $formated);
 fclose ($fileOUT);
+
+print "saving
+$formated
+";
+
+
 save_task_log ("$file saved");
 
 }
 }
 
 function getRandomString($n){
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#*()-+=?<>';
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
 
     for ($i = 0; $i < $n; $i++) {
@@ -1009,20 +1067,25 @@ function getRandomString($n){
 
 
 // cronDel($in) cronAdd($in)  $search
-
+// --------------------------------ADD
 function cronAdd ($in){
-
+global $path,$search;
 $file    = "$path/cron.txt";
 $tmpFile = "$path/cron-new.txt"; if (file_exists($tmpFile)){ unlink($tmpFile); }
 exec ("crontab -l > $file",$output,$return_var);
-$ok=false;
+$ok=false;$dupe=false;
 $fileIN= file($file);
 $fileOUT = fopen($tmpFile, "w") or die ("Error $tmpFile Write falure\n");
 foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
-$pos = strpos("-$line", $search); if ($pos == 1){$ok=true;}  
-fwrite ($fileOUT, "$line\n");
+$pos = strpos("-$line", $search); 
+if ($pos >= 1){$ok=true;
+fwrite ($fileOUT, "$line\n"); print"$line
+";
+$dupe=true;}  
+if(!$dupe and !$pos){fwrite ($fileOUT, "$line\n"); print"$line
+";}
 }
 if (!$ok){fwrite ($fileOUT, "$in\n");}
 fclose ($fileOUT);
@@ -1031,24 +1094,31 @@ if (!$ok){
 exec ("crontab $tmpFile",$output,$return_var);
 $status ="Add to cron $in";save_task_log ($status);
 }
-else{save_task_log ("Add to chron (already in it) $in");}
+else{print"Already in cron
+";
+save_task_log ("Skipping Add to chron $in");
+} 
+
 }
 
-
+//-------------------------------DEL
 function cronDel($in){
+global $search,$path;
 $file    = "$path/cron.txt";
 $tmpFile = "$path/cron-new.txt"; if (file_exists($tmpFile)){ unlink($tmpFile); }
 exec ("crontab -l > $file",$output,$return_var);
-
+$ok=false;
 $fileIN= file($file);
 $fileOUT = fopen($tmpFile, "w") or die ("Error $tmpFile Write falure\n");
 foreach($fileIN as $line){
-$ok=false;
+
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
 $pos = strpos("-$line", $search); 
-if ($pos == 1){$ok=true;}  
-else{fwrite ($fileOUT, "$line\n");}
+if ($pos){$ok=true;print"-
+";}  
+else{fwrite ($fileOUT, "$line\n");print "$line
+";}
 }
 fclose ($fileOUT);
 
@@ -1061,43 +1131,46 @@ else{save_task_log ("Del from chron (not found) $in");}
 }
 // remove from chron
 function unSetcron($in){
-$search="weather_pws.php";$in="";cronDel($in);
-$search="weather_pws.php";$in="";cronDel($in);
-$search="cap_warn.php"   ;$in="";cronDel($in);
-$search="temp.php"       ;$in="";cronDel($in);
+global $search,$node1,$path;
 
+// rebuild to orginal 
 
-// add back the orginal
-$search="/usr/local/sbin/saytime";$in="00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$";cronAdd($in);
+$replace="# Do not remove the following line
+# required for lsnodes and allmon
+15 03 * * * cd /usr/local/sbin; ./astdb.php cron
+00 0-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.pl \$NODE1 > /dev/null)
+";
+$tmpFile = "$path/cron-new.txt"; if (file_exists($tmpFile)){ unlink($tmpFile); }
+$fileOUT = fopen($tmpFile, "w");
+fwrite ($fileOUT, $replace);
+fclose ($fileOUT);
+exec ("crontab $tmpFile",$output,$return_var);
+print "replaced cron to
+$replace
+";
 }
+
+
 // sets up cron and removes old scripts.
 function setUpcron($in){
+global $search;
 // comment out existing time string. 
 //#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$
-$search="/usr/local/sbin/saytime";$in="#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$";
-cronAdd($in);
+$search="/usr/local/sbin/saytime";$in="#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$";cronDel($in);
 
-// add the new time string
+
+$search="AutoSky";$in="#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky";cronDel($in);
+
 $search="weather_pws.php";$in="00 * * * * php /etc/asterisk/local/mm-software/weather_pws.php >/dev/null";cronAdd($in);
-
-// Remove autosky
-//#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky
-$search="AutoSky";$in="#*/23 * * * * /usr/local/bin/AUTOSKY/AutoSky";cronAdd($in);
-
-// add skywarn
 $search="cap_warn.php";$in="00 * * * * php /etc/asterisk/local/mm-software/cap_warn.php >/dev/null";cronAdd($in);
-
-
-$search="temp.php";$in="*/27 * * * * php /etc/asterisk/local/mm-software/temp.php >/dev/null";
-cronAdd($in) ;
+$search="temp.php";$in="*/27 * * * * php /etc/asterisk/local/mm-software/temp.php >/dev/null"; cronAdd($in) ;
 
 
 //stop the looping script from being in memory
-// /usr/local/bin/AUTOSKY/AutoSky
-// /usr/local/bin/AUTOSKY/AutoSky.ON
-$file="/etc/rc.local";  
-$search="AutoSky";$in="";
-edit_config($in); 
+$file="";
+$file="/etc/rc.local"; $search="AutoSky";edit_config("#");
+
+ 
 }
 // Merge in the changes 
 function modifyWEB ($in){
