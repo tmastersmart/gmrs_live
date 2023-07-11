@@ -5,7 +5,7 @@
 //
 //https://api.weather.gov  module not to be called direct 
 //
-//   v1.4
+//   v1.5
 //================================test=================
 //
 //   Accept: application/cap+xml
@@ -181,7 +181,9 @@ print "$datum Detailed: $detailedForecast
 if($forcast){
 
 if($shortForcast){$file=$forcastTxt;$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$shortForcast|$detailedForecast|$icon");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);}
-build_week ($forcastxml2);
+
+if (file_exists($forcastxml2)) {build_week ($forcastxml2);}
+
 if($iconWeek){$file=$forcastIcons;$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$iconWeek);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);}
 if($forcastWeek){$file=$forcastWeekFile;$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$forcastWeek);flock ($fileOUT, LOCK_UN );fclose ($fileOUT);}
 
