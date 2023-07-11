@@ -965,6 +965,63 @@ save_task_log ("$file saved");
 }
 }
  
+function buldFav($in){
+global $favorites,$path,$file,$tmpFile,$ok,$password,$node;
+$favorites    = "$supermonPath/favorites.ini";
+$file = $favorites;
+
+if (file_exists($file)){
+$fileBu = "$file-.bak"; if (file_exists($fileBu)){ unlink($fileBu); }
+copy($file,$fileBu);if(!file_exists($fileBu)){ print "Unable to make a BackUP.";}
+
+$fileOUT = fopen($file, "w") or die ("Error $file Write falure\n");  // 
+
+$formated="
+[general]
+
+label[] = 'RoadKill 1195'
+cmd[] = 'rpt cmd %node% ilink 3 1195'
+
+label[] = 'RoadKill DV Switch 1167'
+cmd[] = 'rpt cmd %node% ilink 3 1167'
+
+label[] = 'Texas GMRS Network 2250'
+cmd[] = 'rpt cmd %node% ilink 3 2250'
+
+label[] = 'Nationwide Chat 700'
+cmd[] = 'rpt cmd %node% ilink 3 700'
+
+label[] = 'Repair/Tuneup 611'
+cmd[] = 'rpt cmd %node% ilink 3 611'
+
+label[] = 'The Lone Wolf 1691'
+cmd[] = 'rpt cmd %node% ilink 3 1691'
+
+label[] = 'ALAMO CITY 1510'
+cmd[] = 'rpt cmd %node% ilink 3 1510'
+
+label[] = 'CENTRAL ILLINOIS 1915'
+cmd[] = 'rpt cmd %node% ilink 3 1915'
+
+label[] = 'EOC Emergency Ops 900'
+cmd[] = 'rpt cmd %node% ilink 3 900'
+
+label[] = 'Edit Favorties.ini to add content'
+cmd[] = 'NONE'
+";
+
+$formated = str_replace("'", '"', $formated);
+fwrite ($fileOUT, $formated);
+fclose ($fileOUT);
+print "saving $allmon \n";
+save_task_log ("$file saved");
+}
+}
+
+
+
+
+
 
 function buildAllmon($in){
 global $allmon,$path,$file,$tmpFile,$ok,$password,$node;
