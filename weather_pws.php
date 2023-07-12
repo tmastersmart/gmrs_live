@@ -1,4 +1,4 @@
-  #!/usr/bin/php
+                                #!/usr/bin/php
 <?php
 // (c)2015/2023 by The Master lagmrs.com  by pws.winnfreenet.com
 // This script uses some code my weather programs. Member CWOP since 2015 
@@ -57,8 +57,8 @@ $path="/etc/asterisk/local/mm-software";
 include ("$path/load.php");
 include ("$path/sound_db.php");
 include ("$path/check_reg.php");
-$ver= "v3.0";  
-$muteTime1= 1; $muteTime2=6;//  MUTE SOUND from 2-5 am 
+$ver= "v3.3";  
+$MuteTime1= 1; $muteTime2=6;//  MUTE SOUND from 2-5 am     if($hour>$MuteTime1 and $hour <$muteTime2){
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -615,22 +615,25 @@ check_gsm_db ("is-registered");if($file1){$action = "$action $file1";}
 // ---------------------------------------------------play the file---------------------
 $datum   = date('m-d-Y H:i:s'); $hour = date('H');
 
+
+$mute=false;
+
 if($sleep){
  if($hour>$MuteTime1 and $hour <$muteTime2){
-$out="Night time Muted $hour"; save_task_log ($out);
-print "$datum $out
-";}
+  $out="Night time Muted $hour"; 
+  save_task_log ($out);print "$datum $out\n";$mute=true;}
 }
-else{
-print "$datum Playing file $currentTime
-";
+
+if(!$mute){
+print "$datum Playing file $currentTime\n";
 check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
 check_wav_db("star dull");if($file1){$action = "$action $file1";}
-
 exec("sox $action $currentTime",$output,$return_var);//print "DEBUG $action";
 exec("sudo asterisk -rx 'rpt localplay $node /tmp/current-time'",$output,$return_var);
-
 }
+
+
+
 
 
 
