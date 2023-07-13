@@ -50,7 +50,7 @@ $clash     ="/tmp/mmweather-task.txt";
 $tailfile  ="/tmp/skywarn-tail.wav";  
 
 
-$ver= "v2.1";
+$ver= "v2.2";
   
 include ("$path/load.php");
 include ("$path/sound_db.php");
@@ -194,7 +194,7 @@ exec ("sox $action $file",$output,$return_var);
 $datum   = date('m-d-Y H:i:s');
 print "$datum Playing file $file
 ";
-$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/skywarn'",$output,$return_var);
+$status= exec("sudo asterisk -rx 'rpt localplay $node /tmp/skywarn-tmp'",$output,$return_var);
 
 
 // build the shorter tail file
