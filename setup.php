@@ -1,4 +1,4 @@
-<?php
+ <?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -8,7 +8,7 @@
 
 // PHP is in UTC Get in sync with the PI
 
-$ver="v1.5";
+$ver="v1.6";
 
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -77,7 +77,8 @@ while (!$yes)
     if ($input == 'f'){reg_force("force");} 
     if ($input == 's'){supermon("view");} 
     if ($input == 'd'){doc("view");}     
-   	if ($input == 'u'){install("I");} 
+   	if ($input == 'u'){install("I");}
+    if ($input == 'x'){uninstall("x");}  
 	if ($input == 'e'){quit('EXIT');}
     if ($input == ''){quit('EXIT');}
 }
@@ -124,7 +125,7 @@ $stripe
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 $phpzone PHP v$phpVersion
 $stripe
-Welcome $call
+Welcome $call  Made in Louisiana
   
  Setup.php  program 
           
@@ -134,6 +135,7 @@ Welcome $call
  S) Supermon Setup
  D) View the Docs
  U) Upgrade (get the latest version)
+ x) Uninstall This software.
  E) Exit  
 $stripe
 ";
@@ -173,7 +175,7 @@ $stripe
  s) Dont say time when Sleeping 1-6 [$displaySleep]
 
  c) Install into cron.
- u) Uninstall from cron.
+ u) Uninstall from cron. 
  W) Write to file.
  M) Main menu
  E) Exit  
@@ -709,14 +711,96 @@ save ("save");
 
 
 function save($in){
-global $tts,$debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $tts,$debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$watchdog;
 $fileOUT = fopen("$path/setup.txt", "w");
 $status ="Writing settings";save_task_log ($status);
 print "$datum $status
 ";
-fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,$tts,,,,");
+fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,$tts,,,,");
 fclose ($fileOUT);
 }
+
+function uninstall($in){
+global $datum,$file,$path;
+
+print "
+---------------------------------------------------------------
+This will remove all the software 
+---------------------------------------------------------------
+Some setting files may remain.
+
+        
+
+  u) uninstall 
+
+ Any other key to abort 
+";
+$a = readline('Enter your command: ');
+
+if ($a == "u"){
+
+$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$path  = "/etc/asterisk/local/mm-software";
+$path2 = "$path/sounds";
+
+$u = explode(",",$files);
+if(!is_dir($path)){ mkdir($path, 0755);}
+chdir($path);
+if(!is_dir($path2)){ mkdir($path2, 0755);}
+chdir($path2);
+
+$datum = date('m-d-Y-H:i:s');
+print"
+$datum Uninstalling sounds
+";
+
+foreach($u as $file) {
+if (file_exists("$path2/$file")){ unlink($file); print "del $file \n";}
+}
+
+$files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
+$error = "";
+chdir($path);
+
+$datum = date('m-d-Y-H:i:s');
+print"
+$datum Uninstalling php files
+";
+
+foreach($u as $file) {
+if (file_exists("$path2/$file")){ unlink($file); print "del $file \n";}
+}
+
+print "$datum setup.php is running and can not be deleted.";
+
+$file = "$path/setup.txt";    if (file_exists($file)){unlink ($file);} 
+$file = "$path/mm-node.txt";  if (file_exists($file)){unlink ($file);} 
+$file = "$path/logs/log.txt"; if (file_exists($file)){unlink ($file);}
+$file = "$path/logs/log2.txt";if (file_exists($file)){unlink ($file);}
+
+$file = "$path/allstar_node_info.conf";if (file_exists($file)){unlink ($file);}
+
+
+
+$file = "$path/nodelist/clean.csv";    if (file_exists($file)){unlink ($file);}
+$file = "$path/nodelist/dirty.csv";    if (file_exists($file)){unlink ($file);}
+$file = "$path/nodelist/hubs.csv";     if (file_exists($file)){unlink ($file);}
+$file = "$path/nodelist/repeaters.csv";if (file_exists($file)){unlink ($file);}
+
+$file ="/usr/local/sbin/firsttime/mmsoftware.sh";if (file_exists($file)){unlink ($file);}
+
+
+unSetcron($in);
+
+print" No backup of supermon exists\n";
+
+
+} 
+quit('EXIT');
+}
+
+
+
 
 
 function install($in){
@@ -1219,7 +1303,7 @@ $search="weather_pws.php";$in="00 * * * * php /etc/asterisk/local/mm-software/we
 $search="cap_warn.php"   ;$in="*/15 * * * * php /etc/asterisk/local/mm-software/cap_warn.php >/dev/null";cronAdd($in);
 $search="temp.php"       ;$in="*/20 * * * * php /etc/asterisk/local/mm-software/temp.php >/dev/null"; cronAdd($in) ;
 
-
+//
 //stop the looping script from being in memory
 
 $fileEdit="/etc/rc.local"; $search="AutoSky";edit_config("#");
