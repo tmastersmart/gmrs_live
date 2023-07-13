@@ -57,7 +57,7 @@ $path="/etc/asterisk/local/mm-software";
 include ("$path/load.php");
 include ("$path/sound_db.php");
 include ("$path/check_reg.php");
-$ver= "v3.3";  
+$ver= "v3.4";  
 $MuteTime1= 1; $muteTime2=6;//  MUTE SOUND from 2-5 am     if($hour>$MuteTime1 and $hour <$muteTime2){
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
@@ -352,15 +352,16 @@ foreach ($u as $word) {
  
  
  
+//print "event:$event Clean:$clean level:$level\n";
 
-if ($level>=2){
+if ($level>=2 and $clean){
 // Events are in a diffrent database
-if ($event){
+print "$datum Alert Detected processing\n";
 //print "DEBUG $event";
 check_gsm_db ("alert");if($file1){$action = "$action $file1";} 
 check_wav_db ("light click"); if($file1){$action = "$action $file1";} 
 //$event = str_replace(",", " ", $event);
-$u = explode(",",$event);
+$u = explode(",",$clean);
 foreach ($u as $line) {
 //$word = strtolower($word);
 if($line){ check_wav_db($line);if($file1){$action = "$action $file1";} } // star dull
@@ -395,7 +396,6 @@ check_gsm_db ("advised to seek shelter");if($file1){$action = "$action $file1";}
 //check_gsm_db ("wow");if($file1){$action = "$action $file1"; }
 //check_gsm_db ("silence1");if($file1){$action = "$action $file1";}
 }
-}
  
 
 
@@ -423,7 +423,7 @@ check_gsm_db ("degrees");if($file1){$action = "$action $file1";}
 if ($the_temp >90 or $the_temp <20){check_gsm_db ("moo1");if($file1){$action = "$action $file1";}} 
 }
 
-//$heatIndex
+//$heatIndex dont say if not very high
 $test=$the_temp+15;
 if($heatIndex >$test) {
 check_gsm_db ("heat index");if($file1){$action = "$action $file1";}
