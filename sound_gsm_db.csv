@@ -388,6 +388,7 @@
 /var/lib/asterisk/sounds,initiating,initiating,.
 /var/lib/asterisk/sounds,in-service,in-service,.
 /etc/asterisk/local/mm-software/sounds/,intermittent,intermittent,
+/etc/asterisk/local/mm-software/sounds/,bridged,bridged
 /var/lib/asterisk/sounds,interstate,interstate,.
 /var/lib/asterisk/sounds,in-the,in-the,.
 /var/lib/asterisk/sounds,invalid,invalid,.
