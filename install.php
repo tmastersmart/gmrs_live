@@ -119,13 +119,13 @@ $path3 = "$path/repo";if(!is_dir($path3)){ mkdir($path3, 0755);}
 $path4 = "$path/backup";if(!is_dir($path4)){ mkdir($path4, 0755);}
 chdir($path3);
   if (file_exists("core-download.zip")){ unlink("core-download.zip");}
-  print "Downloading repo \n";
+  print "Downloading new repo \n";
   exec("sudo wget $repo/core-download.zip",$output,$return_var);
   exec("sudo wget $repo/sounds.zip",$output,$return_var);
   exec("sudo wget $repo/supermon.zip",$output,$return_var);  
   exec("unzip core-download.zip",$output,$return_var);
 
-$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
+$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -PHP $file\n";
@@ -133,7 +133,7 @@ foreach($u as $file) {
   rename ("$path3/$file", "$path/$file");
   exec("sudo chmod +x $path/$file",$output,$return_var); 
  }  
-$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_wav.csv,check_gmrs.sh";
+$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,check_gmrs.sh,cron.txt";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -database $file\n";
@@ -152,7 +152,7 @@ foreach($u as $file) {
 
    exec("unzip supermon.zip",$output,$return_var);
 
- $files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
+ $files = "link.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
 chdir($path1); 
 $u = explode(",",$files);
 foreach($u as $file) {
@@ -160,7 +160,6 @@ foreach($u as $file) {
   if (file_exists("$path1/$file")){unlink("$path1/$file");}
   rename ("$path3/$file", "$path1/$file");
 } 
-
 
 
 
