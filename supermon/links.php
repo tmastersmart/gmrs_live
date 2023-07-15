@@ -1,7 +1,13 @@
 <?php 
+//
+//  AllStarLink/ASL-Supermon is licensed under the GNU General Public License v3.0
+//
+// https://raw.githubusercontent.com/AllStarLink/ASL-Supermon/develop/LICENSE
+// https://github.com/AllStarLink/ASL-Supermon/blob/develop/var/www/html/supermon/link.php
 
-// New features, IRLP capability, Paul Aidukas KN2R (Copyright) July 15, 2013-2017
-// For ham radio use only, NOT for comercial use!
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+
+// Modified in acordance with GPL
 
 include("session.inc");
 include("global.inc");
