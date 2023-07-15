@@ -4,14 +4,14 @@
 
 
   
-$coreVersion = "v2.0";
+$coreVersion = "v2.3";
 load("load");
-$logRotate = 30000;// size to rotate at
+$logRotate = 40000;// size to rotate at
 $piVersion = file_get_contents ("/proc/device-tree/model");
 
 
 function load($in){
-global $tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog,$bridgeCheck;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
@@ -20,7 +20,7 @@ if (is_readable("$path/setup.txt")) {
 //";
    foreach($fileIN as $line){
     $u = explode(",",$line);
-//            $path =  $u[0];
+//            $path =  $u[0];// basicaly a header
              $node  =  $u[1];
           $station  =  $u[2];
              $level =  $u[3];
@@ -38,10 +38,12 @@ if (is_readable("$path/setup.txt")) {
           $nodeName = $u[15];
          $reportAll = $u[16];
           $saveDate = $u[17];
-           $forcast = $u[18];
+//         $forcast = $u[18]; // not using
               $beta = $u[19];
           $watchdog = $u[20];
-             $debug = $u[21];   
+             $debug = $u[21];
+//             $tts = $u[22]; // not yet used     
+       $bridgeCheck = $u[23];          
     }
 }
 
@@ -102,34 +104,38 @@ function formatBytes($size, $precision = 2)
 }
 
 
-
-
-
+// v2 stop using $file confusion  
 function save_task_log ($status){
-global $path,$error,$datum,$file,$logRotate;
+global $path,$error,$datum,$logRotate;
+
+// $logRotate = 40000;// size to rotate at set at top
 
 $datum  = date('m-d-Y H:i:s');
 if(!is_dir("$path/logs/")){ mkdir("$path/logs/", 0755);}
 chdir("$path/logs");
-$file="$path/logs/log.txt";
-$file2="$path/logs/log2.txt"; //if (file_exists($mmtaskTEMP)) {unlink ($mmtaskTEMP);} // Cleanup
+$log="$path/logs/log.txt";
+$log2="$path/logs/log2.txt"; 
 
-// log rotation system
-if (is_readable($file)) {
-   $size= filesize($file);
+
+// log rotation system 
+// To be replaced with daily logs....   
+if (is_readable($log)) {
+   $size= filesize($log);
    if ($size > $logRotate){
-    if (file_exists($file2)) {unlink ($file2);}
-    rename ($file, $file2);
-    if (file_exists($file)) {print "error in log rotation";}
+    if (file_exists($log2)) {unlink ($log2);}
+    rename ($file, $log2);
+    if (file_exists($log)) {print "error in log rotation";}
    }
 }
 
-$fileOUT = fopen($file, 'a+') ;
+$fileOUT = fopen($log, 'a+') ;
 flock ($fileOUT, LOCK_EX );
 fwrite ($fileOUT, "$datum,$status,,\r\n");
 flock ($fileOUT, LOCK_UN );
 fclose ($fileOUT);
 }
+
+
 
 //  Watchdog system 
 // 
