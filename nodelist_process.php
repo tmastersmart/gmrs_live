@@ -9,7 +9,7 @@
 // /var/log/asterisk/astdb.txt <-using this one
 
 
-// v1.2 Beta
+// v1.3 Beta
 function sort_nodes ($in){
 global $beta,$path,$node,$datum;
 
@@ -27,7 +27,7 @@ $newfile3 =  "$pathNode/hubs.csv";
 
 if (file_exists($nodelist2)){
  $ft = time()-filemtime($nodelist2);
- if ($ft < 48 * 3600){ return; }
+// if ($ft < 48 * 3600){ return; }
 }
 $datum = date('[H:i:s]');$out="Updating Nodelist";save_task_log ($out); 
 print "$datum $out";
@@ -54,12 +54,13 @@ if(!isset($u[3])){$u[3]="";}
 if(!isset($u[4])){$u[4]="";}
 
 
+
 $u[2] = str_replace("-", "", $u[2]);// remove from address
 
 //  using() instead of []
-$u[1] = str_replace("(", "[", $u[1]);$u[1] = str_replace(")", "]", $u[1]); 
+//$u[1] = str_replace("(", "[", $u[1]);$u[1] = str_replace(")", "]", $u[1]); 
 $u[2] = str_replace("(", "[", $u[2]);$u[2] = str_replace(")", "]", $u[2]); 
-$u[3] = str_replace("(", "[", $u[3]);$u[3] = str_replace(")", "]", $u[3]); 
+$u[3] = str_replace("(", "", $u[3]);$u[3] = str_replace(")", "", $u[3]); 
 
 
 if ($u[0]==1000){// erase the header
@@ -73,29 +74,32 @@ if ($u[0]==1000){// erase the header
 //1987|Inactive
 //1988|Inactive
 //1989|Inactive
-$test= "-$u[1] $u[2]";
+$test= "-$u[1] $u[2]";  $test= strtolower($test);
 // Unsure what this is remove it 
 $pos = strpos($test, "Inactive");if ($pos){$u[0]=0;}
  
-   
+//if ($u[1]="" and $u[2]="" and $u[3]="") {$u[0]=0;}// UNknown why these are null   
 // 10 is blank 300 is active
+
 if ($u[0]>1){  
 // if no call then its a repeater or a HUB- Guess HUB
 if (!$u[3]){$u[4]="H";} 
 
 // Auto Create the type field
+//1195	The RoadKill !! Repeater System	Baton Rouge,LA		H
+$pos = strpos($test, "repeater") ;if ($pos){$u[4]="R";}
+$pos = strpos($test, "roadkill") ;if ($pos){$u[4]="R";}
+$pos = strpos($test, "road kill") ;if ($pos){$u[4]="R";}
+$pos = strpos($test, "statewide");if ($pos){$u[4]="H";}
+$pos = strpos($test, "hub");      if ($pos){$u[4]="H";}
+$pos = strpos($test, "node");     if ($pos){$u[4]="N";}
+$pos = strpos($test, "iax");      if ($pos){$u[4]="I";}
+$pos = strpos($test, "zello");    if ($pos){$u[4]="Z";}
+$pos = strpos($test, "moble");    if ($pos){$u[4]="N";}
+$pos = strpos($test, "dvswitch"); if ($pos){$u[4]="D";}
+$pos = strpos($test, "emergency");if ($pos){$u[4]="H";}
 
-$pos = strpos($test, "Repeater") ;if ($pos){$u[4]="R";}
-//$pos = strpos($test, "GMRS Live");if ($pos){$u[4]="H";}
-$pos = strpos($test, "Hub");      if ($pos){$u[4]="H";}
-$pos = strpos($test, "HUB");      if ($pos){$u[4]="H";}
-$pos = strpos($test, "Node");     if ($pos){$u[4]="N";}
-$pos = strpos($test, "NODE");     if ($pos){$u[4]="N";}
-$pos = strpos($test, "Zello");    if ($pos){$u[4]="Z";}
-$pos = strpos($test, "ZELLO");    if ($pos){$u[4]="Z";}
-$pos = strpos($test, "MOBILE");   if ($pos){$u[4]="N";}
-$pos = strpos($test, "DVswitch"); if ($pos){$u[4]="D";}
-$pos = strpos($test, "Emergency");if ($pos){$u[4]="H";}
+
 
 // Not repeaters but a hub
 if ($u[0] == 1195){$u[4]="H";}
@@ -187,7 +191,12 @@ if ($u[0]==2978){$u[4]= "N";}// No named node?????
 //2268||Amarillo 650 Repeater|  
 
 //slide over data to fix corruped entries above
-if ($u[1] ==""){ $u[1]=$u[2];if($u[3]!=""){$u[2]=$u[3];$u[3]="";}}
+
+// SLIDE 
+if ($u[1] ==""){ $u[1]=$u[2]; $u[2]="";
+   if($u[3]!=""){$u[2]=$u[3];$u[3]="";}
+   
+   }
 
 
 //1040|Thomas,- Hammond, IN|(WRCW750)
@@ -203,26 +212,41 @@ if ($u[0] ==1041){$u[1]="Thomas";$u[2]="Hammond, IN";$u[3]="[WRCW750]";$u[4]="N"
 
 
 
-// FIX IDs in the wrong fields  ( this may all be fixed now?)
+// pull id from the first field and put in 3 
 $posL = strpos($u[1], "[W"); 
 if ($posL>=1){
     $test = explode("[",$u[1]);$id= explode("]",$test[1]);
-    $u[3]="[$id[0]]";
+    $size= strlen($id[0]);
+    if ($size <=8){$u[3]="[$id[0]]";} 
     }
-// FIX IDs in the wrong fields 
-$posL = strpos($u[2], "[W"); 
+     
+// pull id from the first field and put in 3 
+$posL = strpos($u[1], "(W"); 
 if ($posL>=1){
-    $test = explode("[",$u[2]);$id= explode("]",$test[1]);
-    $u[3]="[$id[0]]";
+    $test = explode("(",$u[1]);$id= explode(")",$test[1]);
+    $size= strlen($id[0]);
+    if ($size <=8){$u[3]="[$id[0]]";} 
     }
+         
+// FIX IDs in the wrong fields 
+$posL = strpos("-$u[2]", "[W"); 
+if ($posL>=1){
+    $u[2]=str_replace("[", "", $u[2]);
+    $u[2]=str_replace("]", "", $u[2]); 
+    $u[2]=trim($u[2]);
+    $u[3]="[$u[2]]";$u[2]="";
+    }
+    
+    
+    
 // ID in wrong field 2 move to 3
-$posL = strpos($u[2], "W");$posR = strpos($u[2], "]"); 
-if($posL==1){
- if($posR==8){
-  $u[3]= "$u[2]";
-  $u[2]= "";
- }
-}
+//$posL = strpos($u[2], "W");$posR = strpos($u[2], "]"); 
+//if($posL==1){
+// if($posR==8){
+//  $u[3]= "$u[2]";
+//  $u[2]= "";
+//}
+//}
 
 // fix states
 $state = explode(",",$u[2]);
@@ -272,10 +296,10 @@ $u[0]=trim($u[0]);
 $u[1]=trim($u[1]);
 $u[2]=trim($u[2]);
 $u[3]=trim($u[3]); 
+$u[3] = str_replace("[", "", $u[3]);$u[3] = str_replace("]", "", $u[3]); 
 
 
-
-fwrite ($fileOUT, "$u[0]|$u[1]|$u[2]|$u[3]\n");
+               fwrite ($fileOUT,  "$u[0]|$u[1]|$u[2]|$u[3]|$u[4]\n");
 if($u[4]=="R"){fwrite ($fileOUT2, "$u[0]|$u[1]|$u[2]|$u[3]|$u[4]\n");}
 if($u[4]=="H"){fwrite ($fileOUT3, "$u[0]|$u[1]|$u[2]|$u[3]|$u[4]\n");}
  }
