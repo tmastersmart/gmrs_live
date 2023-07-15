@@ -106,8 +106,14 @@ Aborted  Type 'php install.php' to try again
 ";}
 
 function installa($in){
+// his only installs what does not exist. So you can rerun it over and over in case of error
+// ,advisory.gsm
+//
+//  https://github.com/tmastersmart/gmrs_live/zipball/master/  get the zip 
+//  exec("sudo wget $repo/$file",$output,$return_var);
 
-$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul,advisory.gsm";
+//
+$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
@@ -129,7 +135,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "supermon.txt,supermon_weather.php,load.php,setup.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
+$files = "supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
 
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
@@ -146,6 +152,30 @@ if (!file_exists("$path/$file")){
  exec("sudo chmod +x $file",$output,$return_var); 
    }
    }
+   
+// non chmod files to install
+$files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
+$u = explode(",",$files);
+foreach($u as $file) {
+if (!file_exists("$path/$file")){ 
+ print "sudo wget $repo2/$file
+   "; 
+ exec("sudo wget $repo2/$file ",$output,$return_var);
+ }   
+ }  
+ 
+// Install the supermon mods
+chdir("/srv/http/supermon");
+$files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
+$u = explode(",",$files);
+foreach($u as $file) {
+print "sudo wget $repo2/supermon/$file";
+//exec("sudo wget $repo2/$file ",$output,$return_var);
+} 
+  
+ 
+ 
+ 
    
 }
 
