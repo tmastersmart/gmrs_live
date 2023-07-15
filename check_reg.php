@@ -1,6 +1,6 @@
 <?php
 // (c)2015/2023 by The Master lagmrs.com
-// Registrations=$(/bin/asterisk -rx "iax2 show registry" | tail -n +2)
+
 //  "Auth. Sent" at Server
 //  "Registered" at Server
 //
@@ -8,8 +8,40 @@
 //
 // check if the node is reg
 
+
+
+// Bridged detection.
+// checks if this node is bridged
+function bridge_check($in){
+global $bridged,$node,$node1,$nodes,$path,$datum,$debug;
+
+$file   = "/tmp/bridge_check.txt"; if(file_exists($file)){unlink($file);}
+$status= exec("/bin/asterisk -rx 'rpt xnode $node' > $file",$output,$return_var);
+$fileIN= file($file);$bridged=false;
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
+$pos = strpos("-$line", "RPT_ALINKS"); // RPT_ALINKS=1,1195TU
+if ($pos){ 
+$u = explode("=",$line);// get the value
+$u2 = explode(",",$u[1]);// break up the fields
+$nodes=$u2[0]; 
+if ($nodes >1){$bridged=true;}
+  }
+ }
+$file = "/tmp/bridged_flag.txt"; if(file_exists($file)){unlink($file);}
+if($debug){print"$datum DEBUG $u[0]=$u[1]\n";}
+if($bridged) {
+$out="node $node is Bridged $u[1]"; save_task_log ($out);print "$datum $out\n";
+$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,$out);flock ($fileOUT, LOCK_UN );fclose ($fileOUT); 
+//  /etc/asterisk/local/mm-software/sounds/,bridged,bridged
+}
+ 
+ 
+}
+
 function reg_check ($in){
-global $counter,$datum,$node,$node1,$registered,$ip,$file,$path,$NotReg,$watchdog,$registered,$ip;
+global $counter,$datum,$node,$node1,$registered,$ip,$file,$path,$NotReg,$debug,$watchdog;
 
 $file   = "/tmp/registered_check.txt"; if(file_exists($file)){unlink($file);}
 //semaphore
@@ -28,9 +60,11 @@ if (!$node1){$host=$u[0];$port=$u[1];$dnsmge=$u[4];$node1=$u[11]; $ip=$u[30];$po
 //print "$line
 //";
 }
+if ($node <> $node1){$out="$node <> $node1";save_task_log ($out);print"$datum $out\n"; }
 if ($ip =="<Unregistered>"){$registered="Unregistered";}
 
 $datum   = date('m-d-Y H:i:s');
+if($debug){$out="$node1 $ip $u[41]";save_task_log ($out);print"$datum DEBUG $out\n";}
 print "$datum Node:$node1 is $registered port:$port";
 if ($registered=="Registered"){
 print "<OK!>
@@ -40,24 +74,17 @@ $file= $fileYes;
 }
 else {
 print "Error!"; 
-save_task_log ("node $node1 $ip $registered");
+save_task_log ("node:$node Detect node:$node1 $ip $registered");
 $file= $fileYes; if(file_exists($file)){unlink($file);}
 $file= $fileNo;
 }
 $fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX );fwrite ($fileOUT,"$node1 $ip $port2 $registered");flock ($fileOUT, LOCK_UN );fclose ($fileOUT);  
-//  "Auth. Sent"  "Registered"    rejected: 'Registration Refused' // Request,Auth.,
-//
 
-// 2955 <Unregistered>  Registered
-
-// Host                  dnsmgr  Username               Perceived             Refresh  State
-//198.199.120.25:4569   Y       2955                   <Unregistered>             60  Timeout
-//198.199.120.25:4569   Y       2955                   <Unregistered>             60  Timeout
 }
 
 // Take action to fix reg
 function reg_fix ($in){
-global $counter,$datum,$node1,$registered,$ip,$node,$file,$path,$NotReg,$watchdog,$newPort;
+global $counter,$datum,$node1,$registered,$ip,$node,$file,$path,$NotReg,$watchdog,$debug,$newPort;
 // Watchdog -----> restart AST asterisk (MMregister fix)
 $newPort= rand(4500,4600); rotate_port("rotate");
 sleep(10);
@@ -80,7 +107,7 @@ reg_check ("recheck");
 // we check which port is in use
 //
 function find_port ($in){
-global $port;
+global $port,$debug,$datum;
 $port="";
 $iax     =  "/etc/asterisk/iax.conf";
 $fileIN= file($iax);
@@ -89,6 +116,7 @@ $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
 $pos = strpos("-$line", "bindport="); 
 if ($pos == 1){
+if($debug){print"$datum DEBUG $line\n";}
 $u= explode("=",$line);
 $port = $u[1]; $port= trim($port," ");
 return $port;
@@ -99,7 +127,7 @@ return $port;
 // rotate the port to this number
 // use extra level error checking
 function rotate_port($in){  //$random = rand(4500,4600);   // rand(min,max); 
-global $path,$newPort;
+global $path,$newPort,$debug;
 
 if(!$newPort){$newPort= rand(4500,4600);}
 $datum = date('m-d-Y-H:i:s');
@@ -120,7 +148,9 @@ foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
 $pos = strpos("-$line", "bindport="); 
-if ($pos == 1){$status = "$status $line changed to bindport=$newPort";$line="bindport=$newPort";}
+if ($pos == 1){$status = "$status $line changed to bindport=$newPort";$line="bindport=$newPort";
+
+}
 $pos = strpos("-$line", ";rotate_port"); if ($pos == 1){$line=";rotate_port $datum port:$newPort";$savever=false;}
 fwrite ($fileOUT, "$line\n");
 }
