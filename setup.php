@@ -747,35 +747,59 @@ if ($a == "u"){
 
 $files = "bridged.gsm,clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";
-$path2 = "$path/sounds";
+$path2 = "/etc/asterisk/local/mm-software/sounds";
 
-$u = explode(",",$files);
-if(!is_dir($path)){ mkdir($path, 0755);}
-chdir($path);
-if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2);
-
 $datum = date('m-d-Y-H:i:s');
-print"
-$datum Uninstalling sounds
-";
+print"$datum Uninstalling sounds\n";
 
-foreach($u as $file) {
-if (file_exists("$path2/$file")){ unlink($file); print "del $file \n";}
-}
+foreach (glob("*.gsm") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+
+foreach (glob("*.wav") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+    
+    
+    
 
 $files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
 $error = "";
+$path  = "/etc/asterisk/local/mm-software";
 chdir($path);
-
 $datum = date('m-d-Y-H:i:s');
-print"
-$datum Uninstalling php files
-";
+print"$datum Uninstalling php files\n";
 
-foreach($u as $file) {
-if (file_exists("$path2/$file")){ unlink($file); print "del $file \n";}
-}
+foreach (glob("*.php") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+
+foreach (glob("*.txt") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+foreach (glob("*.csv") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+    
+foreach (glob("*.sh") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+
+
+
+
+
 
 print "$datum setup.php is running and can not be deleted.";
 
