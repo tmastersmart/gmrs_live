@@ -1,4 +1,4 @@
-<?php
+ <?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -40,7 +40,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.4";
+$ver="v2.5";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -113,7 +113,7 @@ function installa($in){
 //  exec("sudo wget $repo/$file",$output,$return_var);
 
 //
-$files = "bridged.gsm,clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
@@ -135,7 +135,7 @@ exec("sudo wget $repo/$file",$output,$return_var);
    }
    }
 // install other
-$files = "supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
+$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
 
 $repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error="";
@@ -236,8 +236,7 @@ $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out)
  
 $file="/usr/local/bin/AUTOSKY/SOUNDS/asn02";
 if(!file_exists($file)){ 
- print"$datum We need the sound files from AUTOSKY so installing them.
- ";  
+ print" We need the sound files from AUTOSKY so installing them.\n";  
  exec("pacman -Sy hamvoip-autosky",$output,$return_var);
 }
  
