@@ -48,6 +48,32 @@ php weather_pws.php
 
 php cap_warn.php
 
+Updates 7/14/2023
+
+Detects if your registered and fixes it.
+Detects if your bridiging networks and warns you then removes bridge.
+
+Supermon 1 click install.
+
+Supermon mods for GMRS
+
+New GMRSLive node repeater hub directory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 I have my cron setup like this.
 
 
