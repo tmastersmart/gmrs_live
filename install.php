@@ -33,14 +33,17 @@
 // stage 2
 //                 First stages of a GMRS directory are working see the nodelist being created each day.
 //                 The future plan is to create my own supermon front end once stage 1 is perfected. 
-
+// v2.6 07/15/023  New download and update routines
+//                 New bridging detection
+//                 Node directory for Repeaters and hubs
+//                 Supermon updates
 // stage 3
 //                 much much more..............................
 
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.5";
+$ver="v2.6";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -105,74 +108,63 @@ else {print "
 Aborted  Type 'php install.php' to try again
 ";}
 
+
 function installa($in){
-// his only installs what does not exist. So you can rerun it over and over in case of error
-// ,advisory.gsm
-//
-//  https://github.com/tmastersmart/gmrs_live/zipball/master/  get the zip 
-//  exec("sudo wget $repo/$file",$output,$return_var);
 
-//
-$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
-$path  = "/etc/asterisk/local/mm-software";
-$path2 = "$path/sounds";
+$repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
+$path1 = "/srv/http/supermon";
+$path  = "/etc/asterisk/local/mm-software"; if(!is_dir($path)){ mkdir($path, 0755);}
+$path2 = "$path/sounds";if(!is_dir($path2)){ mkdir($path2, 0755);}
+$path3 = "$path/repo";if(!is_dir($path3)){ mkdir($path3, 0755);}
+$path4 = "$path/backup";if(!is_dir($path4)){ mkdir($path4, 0755);}
+chdir($path3);
+  if (file_exists("core-download.zip")){ unlink("core-download.zip");}
+  print "Downloading repo \n";
+  exec("sudo wget $repo/core-download.zip",$output,$return_var);
+  exec("sudo wget $repo/sounds.zip",$output,$return_var);
+  exec("sudo wget $repo/supermon.zip",$output,$return_var);  
+  exec("unzip core-download.zip",$output,$return_var);
 
-$u = explode(",",$files);
-if(!is_dir($path)){ mkdir($path, 0755);}
-chdir($path);
-if(!is_dir($path2)){ mkdir($path2, 0755);}
-chdir($path2);
-$repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds";
-$datum = date('m-d-Y-H:i:s');
-print"$datum Install sounds
-";
-
-foreach($u as $file) {
-if (!file_exists("$path2/$file")){
-   print "sudo wget $repo/$file
-   "; 
-exec("sudo wget $repo/$file",$output,$return_var);
-   }
-   }
-// install other
 $files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
-
-$repo2="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
-$error="";
-chdir($path);
-$datum = date('m-d-Y-H:i:s');
-print"$datum Installing scripts
-";
 $u = explode(",",$files);
 foreach($u as $file) {
-if (!file_exists("$path/$file")){ 
-   print "sudo wget $repo2/$file
-   "; 
- exec("sudo wget $repo2/$file ",$output,$return_var);
- exec("sudo chmod +x $file",$output,$return_var); 
-   }
-   }
-   
-// non chmod files to install
-$files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
-$u = explode(",",$files);
-foreach($u as $file) {
-if (!file_exists("$path/$file")){ 
- print "sudo wget $repo2/$file
-   "; 
- exec("sudo wget $repo2/$file ",$output,$return_var);
- }   
+  print "Installing -PHP $file\n";
+  if (file_exists("$path/$file")){unlink("$path/$file");}
+  rename ("$path3/$file", "$path/$file");
+  exec("sudo chmod +x $path/$file",$output,$return_var); 
  }  
- 
-// Install the supermon mods
-chdir("/srv/http/supermon");
-$files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
+$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_wav.csv,check_gmrs.sh";
 $u = explode(",",$files);
 foreach($u as $file) {
-print "sudo wget $repo2/supermon/$file";
-//exec("sudo wget $repo2/$file ",$output,$return_var);
-} 
+  print "Installing -database $file\n";
+  if (file_exists("$path/$file")){unlink("$path/$file");}
+  rename ("$path3/$file", "$path/$file");
+ }  
+  exec("unzip sounds.zip",$output,$return_var);
   
+$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$u = explode(",",$files);
+foreach($u as $file) {
+  print "Installing -Sound $file\n";
+  if (file_exists("$path2/$file")){unlink("$path2/$file");}
+  rename ("$path3/$file", "$path2/$file");
+} 
+
+   exec("unzip supermon.zip",$output,$return_var);
+
+ $files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
+chdir($path1); 
+$u = explode(",",$files);
+foreach($u as $file) {
+  print "Installing -Supermon $file\n";
+  if (file_exists("$path1/$file")){unlink("$path1/$file");}
+  rename ("$path3/$file", "$path1/$file");
+} 
+
+
+
+
+
  
  
  
