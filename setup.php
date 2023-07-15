@@ -1,4 +1,4 @@
- <?php
+  <?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -143,9 +143,9 @@ $stripe
  
 
 function editmenu(){
-global $tts,$sleep,$debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog;
+global $tts,$sleep,$debug,$IconBlock,$forcast,$beta,$AutoNode,$stripe,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate,$watchdog,$bridgeCheck;
 $displayIconBlock="false";$displayWatch="false"; $displayWarn="false";$displayAdvisory="false"; 
-$displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";$displaydebug="false"; $displaySleep    ="false";
+$displayStatement="false";$displayReport="false";$displayForcast="false";$displayBeta="false";$displaydebug="false"; $displaySleep    ="false";$displaybridgeCheck= "false";
 if ($sayWatch)    {$displayWatch =   "true";}
 if ($sayWarn)     {$displayWarn     ="true";}
 if ($sayAdvisory) {$displayAdvisory ="true";}
@@ -156,6 +156,7 @@ if ($reportAll)   {$displayReport   ="true";}
 if ($IconBlock)   {$displayIconBlock="true";}
 if ($debug)       {$displaydebug    ="true";}
 if ($sleep)       {$displaySleep    ="true";}
+if ($bridgeCheck) {$displaybridgeCheck= "true";}
 print"
 
 $stripe
@@ -168,12 +169,11 @@ $stripe
  5) SayWatch:$displayWatch SayAdvisory:$displayAdvisory SayStatement:$displayStatement 
  6) CPU Temp setup  HiTemp[$high]  Hot[$hot] All temps[$displayReport]
  7) Node   Auto:[$AutoNode]  Node:[$node]
- 8) Forcast [$displayForcast] 
  9) Beta features [$displayBeta]
  0) Watchdog limit. will fix reg automaticaly after [$watchdog] falures 99=disable
  d) Debugging info [$displaydebug]
  s) Dont say time when Sleeping 1-6 [$displaySleep]
-
+ b) Bridging detection [$displaybridgeCheck]  
  c) Install into cron.
  u) Uninstall from cron. 
  W) Write to file.
@@ -257,7 +257,7 @@ die;
 
 
 function edit($in){
-global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll;
+global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$bridgeCheck;
 editmenu();
 $stdin = fopen('php://stdin', 'r');
 $yes   = false;
@@ -273,11 +273,12 @@ while (!$yes)
     if ($input == '4'){location($lon);}
     if ($input == '6'){cpu($hot);}
     if ($input == '7'){setnode($node);}
-    if ($input == '8'){forcast("set");}
+ 
     if ($input == '9'){beta("set");}
     if ($input == 'd'){debug("set");}
     if ($input == '0'){watchdog("set");}
     if ($input == 's'){sleep1("set");}
+    if ($input == 'b'){bridge("set");}
     if ($input == 'c'){setUpcron("set");}
     if ($input == 'u'){unSetcron("set");}
     if ($input == 'm'){start_menu($in);start("start");}
@@ -411,23 +412,26 @@ start_menu($in);start("start");
 }
 
 
+function bridge($in){
+global $bridgeCheck;
 
-
-
-function forcast($in){
-global $forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$testNewApi,$high,$hot,$nodeName,$reportAll,$saveDate;
-$displayForcast="false";$displayBeta="false";
-if ($forcast) {    $displayForcast  ="true";}
-if ($beta){        $displayBeta     ="true";}
+$displaybridgeCheck="false";
+if ($bridgeCheck) {   $displaybridgeCheck ="true";}
 print "
-NWS forcast will be played after time if set. Forcast is set to $displayForcast
-(this is still in beta)
+Automatic bridging detection and auto disconnect [$displaybridgeCheck]
+Check is run on a schedule if bridging is detected a message will 
+play warning you and a disconnect will be atempted.
+
+Still in beta so if you see any problems just turn it off.
 ";
 $line = readline("Set to t/f: ");
-if ($line=="t"){$forcast=true;}
-if ($line=="f"){$forcast=false;}
+if ($line=="t"){$bridgeCheck=true;}
+if ($line=="f"){$bridgeCheck=false;}
 editmenu();
 }
+
+
+
 
 function sleep1(){
 global $sleep ;
@@ -654,7 +658,7 @@ editmenu();
 
 
 function load($in){
-global $autotts,$tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $bridgeCheck,$autotts,$tts,$sleep,$IconBlock,$debug,$AutoNode,$datum,$forcast,$beta,$saveDate,$path,$node,$station,$level,$zipcode,$skywarn,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$high,$hot,$nodeName,$reportAll,$watchdog;
 
 if (is_readable("$path/setup.txt")) {
    $fileIN= file("$path/setup.txt");
@@ -681,11 +685,12 @@ if (is_readable("$path/setup.txt")) {
           $nodeName = $u[15];
          $reportAll = $u[16];
           $saveDate = $u[17];
-           $forcast = $u[18];
+           $forcast = $u[18]; // not using
               $beta = $u[19];
           $watchdog = $u[20];
              $debug = $u[21];
-               $tts = $u[22];   
+               $tts = $u[22]; // later add on
+       $bridgeCheck = $u[23];     
     }
 }
 
@@ -705,18 +710,19 @@ $sleep=true;$tts=$autotts;
 $sayWarn=true;$sayWatch=true;$sayAdvisory=true;$sayStatement =true;
 $node = $AutoNode;$forcast= false;$beta = false; $debug=false;
 $watchdog = 10;
+$bridgeCheck = true;
 save ("save");
 }
 }
 
 
 function save($in){
-global $tts,$debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$watchdog;
+global $tts,$debug,$datum,$forcast,$beta,$AutoNode,$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$watchdog,$bridgeCheck;
 $fileOUT = fopen("$path/setup.txt", "w");
 $status ="Writing settings";save_task_log ($status);
 print "$datum $status
 ";
-fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,$tts,,,,");
+fwrite ($fileOUT, "$path,$node,$station,$level,$zipcode,$IconBlock,$lat,$lon,$sayWarn,$sayWatch,$sayAdvisory,$sayStatement,$sleep,$high,$hot,$nodeName,$reportAll,$datum,$forcast,$beta,$watchdog,$debug,$tts,$bridgeCheck,,,,");
 fclose ($fileOUT);
 }
 
@@ -790,9 +796,15 @@ $file = "$path/nodelist/repeaters.csv";if (file_exists($file)){unlink ($file);}
 $file ="/usr/local/sbin/firsttime/mmsoftware.sh";if (file_exists($file)){unlink ($file);}
 
 
+//$file = "/srv/http/supermon/links.php";    if (file_exists($file)){unlink ($file);}
+$file = "/srv/http/supermon/gmrs-rep.php"; if (file_exists($file)){unlink ($file);}
+$file = "/srv/http/supermon/gmrs-hubs.php";if (file_exists($file)){unlink ($file);}
+$file = "/srv/http/supermon/gmrs-list.php";if (file_exists($file)){unlink ($file);}
+
+
 unSetcron($in);
 
-print" No backup of supermon exists\n";
+
 
 
 } 
@@ -869,6 +881,20 @@ foreach($u as $file) {
    "; 
  exec("sudo wget $repo2/$file ",$output,$return_var);
  }
+ 
+ 
+// Install the supermon mods
+chdir("/srv/http/supermon");
+$files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
+$u = explode(",",$files);
+foreach($u as $file) {
+print "sudo wget $repo2/supermon/$file";
+//exec("sudo wget $repo2/$file ",$output,$return_var);
+} 
+ 
+ 
+ 
+ 
 
 // special download of setup because its running. Will install elsewhere 
 $path2 = "$path/update";
