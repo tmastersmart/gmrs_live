@@ -5,7 +5,7 @@
 //
 //https://api.weather.gov  module not to be called direct 
 //
-//   v1.5
+//   v1.6
 //================================test=================
 //
 //   Accept: application/cap+xml
@@ -154,25 +154,14 @@ if(!$event){$event="clear";}
 
 
 if ($debug){
-if ($description){print "$datum Description: $description
-";}
+ if ($description){print "$datum DEBUG Description:$description\n";}
+ if ($headline){   print "$datum DEBUG Headline:$headline\n";}
+}
 
 
-if($headline){
-print "$datum Headline: $headline
-";}
-}
-// Forcast
-if ($shortForcast){
-print "$datum Forcast: $shortForcast
-";}
+if ($shortForcast){print "$datum Forcast: $shortForcast\n";}
 
-if ($debug){
-if ($detailedForecast){
-print "$datum Detailed: $detailedForecast
-";
-}
-}
+if ($debug){if ($detailedForecast){print "$datum DEBUG Detailed: $detailedForecast\n";}}
 
 
 
@@ -193,8 +182,7 @@ if($forcastWeek){$file=$forcastWeekFile;$fileOUT = fopen($file,'w');flock ($file
 }
 
 }
-else{$out="ERROR lat/lon not set"; save_task_log ($out);print "$datum $out
-";}
+else{$out="ERROR lat/lon not set"; save_task_log ($out);print "$datum $out \n";}
 
 
 
