@@ -908,7 +908,7 @@ foreach($u as $file) {
 // Install the supermon mods
 chdir("/srv/http/supermon");
 $repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/supermon";
-$files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
+$files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
 $u = explode(",",$files);
 foreach($u as $file) {
  print "downloading $file\n"; 
@@ -921,11 +921,12 @@ foreach($u as $file) {
  
 
 // special download of setup because its running. Will install elsewhere 
+$repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/supermon";
 $path2 = "$path/update";
 if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2); 
  print "downloading $file\n"; 
- exec("sudo wget $repo2/setup.php ",$output,$return_var);
+ exec("sudo wget $repo/setup.php ",$output,$return_var);
  exec("sudo chmod +x setup.php",$output,$return_var); 
 
 // make backups
