@@ -1,5 +1,5 @@
 <?php
-// (c)2015/2023 by The Master lagmrs.com
+// (c)2023 by The Master lagmrs.com
 //
 // This builds a new cleaned nodelist
 // for future supermon use
