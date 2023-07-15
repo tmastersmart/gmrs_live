@@ -857,65 +857,60 @@ This will update to the software to the current version
 $a = readline('Enter your command: ');
 
 if ($a == "u"){
-$files = "bridged.gsm,clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
-$u = explode(",",$files);
-if(!is_dir($path)){ mkdir($path, 0755);}
-chdir($path);
+
 if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2);
+
+$u = explode(",",$files);
+
 $repo="https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/sounds";
 $datum = date('m-d-Y-H:i:s');
-print"
-$datum Checking for missing sounds
-";
+print"$datum Checking for missing sounds\n";
 
 foreach($u as $file) {
 if (!file_exists("$path2/$file")){
-   print "sudo wget $repo/$file
-   "; 
-exec("sudo wget $repo/$file",$output,$return_var);
-   }
-   }
+  print "downloading $file\n";
+  exec("sudo wget $repo/$file",$output,$return_var);
+  }
+}
 // install other  - setup.php is running so download to temp file - setup.php,
 $files = "supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,sound_db.php";
-$repo2 = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
+$repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $error = "";
+
 chdir($path);
-$status ="Reinstalling scripts to current version";save_task_log ($status);
-print"
-$datum $status
-";
+$status ="Reinstalling scripts to current version";save_task_log ($status);print"$datum $status\n";
+
 $u = explode(",",$files);
 foreach($u as $file) {
-//if (!file_exists("$path/$file")){  // just reinstall them all. 
-   print "sudo wget $repo2/$file
-   "; 
- exec("sudo wget $repo2/$file ",$output,$return_var);
- exec("sudo chmod +x $file",$output,$return_var); 
+  print "downloading $file\n";
+  exec("sudo wget $repo/$file",$output,$return_var);
+  exec("sudo chmod +x $file",$output,$return_var); 
  }
 
-
+chdir($path);
 // non chmod files to install
 $files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
 $u = explode(",",$files);
 foreach($u as $file) {
- print "sudo wget $repo2/$file
-   "; 
- exec("sudo wget $repo2/$file ",$output,$return_var);
+ print "downloading $file\n"; 
+ exec("sudo wget $repo/$file ",$output,$return_var);
  }
- 
+
  
 // Install the supermon mods
 chdir("/srv/http/supermon");
+
 $files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
 $u = explode(",",$files);
 foreach($u as $file) {
-print "sudo wget $repo2/supermon/$file";
-//exec("sudo wget $repo2/$file ",$output,$return_var);
+ print "downloading $file\n"; 
+ exec("sudo wget $repo/$file ",$output,$return_var);
 } 
  
  
@@ -926,8 +921,9 @@ print "sudo wget $repo2/supermon/$file";
 $path2 = "$path/update";
 if(!is_dir($path2)){ mkdir($path2, 0755);}
 chdir($path2); 
-exec("sudo wget $repo2/setup.php ",$output,$return_var);
-exec("sudo chmod +x setup.php",$output,$return_var); 
+ print "downloading $file\n"; 
+ exec("sudo wget $repo2/setup.php ",$output,$return_var);
+ exec("sudo chmod +x setup.php",$output,$return_var); 
 
 // make backups
 $cur   = date('mdyhis');
