@@ -8,7 +8,7 @@
 
 // PHP is in UTC Get in sync with the PI
 
-$ver="v1.7";
+$ver="v1.8";
 
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
 $line = str_replace(" ", "", $line);
@@ -889,6 +889,7 @@ $status ="Reinstalling scripts to current version";save_task_log ($status);print
 $u = explode(",",$files);
 foreach($u as $file) {
   print "downloading $file\n";
+  if (file_exists($file)){unlink($file);}
   exec("sudo wget $repo/$file",$output,$return_var);
   exec("sudo chmod +x $file",$output,$return_var); 
  }
@@ -898,18 +899,20 @@ chdir($path);
 $files = "supermon.txt,readme.txt,sound_wav_db.csv,sound_gsm_db.csv,sound_ulaw_db.csv";
 $u = explode(",",$files);
 foreach($u as $file) {
- print "downloading $file\n"; 
+ print "downloading $file\n";
+ if (file_exists($file)){unlink($file);} 
  exec("sudo wget $repo/$file ",$output,$return_var);
  }
 
  
 // Install the supermon mods
 chdir("/srv/http/supermon");
-
+$repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/supermon";
 $files = "links.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,";
 $u = explode(",",$files);
 foreach($u as $file) {
  print "downloading $file\n"; 
+ if (file_exists($file)){unlink($file);}
  exec("sudo wget $repo/$file ",$output,$return_var);
 } 
  
