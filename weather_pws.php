@@ -1,4 +1,4 @@
-                                #!/usr/bin/php
+#!/usr/bin/php
 <?php
 // (c)2015/2023 by The Master lagmrs.com  by pws.winnfreenet.com
 // This script uses some code my weather programs. Member CWOP since 2015 
@@ -57,7 +57,7 @@ $path="/etc/asterisk/local/mm-software";
 include ("$path/load.php");
 include ("$path/sound_db.php");
 include ("$path/check_reg.php");
-$ver= "v3.4";  
+$ver= "v3.5";  
 $MuteTime1= 1; $muteTime2=6;//  MUTE SOUND from 2-5 am     if($hour>$MuteTime1 and $hour <$muteTime2){
 // Get php timezone in sync with the PI
 $line =	exec('timedatectl | grep "Time zone"'); //       Time zone: America/Chicago (CDT, -0500)
@@ -253,7 +253,7 @@ $file="/tmp/conditions.txt";$fileOUT = fopen($file,'w');flock ($fileOUT, LOCK_EX
 $vpath="/var/lib/asterisk/sounds";
 
 // run the forcast
-//if ($forcast){  
+
 include("$path/forcast.php");// mandatory to get alerts
 if ($event="clear"){$event="";} // Skip if clear
 
@@ -324,7 +324,7 @@ foreach ($u as $word) {
 // -----------------------forcast --------------------
 // 1 temp 2=cond 3=wind humi rain 4=forcast
 if ($level >=4){
- if ($forcast){
+
   if ($shortForcast) {
 $status = "today";
 if ($hour >= 12 and $hour <19) {$status = "evening";}  
@@ -343,7 +343,7 @@ foreach ($u as $word) {
  if($word){check_gsm_db ($word);if($file1){$action = "$action $file1";} }
     }
    }
-  } // forcast end
+
  } // level 4 end
 
  
@@ -577,7 +577,7 @@ watchdog ("reg");// add to counter
 check_gsm_db ("an-error-has-occured");if($file1){$action = "$action $file1";}
 check_gsm_db ("node");if($file1){$action = "$action $file1";} 
 $oh=false;
-$x = (string)$node1;
+$x = (string)$node;
 for($i=0;$i<strlen($x);$i++)
  { 
 make_number ($x[$i]); 
@@ -598,7 +598,7 @@ $test=false;
 if ($test and $registered =="Registered"){
 check_gsm_db ("node");if($file1){$action = "$action $file1";} 
 $oh=false;
- $x = (string)$node1;
+ $x = (string)$node;
  for($i=0;$i<strlen($x);$i++)
  { 
 make_number ($x[$i]); 
@@ -609,7 +609,22 @@ if($file2){$action = "$action $file2";}
 check_gsm_db ("is-registered");if($file1){$action = "$action $file1";} 
 }
 
+if($bridgeCheck){
+bridge_check("check");
 
+if ($bridged){
+//  emergency  warning  terminating  sorry2  removed repair
+// alllinksdisconnected 
+check_wav_db ("strong click"); if($file1){$action = "$action $file1";}
+check_gsm_db ("bridged");if($file1){$action = "$action $file1";} 
+check_gsm_db ("emergency");if($file1){$action = "$action $file1";}
+check_gsm_db ("sorry2");if($file1){$action = "$action $file1";}  
+check_ulaw_db ("alllinksdisconnected");if($file1){$action = "$action $file1";} 
+
+print "$datum rpt cmd $node ilink 6 \n";exec("sudo asterisk -rx 'rpt cmd $node ilink 6 '",$output,$return_var);
+sleep(7); // wait for any telementary
+ }
+}
 
  
 // ---------------------------------------------------play the file---------------------
