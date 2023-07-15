@@ -1,4 +1,4 @@
-  <?php
+<?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -745,7 +745,7 @@ $a = readline('Enter your command: ');
 
 if ($a == "u"){
 
-$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "bridged.gsm,clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
 
@@ -802,6 +802,8 @@ $file = "/srv/http/supermon/gmrs-hubs.php";if (file_exists($file)){unlink ($file
 $file = "/srv/http/supermon/gmrs-list.php";if (file_exists($file)){unlink ($file);}
 
 
+
+
 unSetcron($in);
 
 
@@ -831,7 +833,7 @@ This will update to the software to the current version
 $a = readline('Enter your command: ');
 
 if ($a == "u"){
-$files = "clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "bridged.gsm,clear.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 
 $path  = "/etc/asterisk/local/mm-software";
 $path2 = "$path/sounds";
