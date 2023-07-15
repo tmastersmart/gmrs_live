@@ -1,4 +1,4 @@
-<?php
+  <?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -1160,12 +1160,20 @@ sstem=Display Groups
 nodes=$node
 menu=yes
 
+[Repeators]
+url='/supermon/gmrs-rep.php'
+menu=yes
+
+[Hubs]
+url='/supermon/gmrs-hubs.php'
+menu=yes
+
 [lsNodes]
 url='/cgi-bin/lsnodes_web?node=$node'
 menu=yes
 
 [GMRSLive]
-url='/http://gmrslive.com/status/link.php?nodes=700,900'
+url='http://gmrslive.com/status/link.php?nodes=700,900'
 menu=yes
 
 [RoadKill]
