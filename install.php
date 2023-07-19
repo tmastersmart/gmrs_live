@@ -123,7 +123,7 @@ chdir($path3);
   exec("sudo wget $repo/supermon.zip",$output,$return_var);  
   exec("unzip core-download.zip",$output,$return_var);
 
-$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh";
+$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -PHP $file\n";
@@ -140,7 +140,7 @@ foreach($u as $file) {
  }  
   exec("unzip sounds.zip",$output,$return_var);
   
-$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,under-voltage-detected.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+$files = "bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -Sound $file\n";
