@@ -42,7 +42,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.9"; $release="07-18-2023";
+$ver="v3.0"; $release="07-19-2023";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -157,19 +157,14 @@ print"Reinstalling link.php from archive\n";
 $fileBu = "$path1/links.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
 copy ("$path1/links.php",$fileBu);
  
-if (file_exists("$path3/link.merge")){
-unlink ("link.php");
-copy ($fileBu,"$path1/links.php");   // Bring in org file so we can merge
-exec("patch -u -b /srv/http/supermon/link.php -i $path3/link.merge",$output,$return_var); // merge in changes...
-}
-
-else{
- if (!file_exists($fileBu)){print"Unknown error $fileBu does not exist.\n";}
- if (!file_exists("$path3/link.merge")){print"Unknown error $path3/link.merge does not exist.\n";}
-}
+//if (file_exists("$path3/link.merge")){
+//unlink ("link.php");
+//copy ($fileBu,"$path1/links.php");   // Bring in org file so we can merge
+//exec("patch -u -b /srv/http/supermon/link.php -i $path3/link.merge",$output,$return_var); // merge in changes...
+//}
 
 
-$files = "gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
+$files = "gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,link.php";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -Supermon mods  $file\n";
