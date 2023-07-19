@@ -243,7 +243,7 @@ They will now be installed by packman. enter Y
 ";  
  exec("pacman -Sy hamvoip-autosky",$output,$return_var);
 }
- 
+} 
 function clean_($in){
 
    chdir($in);
@@ -284,4 +284,3 @@ function clean_($in){
 
 } 
  
-}
