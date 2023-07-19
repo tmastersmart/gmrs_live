@@ -52,12 +52,14 @@ print "
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
 PHP:$phpVersion  Installer:$ver  Release date:$release
+(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
-= Welcome                                                  =
-=                                                          =
-= This installer will install all the php programs and     =
-= sound files.                                             =
-=                                                          =
+ Welcome to my php installer.                                                  
+                                                          
+ This will install and setup the node controler software.                                              
+
+ Most everything is automated no more editing config files.
+                                                         
 ============================================================
 Software will be installed to $path
 
@@ -68,37 +70,27 @@ $a = readline('Enter your command: ');
 
 if ($a=="i"){
 
-
 installa($out);
 // automatic node setup
 $file= "$path/mm-node.txt";
 create_nodea ($file);
 
-
-
-
-
-
 print "
-===================================================
-Custom installer $ver Finished 
-(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
-
-===================================================
+============================================================
+PHP:$phpVersion  Installer:$ver  Release date:$release
+(c) 2023 by WRXB288 LAGMRS.com all rights reserved
+Custom installer Finished 
+============================================================
 
 Software Made in loUiSiAna
-
-
 Thank you for downloading........... And have Many nice days
 
 Software was installed to $path
-
-type
-
+to manualu load setup type
 cd $path
-
 php setup.php
 
+>>>>>>>>>>>>>>>>>Autoloading setup.php <<<<<<<<<<<<<
 ";
 include ("$path/setup.php");
 }
@@ -115,9 +107,12 @@ $path  = "/etc/asterisk/local/mm-software"; if(!is_dir($path)){ mkdir($path, 075
 $path2 = "$path/sounds";if(!is_dir($path2)){ mkdir($path2, 0755);}
 $path3 = "$path/repo";if(!is_dir($path3)){ mkdir($path3, 0755);}
 $path4 = "$path/backup";if(!is_dir($path4)){ mkdir($path4, 0755);}
-chdir($path3);
-  if (file_exists("core-download.zip")){ unlink("core-download.zip");}
-  print "Downloading new repo \n";
+ chdir($path3);
+ clean_repo($path3); 
+ 
+
+  print "Downloading the repo from the archive \n";
+  
   exec("sudo wget $repo/core-download.zip",$output,$return_var);
   exec("sudo wget $repo/sounds.zip",$output,$return_var);
   exec("sudo wget $repo/supermon.zip",$output,$return_var);  
@@ -247,6 +242,44 @@ They will now be installed by packman. enter Y
  exec("pacman -Sy hamvoip-autosky",$output,$return_var);
 }
  
- 
+function clean_repo($in){
+
+   chdir($in);
+   
+   foreach (glob("*.zip") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+ foreach (glob("*.php") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+ foreach (glob("*.txt") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+ foreach (glob("*.csv") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+ foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }
+ foreach (glob("*.wav") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }
+ foreach (glob("*.gsm") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }  
+    
+  foreach (glob("*.merge") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }     
+
+} 
  
 }
