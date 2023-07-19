@@ -14,6 +14,8 @@ type
 
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 
+ (https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php)
+
 run the installer
 
 php install.php
