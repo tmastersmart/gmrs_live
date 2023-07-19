@@ -1,8 +1,14 @@
-# gmrslive.com Time Temp Weather Replacement PROGRAM v2
+# gmrslive.com GMRS NODE xcontroler software
 
-This software replaces the time and temp scripts and the warning scripts.
-It upgrades them to the new weather service servers with the new API. 
-It also adds detection for cpu temp and more.
+* New time temp weather
+* Weather Alert system 
+* Supermon 1 click install
+* Supermon new weather forcast 
+* Supermon repeater and Hub index
+* Bridging notification and autofix 
+* Reg Falure notification and autofix
+* Network Falure notification
+ 
 Written from scratch in PHP no shell scripts.
 
 This software uses a NWS licensed API code 
@@ -14,12 +20,11 @@ type
 
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 
- (https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php)
-
 run the installer
 
 php install.php
 
+Install is automated no scripts to edit. 
 
 This will install and place you in the setup program.
 
