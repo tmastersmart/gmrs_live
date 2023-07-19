@@ -1,4 +1,4 @@
-# gmrslive.com GMRS NODE xcontroler software
+# gmrslive.com GMRS NODE controler software
 
 * New time temp weather
 * Weather Alert system 
