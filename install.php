@@ -2,16 +2,11 @@
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
-// This installer sets up and installs the scripts. You still need
-// to edit the script and install to cron yourself.
+// This installer sets up and installs the software. 
 //
-// Later versions might auto install to cron.
-// 
-// weather_pws.php
-// temp.php and /sounds/
+// all software is hand coded in php from scratch 
+// in North Louisiana.
 //
-//
-// check_gmrs.sh   modified for gmrs live
 //
 // -------------------------------------------------------------
 
@@ -28,22 +23,25 @@
 //                 Automated Reg down detection and automated fix
 //                 Many changes to alerts,Alerts now play with time,Reg down notification is in cap_warn and weather_pws               
 //                 Many changes to setup program. Auto install of super mon is a work in progress and wont be released until fully tested.
-
-
 // stage 2
 //                 First stages of a GMRS directory are working see the nodelist being created each day.
-//                 The future plan is to create my own supermon front end once stage 1 is perfected. 
 // v2.6 07/15/023  New download and update routines
 //                 New bridging detection
 //                 Node directory for Repeaters and hubs
-//                 Supermon updates
+//                 Supermon updates. 
+//                 New update process with merge files for supermon. So I wont be redistributiong anything
+
+
 // stage 3
-//                 much much more..............................
+//                 Plans for supermon. 
+//                 1 click connect from the new directory
+//                 Log book for 
+//                 Call sign look up
 
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.6";
+$ver="v2.7";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -150,17 +148,30 @@ foreach($u as $file) {
   rename ("$path3/$file", "$path2/$file");
 } 
 
-   exec("unzip supermon.zip",$output,$return_var);
+exec("unzip supermon.zip",$output,$return_var);
 
- $files = "link.php,gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
+
 chdir($path1); 
+$fileBu = "$path1/links.php.bak"; 
+if (file_exists($fileBu) and file_exists("$path3/link.merge")){
+unlink ("link.php");
+copy ($fileBu,"$path1/links.php");   // Bring in org file so we can merge
+exec("patch -u -b /srv/http/supermon/link.php -i $path3/link.merge",$output,$return_var); // merge in changes...
+}
+
+else{
+ if (!file_exists($fileBu)){print"Unknown error $fileBu does not exist.\n";}
+ if (!file_exists("$path3/link.merge")){print"Unknown error $path3/link.merge does not exist.\n";}
+}
+
+
+$files = "gmrs-rep.php,gmrs-hubs.php,gmrs-list.php";
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing -Supermon $file\n";
+  print "Installing -Supermon mods  $file\n";
   if (file_exists("$path1/$file")){unlink("$path1/$file");}
   rename ("$path3/$file", "$path1/$file");
 } 
-
 
 
 
@@ -225,9 +236,14 @@ exit 0
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
  exec("sudo chmod +x $file",$output,$return_var);
  
-$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02";
+$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02.wav";
 if(!file_exists($file)){ 
- print" We need the sound files from AUTOSKY so installing them.\n";  
+print"
+We need the sound files from AUTOSKY for cap_warn 
+but they are missing.
+for legal reasions I do not redistrubute them.
+They will now be installed by packman. enter Y
+";  
  exec("pacman -Sy hamvoip-autosky",$output,$return_var);
 }
  
