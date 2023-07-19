@@ -149,8 +149,15 @@ exec("unzip supermon.zip",$output,$return_var);
 
 
 chdir($path1); 
-$fileBu = "$path1/links.php.bak"; 
-if (file_exists($fileBu) and file_exists("$path3/link.merge")){
+// multi installs may mess up link. just to make sure its default
+exec("sudo wget $repo/supermon/list.php",$output,$return_var);
+print"Reinstalling link.php from archive\n";
+
+
+$fileBu = "$path1/links.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
+copy ("$path1/links.php",$fileBu);
+ 
+if (file_exists("$path3/link.merge")){
 unlink ("link.php");
 copy ($fileBu,"$path1/links.php");   // Bring in org file so we can merge
 exec("patch -u -b /srv/http/supermon/link.php -i $path3/link.merge",$output,$return_var); // merge in changes...
