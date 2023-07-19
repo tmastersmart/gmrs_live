@@ -1,4 +1,5 @@
- <?php
+#!/usr/bin/php
+<?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
 //
@@ -41,7 +42,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.7"; $release="07-18-2023";
+$ver="v2.9"; $release="07-18-2023";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -69,6 +70,7 @@ Software will be installed to $path
 $a = readline('Enter your command: ');
 
 if ($a=="i"){
+
 
 installa($out);
 // automatic node setup
@@ -108,8 +110,8 @@ $path2 = "$path/sounds";if(!is_dir($path2)){ mkdir($path2, 0755);}
 $path3 = "$path/repo";if(!is_dir($path3)){ mkdir($path3, 0755);}
 $path4 = "$path/backup";if(!is_dir($path4)){ mkdir($path4, 0755);}
  chdir($path3);
- clean_repo($path3); 
- 
+
+clean_($path3);
 
   print "Downloading the repo from the archive \n";
   
@@ -242,7 +244,7 @@ They will now be installed by packman. enter Y
  exec("pacman -Sy hamvoip-autosky",$output,$return_var);
 }
  
-function clean_repo($in){
+function clean_($in){
 
    chdir($in);
    
