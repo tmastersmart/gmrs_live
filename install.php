@@ -41,7 +41,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v2.7";
+$ver="v2.7"; $release="07-18-2023";
 $out="";
 print "
    _____ __  __ _____   _____   _           _        _ _           
@@ -51,7 +51,7 @@ print "
  | |__| | |  | | | \ \ ____) | | | | | \__ \ || (_| | | |  __/ |   
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
-PHP:$phpVersion  Installer:$ver
+PHP:$phpVersion  Installer:$ver  Release date:$release
 ============================================================
 = Welcome                                                  =
 =                                                          =
