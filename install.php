@@ -135,9 +135,9 @@ foreach($u as $file) {
   if (file_exists("$path/$file")){unlink("$path/$file");}
   rename ("$path3/$file", "$path/$file");
  }  
-  exec("unzip sounds.zip",$output,$return_var);
-  
-$files = "net-down.gsm,bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
+ exec("unzip sounds.zip",$output,$return_var);
+
+$files = "net_down.gsm,bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -Sound $file\n";
