@@ -1,4 +1,4 @@
-# gmrslive.com GMRS NODE Magager
+# gmrslive.com GMRS NODE Manager
 Node Controler software
 
 * New time temp weather
