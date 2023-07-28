@@ -42,9 +42,9 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.2"; $release="07-27-2023";
+$ver="v3.3"; $release="07-28-2023";
 $out="";
-c64($in);
+c641($in);
 print "
    _____ __  __ _____   _____   _           _        _ _           
   / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
@@ -151,8 +151,11 @@ foreach($u as $file) {
 exec("unzip supermon.zip",$output,$return_var);
 
 chdir($path1); 
-// multi installs may mess up link. just to make sure its default
-unlink ("$path1/links.php");
+// multi installs causes problems on test unit
+// cleanup
+if (file_exists("$path1/list.php")){  unlink("$path1/list.php");}
+if (file_exists("$path1/list.php.1")){unlink("$path1/list.php.1");}
+
 exec("sudo wget $repo/supermon/list.php",$output,$return_var);
 print"Reinstalling link.php from archive\n";
 
@@ -189,7 +192,7 @@ $nodesounds="/var/lib/asterisk/sounds/rpt/nodenames";
     if (is_file($file)) { unlink($file);print"del $file\n";  }
     }
 
-exec("unzip $path/nodenames.zip",$output,$return_var); 
+exec("unzip $path3/nodenames.zip",$output,$return_var); 
 
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
@@ -308,7 +311,7 @@ function clean_($in){
 
 } 
  
-function c64($in){
+function c641($in){
 print"
 
 
