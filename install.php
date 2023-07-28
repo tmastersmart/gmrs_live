@@ -152,16 +152,17 @@ exec("unzip supermon.zip",$output,$return_var);
 
 chdir($path1); 
 // multi installs causes problems on test unit
-// cleanup
+// just a local cleanup for the test unit
 if (file_exists("$path1/list.php")){  unlink("$path1/list.php");}
 if (file_exists("$path1/list.php.1")){unlink("$path1/list.php.1");}
+if (file_exists("$path1/list.php.2")){unlink("$path1/list.php.2");}
 
 exec("sudo wget $repo/supermon/list.php",$output,$return_var);
 print"Reinstalling link.php from archive\n";
 
 
-$fileBu = "$path1/links.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
-copy ("$path1/links.php",$fileBu);
+$fileBu = "$path1/list.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
+copy ("$path1/list.php",$fileBu);
  
 //if (file_exists("$path3/link.merge")){
 //unlink ("link.php");
