@@ -123,7 +123,8 @@ clean_($path3);
    
   exec("unzip core-download.zip",$output,$return_var);
 
-$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php";
+$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
+
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -PHP $file\n";
@@ -131,7 +132,8 @@ foreach($u as $file) {
   rename ("$path3/$file", "$path/$file");
   exec("sudo chmod +x $path/$file",$output,$return_var); 
  }  
-$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,check_gmrs.sh,cron.txt";
+
+$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,states.csv,check_gmrs.sh,cron.txt,readme.txt";  
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -database $file\n";
@@ -179,7 +181,14 @@ foreach($u as $file) {
   if (file_exists("$path1/$file")){unlink("$path1/$file");}
   rename ("$path3/$file", "$path1/$file");
 } 
-
+// gmrs supermon 
+$files = "input-scan.php,";
+$u = explode(",",$files);
+foreach($u as $file) {
+  print "Installing - GMRS Supermon  $file\n";
+  if (file_exists("$path1/admin/$file")){unlink("$path1/admin/$file");}
+  rename ("$path3/$file", "$path1/admin/$file");
+} 
 
 
 
