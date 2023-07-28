@@ -1,116 +1,164 @@
 # gmrslive.com GMRS NODE Manager
-Node Controler software
+Copyright 2023 by lagmrs.com winnfreenet.com WRXB288
+Weather software comes from my weather scripts (c) 2015 pws.winnfreenet.com
+GMRS Node Manager
+===================================================================================
 
-* New time temp weather
-* Weather Alert system 
+This software was written for GMRS nodes.  
+
+* New time temp weather system
+* Weather Alert system based on New API
 * Supermon 1 click install
+* Setup screen. No editing files.
 * Supermon new weather forcast 
 * Supermon repeater and Hub index
 * Bridging notification and autofix 
 * Reg Falure notification and autofix
 * Network Falure notification
- 
-Written from scratch in PHP no shell scripts.
-
-This software uses a NWS licensed API code 
+* High CPU Temp Alarm
+* CPU event alarms 
+* Alarms/Notificationover read by the node lady
+* Supermon Logbook
+* Uninstaller and Updater.
 
 download the installer.
-
 Drop to a shell
 type
-
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 
-run the installer
+This in not a bunch of shell scripts nor are they modifications to any existing scripts
+This is a totaly new program written from the ground up in Louisiana in cross platform PHP.
 
-php install.php
+The main goal is to modernise and get rid of editing files for new users. You will see a new
+option in your menu when you logon to the node this will take you to the setup program.
 
-Install is automated no scripts to edit. 
+This is only the start I am creating a GMRS Supermon and in that there will be admin
+screens so that you will never have to login to make changes.
 
-This will install and place you in the setup program.
+Will this work on a repeater. Yes I am writting this for my node and upcomming repeator thats why
+everything is optional you may disable anything you dont want.
 
 
-The software is a custom time and temp system that reads data from 
-mesowest, madis, APRSWXNET/Citizen Weather Observer Program (CWOP)
-It allows you to pick a station closest to you. 
-find your local MADIS station and airport go to the map 
+----- Modules that are called by cron or manualy -----
 
-https://madis-data.ncep.noaa.gov/MadisSurface/ Get the ID from this map only
+* weather_pws.php Time and temp & weather
 
-http://www.wxqa.com/  (CWOP) main website
-
-https://mesowest.utah.edu/
-
-https://madis-data.ncep.noaa.gov
-
-https://aprs.fi/ These are aprs stations but you cant use station numbers from this map.
+  I wrote this because the built in temp was not displaying the correct temp for
+my area. I have my own weather station that submits data to the COWP which checks
+and relays this data into the NWS system. Most all services use this for my city
+but the node was not. This module pulls data from mesowest, madis, APRSWXNET/
+Citizen Weather Observer Program (CWOP). APRSWXNET is the ham radio weather 
+stations CWOP is the stations that submit through the net like mine.
+ 
+  Find your local MADIS station and airport go to the map 
+https://madis-data.ncep.noaa.gov/MadisSurface/  make sure all DATASETS are turned
+on and find the code your station or a close station near you.
 
   
-Select how much data you want only temp or temp hum rain wind. The temp data is more accurate than the 
-stock script which does not allow you to pick the station. in addition this allows station owners 
-like me and hams running CWOP stations to use your own local temp.
+  I am using the new NWS API for forecast and alerts.  
+  
+  The module also has a high temp warning notice that will play after the weather. 
+  It can warn of over temp and throttling of the CPU.
 
-run them
+ Also included is a watchdog checking to see if net goes down and if you become unregistered.
+ The automated reg fix will atempt to bring you back online. This wont work for everyone
+ because it depends on why your unregistered. If your port is being blocked by your
+ router, modem, isp or gateway after several days of use it will fix it.
+ 
+ Network notification. No longer will you node go down and you not know about it.
+ 
+ Advanced time system is much better than the default scripts. Includes randomised 
+ voices and comments to make it sound more real.
+ 
+
+Run the program by typing 
 
 php weather_pws.php
 
+
+* temp.php
+
+ It will play High temp messages and any cpu code thrown including throttling.
+For debugging you can have it say the current temp or
+just talk when its over heating. Run it by typing 
+
+php temp.php
+
+You can run this by cron if you like but its built into the time and temp script also.
+If you don't want to use time and temp you can just use temp.
+
+
+* cap_warn.php
+ The current alert script is way to hard to setup and most people are not even
+using it. When they do it doesn't work right if not set up correctly. This is
+my own version written from scratch in PHP. Its using the same sound files at
+this time. Also the existing script uses a looping program that stays 
+running in memory all the time. I do not like that I think its better to run 
+it from cron on a schedule so its only in memory when it runs.
+
+The second problem is the NWS is moving away from v1.1 cap to v1.2 and autosky will
+stop working when its changed. I am using the NWS new API.
+The new API is geocoded so you need to enter your LAT/LON
+
+
+Be sure you remove all links to AUTOSKY if you were using it.
+Setup will atempt to do this for you.
+
+Remove the start file that places the looping script in memory 
+Edit /etc/rc.local file.
+remove
+/usr/local/bin/AUTOSKY/AutoSky
+/usr/local/bin/AUTOSKY/AutoSky.ON
+
+Test the program by typing php cap_warn.php from the directory
+
+* nodelist_process.php
+
+The nodelist processor creates a cleaned up csv filtered nodelist database
+This creates a database for the GMRS Supermon node index to use.
+This processor runs at a random time at night with retries at about 1 hr apart.  
+On each run it checks the nodelist to see if it was updated if so it does nothing.
+If the nodelist is out of date it makes atempts to update it. 
+You can force a update by running it manualy. Extra care was taken to use random 
+Times as not to overload servers. The update times are subject to change as I watch how it works.
+
+
+
+* Software is installed into /etc/asterisk/local/mm-software/
+drop to a shell and type
+cd /etc/asterisk/local/mm-software
+
+type any of the following
+
+php setup.php
+php temp.php
 php cap_warn.php
-
-Updates 7/14/2023
-
-Detects if your registered and fixes it.
-Detects if your bridiging networks and warns you then removes bridge.
-
-Supermon 1 click install.
-
-Supermon mods for GMRS
-
-New GMRSLive node repeater hub directory
+php weather_pws.php
+php nodelist_process.php
 
 
 
+* licensing
+Weather scripts use keys specialy created for this software licensed to me.
+You may not use these keys in other software get your own.
+
+All software is written by me.
+Execpt for the mods to link.php
+link.php is licensed under the GNU General Public License v3.0
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
+You must have my permission to redistribute this software package. 
+With I plan on granting I just need to list who is doing it thanks..... 
 
 
 
+ 
+* new updates
 
+The setup program can update and uninstall.
 
+If you have any problems and need to uninstall please report them to me at www.lagmrs.com
 
-
-
-
-
-
-
-
-I have my cron setup like this.
-
-
-#00 8-23 * * * (source /usr/local/etc/allstar.env ; /usr/bin/nice -19 /usr/bin/perl /usr/local/sbin/saytime.p$
-
-#*/20 * * * * /usr/local/bin/AUTOSKY/AutoSky
-
-*/15 * * * * php /etc/asterisk/local/mm-software/skywarn.php >> /dev/null
-
-00 7-23 * * * php /etc/asterisk/local/mm-software/weather_pws.php >> /dev/null
-
-the weather_pws.php has the temp warning built into it.
-
-super mon. Read supermon.txt file you need to change some code.
-
-
-Aditional scripts not in the installer
-
-weather_hubitat.php
-
-This script is for hubitat smart hub owners it pulls the temp from a sensor on your hub. See instructions in script
-
-
-Reg fix.
-
-This version has auto reg detection and if you want will run the reg fix to automaticaly place you back online.
-I created this script to get arround a problem with my isp ATT FIXED WIRELESS. After a while a day or 2 you become unregestered
-and rebooting will not solve the problem. This fixes that by rotating the port then placing it back on the next boot.
-Beware dv switch wont be able to connect to you node while the port is not standard.
 
 
 
