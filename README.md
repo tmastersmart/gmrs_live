@@ -1,7 +1,5 @@
 # gmrslive.com GMRS NODE Manager
-Copyright 2023 by lagmrs.com winnfreenet.com WRXB288
-Weather software comes from my weather scripts (c) 2015 pws.winnfreenet.com
-GMRS Node Manager
+
 ===================================================================================
 
 This software was written for GMRS nodes.  
