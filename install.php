@@ -42,8 +42,9 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.1"; $release="07-20-2023";
+$ver="v3.2"; $release="07-27-2023";
 $out="";
+c64($in);
 print "
    _____ __  __ _____   _____   _           _        _ _           
   / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
@@ -117,7 +118,9 @@ clean_($path3);
   
   exec("sudo wget $repo/core-download.zip",$output,$return_var);
   exec("sudo wget $repo/sounds.zip",$output,$return_var);
-  exec("sudo wget $repo/supermon.zip",$output,$return_var);  
+  exec("sudo wget $repo/supermon.zip",$output,$return_var); 
+  exec("sudo wget $repo/nodenames.zip",$output,$return_var);
+   
   exec("unzip core-download.zip",$output,$return_var);
 
 $files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php";
@@ -147,9 +150,9 @@ foreach($u as $file) {
 
 exec("unzip supermon.zip",$output,$return_var);
 
-
 chdir($path1); 
 // multi installs may mess up link. just to make sure its default
+unlink ("$path1/links.php");
 exec("sudo wget $repo/supermon/list.php",$output,$return_var);
 print"Reinstalling link.php from archive\n";
 
@@ -164,6 +167,7 @@ copy ("$path1/links.php",$fileBu);
 //}
 
 
+chdir("/srv/http/supermon");
 $files = "gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,link.php";
 $u = explode(",",$files);
 foreach($u as $file) {
@@ -174,10 +178,28 @@ foreach($u as $file) {
 
 
 
+
+
+chdir($path3);//repo 
+
+$nodesounds="/var/lib/asterisk/sounds/rpt/nodenames";
+
+ foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }
+
+exec("unzip $path/nodenames.zip",$output,$return_var); 
+
+ foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { 
+    rename ("$path3/$file", "$nodesounds/$file");
+    print"Installing sound file:$file\n";  }
+    }
+    
  
- 
- 
-   
+  
 }
 
 function create_nodea ($file){
@@ -286,3 +308,17 @@ function clean_($in){
 
 } 
  
+function c64($in){
+print"
+
+
+
+
+
+
+        **** COMODORE 64 BASIC V2 **** 
+ 64K RAM SYSTEM  38911 BASIC BYTES FREE
+READY.
+
+";
+}
