@@ -87,7 +87,11 @@ php setup.php
 >>>>>>>>>>>>>>>>>Doing first time Setup<<<<<<<<<<<<<
 ";
 chdir($path);
-$output = shell_exec("php $path/node_process.php");print"$output\n";
+$output = shell_exec("php $path/node_process.php");
+foreach($output as $line){
+print "$line\n";
+}
+
 include ("$path/setup.php");
 }
 else {print "
@@ -115,7 +119,9 @@ clean_($path3);
   exec("sudo wget $repo/nodenames.zip",$output,$return_var);
    
   exec("unzip core-download.zip",$output,$return_var);
-  print "$output\n";
+foreach($output as $line){
+print "$line\n";
+}
 
 $files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
 
@@ -134,7 +140,11 @@ foreach($u as $file) {
   if (file_exists("$path/$file")){unlink("$path/$file");}
   rename ("$path3/$file", "$path/$file");
  }  
- exec("unzip sounds.zip",$output,$return_var);print "$output\n";
+ exec("unzip sounds.zip",$output,$return_var);
+ 
+ foreach($output as $line){
+print "$line\n";
+}
 
 $files = "net_down.gsm,bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
 $u = explode(",",$files);
@@ -144,7 +154,10 @@ foreach($u as $file) {
   rename ("$path3/$file", "$path2/$file");
 } 
 
-exec("unzip supermon.zip",$output,$return_var); print "$output\n";
+exec("unzip supermon.zip",$output,$return_var); 
+foreach($output as $line){
+print "$line\n";
+}
 
 chdir($path1); 
 // multi installs causes problems on test unit
@@ -196,7 +209,11 @@ $nodesounds="/var/lib/asterisk/sounds/rpt/nodenames";
     if (is_file($file)) { unlink($file);print"del $file\n";  }
     }
 
-exec("unzip $path3/nodenames.zip",$output,$return_var); print "$output\n";
+exec("unzip $path3/nodenames.zip",$output,$return_var); 
+
+foreach($output as $line){
+print "$line\n";
+}
 
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
