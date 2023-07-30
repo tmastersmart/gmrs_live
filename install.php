@@ -87,11 +87,7 @@ php setup.php
 >>>>>>>>>>>>>>>>>Doing first time Setup<<<<<<<<<<<<<
 ";
 chdir($path);
-$output = shell_exec("php $path/node_process.php");
-foreach($output as $line){
-print "$line\n";
-}
-
+include ("$path/nodelist_process.php");
 include ("$path/setup.php");
 }
 else {print "
@@ -244,8 +240,7 @@ if ($pos2){$u= explode("=",$line);
 $call=$u[1];}
 }
 
-
-
+ 
 // /usr/local/etc/tts.conf 
 // Get any tss key if exists
 $file ="/usr/local/etc/tts.conf";
