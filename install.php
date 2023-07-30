@@ -31,7 +31,7 @@
 //                 Node directory for Repeaters and hubs
 // stage 3
 // v3.3 07/28/2023 Lots of new addons. New connect sounds. 
-
+// v3.4
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
@@ -251,7 +251,7 @@ $file2="/usr/local/sbin/firsttime/mmsoftware.sh";
 copy($file, $file2);// copy existing to get correct permissions
 $file= $file2;
 $out='#/!bin/bash
-#MENUFT%055%Time Temp Weather Alert Setup/ MM Software Setup
+#MENUFT%055%Time/Weather/Node Manager Setup
 
 $SON
 reset
@@ -329,4 +329,3 @@ READY.
 
 ";
 }
-
