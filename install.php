@@ -208,7 +208,7 @@ foreach($u as $file) {
   rename ("$path3/$file", "$path1/$file");
 } 
 // gmrs supermon 
-$files = "input-scan.php,";
+$files = "input-scan.php,gmrs-node-index.php";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing - GMRS Supermon  $file\n";
