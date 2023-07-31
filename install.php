@@ -115,9 +115,7 @@ clean_($path3);
   exec("sudo wget $repo/nodenames.zip",$output,$return_var);
    
   exec("unzip core-download.zip",$output,$return_var);
-foreach($output as $line){
-print "$line\n";
-}
+
 
 $files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
 
@@ -136,24 +134,49 @@ foreach($u as $file) {
   if (file_exists("$path/$file")){unlink("$path/$file");}
   rename ("$path3/$file", "$path/$file");
  }  
- exec("unzip sounds.zip",$output,$return_var);
- 
- foreach($output as $line){
-print "$line\n";
-}
 
-$files = "net_down.gsm,bridged.gsm,clear.wav,heat_advisory.wav,flood_advisory.wav,weather_service.wav,hot.ul,warning.ul,under-voltage-detected.ul,arm-frequency-capped.ul,currently-throttled.ul,soft-temp-limit-active.ul,arm-frequency-capping.ul,throttling-has-occurred.ul,soft-temp-limit-occurred.ul";
-$u = explode(",",$files);
-foreach($u as $file) {
-  print "Installing -Sound $file\n";
-  if (file_exists("$path2/$file")){unlink("$path2/$file");}
-  rename ("$path3/$file", "$path2/$file");
-} 
+
+
+exec("unzip $path3/sounds.zip",$output,$return_var);
+$path2 = "$path/sounds";$path3 = "$path/repo";$path4 = "$path/backup"; // just for debugging
+chdir($path3);   
+ foreach (glob("*.wav") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { 
+     if (!file_exists("$path2/$file")){ 
+     rename ("$path3/$file", "$path2/$file");
+     print"Installing sound file:$path2/$file\n"; 
+     }
+     else(unlink("$path3/$file"));// cleanup
+    }
+  }
+
+ foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { 
+     if (!file_exists("$path2/$file")){ 
+     rename ("$path3/$file", "$path2/$file");
+     print"Installing sound file:$path2/$file\n"; 
+     }
+     else(unlink("$path3/$file"));// cleanup
+    }
+  }
+
+ foreach (glob("*.gsm") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { 
+     if (!file_exists("$path2/$file")){ 
+     rename ("$path3/$file", "$path2/$file");
+     print"Installing sound file:$path2/$file\n"; 
+     }
+     else(unlink("$path3/$file"));// cleanup
+    }
+  }
+
+
 
 exec("unzip supermon.zip",$output,$return_var); 
-foreach($output as $line){
-print "$line\n";
-}
+
 
 chdir($path1); 
 // multi installs causes problems on test unit
