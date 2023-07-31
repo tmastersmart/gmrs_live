@@ -222,26 +222,18 @@ foreach($u as $file) {
 chdir($path3);//repo 
 
 $nodesounds="/var/lib/asterisk/sounds/rpt/nodenames";
-
- foreach (glob("*.ul") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file\n";  }
-    }
-
 exec("unzip $path3/nodenames.zip",$output,$return_var); 
-
-foreach($output as $line){
-print "$line\n";
-}
-
+    
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    rename ("$path3/$file", "$nodesounds/$file");
-    print"Installing sound file:$file\n";  }
+     if (!file_exists("$path2/$file")){ 
+     rename ("$path3/$file", "$path2/$file");
+     print"Installing sound file:$path2/$file\n"; 
+     }
+     else(unlink("$path3/$file"));// cleanup
     }
-    
- 
+  } 
   
 }
 
