@@ -35,7 +35,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.4"; $release="07-30-2023";
+$ver="v3.5"; $release="07-31-2023";
 $out="";
 c641($in);
 print "
@@ -276,16 +276,14 @@ exit 0
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
  exec("sudo chmod +x $file",$output,$return_var);
  
-$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02.wav";
-if(!file_exists($file)){ 
-print"
-We need the sound files from AUTOSKY for cap_warn 
-but they are missing.
-for legal reasions I do not redistrubute them.
-They will now be installed by packman. enter Y
-";  
- exec("pacman -Sy hamvoip-autosky",$output,$return_var);
-}
+//$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02.wav";
+//if(!file_exists($file)){ 
+//print"
+//We need the sound files from AUTOSKY for cap_warn 
+//They will now be installed by packman. enter Y
+//";  
+// exec("pacman -Sy hamvoip-autosky",$output,$return_var);
+//}
 } 
 function clean_($in){
 
