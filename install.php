@@ -35,7 +35,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.5"; $release="07-31-2023";
+$ver="v3.7"; $release="07-31-2023";
 $out="";
 c641($in);
 print "
@@ -117,7 +117,7 @@ clean_($path3);
   exec("unzip core-download.zip",$output,$return_var);
 
 
-$files = "setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
+$files = "tagline.php,setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
 
 $u = explode(",",$files);
 foreach($u as $file) {
