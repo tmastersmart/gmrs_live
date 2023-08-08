@@ -35,7 +35,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.7"; $release="07-31-2023";
+$ver="v3.8"; $release="08-08-2023";
 $out="";
 c641($in);
 print "
@@ -200,20 +200,25 @@ copy ("$path1/list.php",$fileBu);
 
 
 chdir("/srv/http/supermon");
-$files = "gmrs-rep.php,gmrs-hubs.php,gmrs-list.php,link.php";
+
+
+$files = "input-scan.php,favicon.ico,link.php,lsnodes.php,gmrs-node-index.php";
 $u = explode(",",$files);
 foreach($u as $file) {
   print "Installing -Supermon mods  $file\n";
   if (file_exists("$path1/$file")){unlink("$path1/$file");}
   rename ("$path3/$file", "$path1/$file");
+
 } 
-// gmrs supermon 
-$files = "input-scan.php,gmrs-node-index.php";
+
+// This is the new GMRS Supermon admin area
+$path5 = "$path1/admin";
+$files = "gmrs-node-index.php,input-scan.php";
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing - GMRS Supermon  $file\n";
-  if (file_exists("$path1/admin/$file")){unlink("$path1/admin/$file");}
-  rename ("$path3/$file", "$path1/admin/$file");
+  print "Installing -Supermon mods  $file\n";
+  if (file_exists("$path5/$file")){unlink("$path5/$file");}
+  rename ("$path3/$file", "$path5/$file");
 } 
 
 
