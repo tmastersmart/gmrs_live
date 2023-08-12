@@ -32,10 +32,15 @@
 // stage 3
 // v3.3 07/28/2023 Lots of new addons. New connect sounds. 
 // v3.4
+// v3.8 08/08/2023 new supermon lsnodes add on. bug fixes
+// v4.1 08/12/2023 Security fixes for supermon. New supermon addons
+//                 Directory finished
+//                 Log viewer finished
+
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v3.8"; $release="08-08-2023";
+$ver="v4.1"; $release="08-12-2023";
 $out="";
 c641($in);
 print "
@@ -80,7 +85,7 @@ Software Made in loUiSiAna
 Thank you for downloading........... And have Many nice days
 
 Software was installed to $path
-to manualu load setup type
+
 cd $path
 php setup.php
 
@@ -89,6 +94,7 @@ php setup.php
 chdir($path);
 include ("$path/nodelist_process.php");
 include ("$path/setup.php");
+die;
 }
 else {print "
 Aborted  Type 'php install.php' to try again
@@ -117,24 +123,31 @@ clean_($path3);
   exec("unzip core-download.zip",$output,$return_var);
 
 
-$files = "tagline.php,setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,connect.php";
-
+$files = "supermon_lnodes.php,tagline.php,setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,connect.php";
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing -PHP $file\n";
+  print "Installing -PHP $path/$file ";
+  if (!file_exists("$path3/$file")){print"error file missing\n";}
+  else{
   if (file_exists("$path/$file")){unlink("$path/$file");}
   rename ("$path3/$file", "$path/$file");
   exec("sudo chmod +x $path/$file",$output,$return_var); 
- }  
+  print"ok\n";
+  }
+  } 
 
-$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,states.csv,check_gmrs.sh,cron.txt,readme.txt";  
+$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,states.csv,cron.txt,readme.txt,taglines.txt";   
+
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing -database $file\n";
+  print "Installing -database $path/$file ";
+    if (!file_exists("$path3/$file")){print"error file missing\n";}
+  else{
   if (file_exists("$path/$file")){unlink("$path/$file");}
-  rename ("$path3/$file", "$path/$file");
- }  
-
+  if (file_exists("$path3/$file")){rename ("$path3/$file", "$path/$file");}
+  print"ok\n";
+  } 
+  }
 
 
 exec("unzip $path3/sounds.zip",$output,$return_var);
@@ -192,34 +205,65 @@ print"Reinstalling link.php from archive\n";
 $fileBu = "$path1/list.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
 copy ("$path1/list.php",$fileBu);
  
-//if (file_exists("$path3/link.merge")){
-//unlink ("link.php");
-//copy ($fileBu,"$path1/links.php");   // Bring in org file so we can merge
-//exec("patch -u -b /srv/http/supermon/link.php -i $path3/link.merge",$output,$return_var); // merge in changes...
-//}
+
 
 
 chdir("/srv/http/supermon");
+$path1 = "/srv/http/supermon";
+exec("unzip $path3/supermon.zip",$output,$return_var); 
 
-
-$files = "input-scan.php,favicon.ico,link.php,lsnodes.php,gmrs-node-index.php";
+$files = "input-scan.php,favicon.ico,supermon.css,link.php,lsnodes.php,gmrs-node-index.php,server.php,controlserver.php,gmrs-chart.php,connect.php,controlpanel.php,index.php";
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing -Supermon mods  $file\n";
+  print "Installing -Supermon root $path1/$file ";
+  if (!file_exists("$path3/$file")){print"error file missing\n";}
+  else{
   if (file_exists("$path1/$file")){unlink("$path1/$file");}
   rename ("$path3/$file", "$path1/$file");
+  print"ok\n";
+  }
 
 } 
+
+
+$path6 = "$path1/edit";
+$files = "dtmf.php,controlserver.php,controlpanel.php";
+$u = explode(",",$files);
+foreach($u as $file) {
+  print "Installing -Supermon edit $path6/$file ";
+  if (!file_exists("$path3/$file")){print"error file missing\n";}
+  else{
+  if (file_exists("$path6/$file")){unlink("$path6/$file");}
+  rename ("$path3/$file", "$path6/$file");
+  print"ok\n";
+  }
+
+}
+
+
+// delete these files from the supermon directory. They are not needed or can be hacked 
+$files = "astlookup.php,voter.php,irlplog.php,bubblechart.php,astnodes.php,extnodes.php,voterserver.php,connectlog.php,webacclog.php,astlog.php,rptstats.php,linuxlog.php,weberrlog.php,allmon.ini";
+$u = explode(",",$files);
+foreach($u as $file) {
+  print "Removing Supermon root $path1/$file ";
+  if (file_exists("$path1/$file")){unlink("$path1/$file");}
+  print"ok\n";
+  }
+ 
 
 // This is the new GMRS Supermon admin area
 $path5 = "$path1/admin";
-$files = "gmrs-node-index.php,input-scan.php";
+$files = "log.php,input-scan.php";
 $u = explode(",",$files);
 foreach($u as $file) {
-  print "Installing -Supermon mods  $file\n";
+  print "Installing -Supermon admin $path5/$file ";
+  if (!file_exists("$path3/$file")){print"error file missing\n";}
+  else{
   if (file_exists("$path5/$file")){unlink("$path5/$file");}
   rename ("$path3/$file", "$path5/$file");
-} 
+  print"ok\n";
+  }
+  }
 
 
 
@@ -239,7 +283,7 @@ exec("unzip $path3/nodenames.zip",$output,$return_var);
      else(unlink("$path3/$file"));// cleanup
     }
   } 
-  
+
 }
 
 function create_nodea ($file){
