@@ -24,7 +24,7 @@
 //                 Automated Reg down detection and automated fix
 //                 Many changes to alerts,Alerts now play with time,Reg down notification is in cap_warn and weather_pws               
 //                 Many changes to setup program. Auto install of super mon is a work in progress and wont be released until fully tested.
-// stage 2
+// stage 2                     a
 //                 First stages of a GMRS directory are working see the nodelist being created each day.
 // v2.6 07/15/023  New download and update routines
 //                 New bridging detection
@@ -36,11 +36,12 @@
 // v4.1 08/12/2023 Security fixes for supermon. New supermon addons
 //                 Directory finished
 //                 Log viewer finished
+//                 Supermon moved into setup for those who want to skip it.
 
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.1"; $release="08-12-2023";
+$ver="v4.2"; $release="08-12-2023";
 $out="";
 c641($in);
 print "
@@ -117,7 +118,7 @@ clean_($path3);
   
   exec("sudo wget $repo/core-download.zip",$output,$return_var);
   exec("sudo wget $repo/sounds.zip",$output,$return_var);
-  exec("sudo wget $repo/supermon.zip",$output,$return_var); 
+  exec("sudo wget $repo/supermon.zip",$output,$return_var);  // Moved to setup
   exec("sudo wget $repo/nodenames.zip",$output,$return_var);
    
   exec("unzip core-download.zip",$output,$return_var);
@@ -187,86 +188,9 @@ chdir($path3);
   }
 
 
-
-exec("unzip supermon.zip",$output,$return_var); 
-
-
-chdir($path1); 
-// multi installs causes problems on test unit
-// just a local cleanup for the test unit
-if (file_exists("$path1/list.php")){  unlink("$path1/list.php");}
-if (file_exists("$path1/list.php.1")){unlink("$path1/list.php.1");}
-if (file_exists("$path1/list.php.2")){unlink("$path1/list.php.2");}
-
-exec("sudo wget $repo/supermon/list.php",$output,$return_var);
-print"Reinstalling link.php from archive\n";
-
-
-$fileBu = "$path1/list.php.bak"; if (file_exists($fileBu) ){ unlink ($fileBu);}
-copy ("$path1/list.php",$fileBu);
- 
-
-
-
-chdir("/srv/http/supermon");
-$path1 = "/srv/http/supermon";
-exec("unzip $path3/supermon.zip",$output,$return_var); 
-
-$files = "input-scan.php,favicon.ico,supermon.css,link.php,lsnodes.php,gmrs-node-index.php,server.php,controlserver.php,gmrs-chart.php,connect.php,controlpanel.php,index.php";
-$u = explode(",",$files);
-foreach($u as $file) {
-  print "Installing -Supermon root $path1/$file ";
-  if (!file_exists("$path3/$file")){print"error file missing\n";}
-  else{
-  if (file_exists("$path1/$file")){unlink("$path1/$file");}
-  rename ("$path3/$file", "$path1/$file");
-  print"ok\n";
-  }
-
-} 
-
-
-$path6 = "$path1/edit";
-$files = "dtmf.php,controlserver.php,controlpanel.php";
-$u = explode(",",$files);
-foreach($u as $file) {
-  print "Installing -Supermon edit $path6/$file ";
-  if (!file_exists("$path3/$file")){print"error file missing\n";}
-  else{
-  if (file_exists("$path6/$file")){unlink("$path6/$file");}
-  rename ("$path3/$file", "$path6/$file");
-  print"ok\n";
-  }
-
-}
-
-
-// delete these files from the supermon directory. They are not needed or can be hacked 
-$files = "astlookup.php,voter.php,irlplog.php,bubblechart.php,astnodes.php,extnodes.php,voterserver.php,connectlog.php,webacclog.php,astlog.php,rptstats.php,linuxlog.php,weberrlog.php,allmon.ini";
-$u = explode(",",$files);
-foreach($u as $file) {
-  print "Removing Supermon root $path1/$file ";
-  if (file_exists("$path1/$file")){unlink("$path1/$file");}
-  print"ok\n";
-  }
- 
-
-// This is the new GMRS Supermon admin area
-$path5 = "$path1/admin";
-$files = "log.php,input-scan.php";
-$u = explode(",",$files);
-foreach($u as $file) {
-  print "Installing -Supermon admin $path5/$file ";
-  if (!file_exists("$path3/$file")){print"error file missing\n";}
-  else{
-  if (file_exists("$path5/$file")){unlink("$path5/$file");}
-  rename ("$path3/$file", "$path5/$file");
-  print"ok\n";
-  }
-  }
-
-
-
+// Supermon install moved to setup program....
+// Some people may not want to install it so
+// its skipped here
 
 chdir($path3);//repo 
 
