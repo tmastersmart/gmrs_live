@@ -101,8 +101,7 @@ $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
  
 print"Cleaning any existing repos......\n";
 chdir($pathR);
-clean_repo($pathR); clean_repo($pathS);// This is for setup_install.php
-//clean_($pathR); // This is for installl.php
+
           
 $file = "$pathR/core-download.zip"; if (file_exists($file)){unlink ($file);}
 $file = "$repoR/sounds.zip"; if (file_exists($file)){unlink ($file);}
@@ -112,7 +111,7 @@ $file = "$repoR/gmrs.zip"; if (file_exists($file)){unlink ($file);}
 $file = "$repoR/admin.zip";if (file_exists($file)){unlink ($file);}
 $file = "$repoR/images.zip"; if (file_exists($file)){unlink ($file);}
 
-
+chdir($pathR);
 
  print "Downloading new repos ...........\n";
   exec("sudo wget $repoURL/core-download.zip",$output,$return_var);
