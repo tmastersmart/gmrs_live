@@ -104,12 +104,12 @@ chdir($pathR);
 
           
 $file = "$pathR/core-download.zip"; if (file_exists($file)){unlink ($file);}
-$file = "$repoR/sounds.zip"; if (file_exists($file)){unlink ($file);}
-$file = "$repoR/supermon.zip";if (file_exists($file)){unlink ($file);}
-$file = "$repoR/nodenames.zip";if (file_exists($file)){unlink ($file);}
-$file = "$repoR/gmrs.zip"; if (file_exists($file)){unlink ($file);}
-$file = "$repoR/admin.zip";if (file_exists($file)){unlink ($file);}
-$file = "$repoR/images.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$pathR/sounds.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$pathR/supermon.zip";if (file_exists($file)){unlink ($file);}
+$file = "$pathR/nodenames.zip";if (file_exists($file)){unlink ($file);}
+$file = "$pathR/gmrs.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$pathR/admin.zip";if (file_exists($file)){unlink ($file);}
+$file = "$pathR/images.zip"; if (file_exists($file)){unlink ($file);}
 
 chdir($pathR);
 
