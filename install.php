@@ -67,7 +67,7 @@ $file= "$path/mm-node.txt";create_nodea ($file); print"-";
 $path= "/etc/asterisk/local/mm-software"; chdir($path);   print"-";
 
 
-if file_exists("$path/setup.php"){include ("$path/setup.php");}
+if (file_exists("$path/setup.php")){include ("$path/setup.php");}
 else {print "Error install failed! $path/setup.php missing\n";}
 
 print "
