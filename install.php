@@ -87,7 +87,7 @@ Aborted  Type 'php install.php' to try again\n";}
 function installa($in){
 
 // Dual code to be in setup_install.php and install.php
-        
+$path  = "/etc/asterisk/local/mm-software";        
 $repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
