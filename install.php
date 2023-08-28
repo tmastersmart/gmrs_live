@@ -137,10 +137,10 @@ if (file_exists($file)){print"Error removing old file $file\n";}
   exec("sudo wget $repo/images.zip",$output,$return_var);
 
  print "Downloading finished...........\n";
- 
+chdir($pathR); 
   exec("unzip $pathR/core-download.zip",$output,$return_var);
   
-chdir($pathR);
+
     
    foreach (glob("*.php") as $file) {
     if($file == '.' || $file == '..') continue;
