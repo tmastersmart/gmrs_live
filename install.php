@@ -87,8 +87,9 @@ Aborted  Type 'php install.php' to try again\n";}
 function installa($in){
 
 // Dual code to be in setup_install.php and install.php
+
 $path  = "/etc/asterisk/local/mm-software";        
-$repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
+$repoURL = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
@@ -100,41 +101,40 @@ $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
  
 print"Cleaning any existing repos......\n";
 chdir($pathR);
-//clean_repo($pathR); clean_repo($pathS);// This is for setup_install.php
-clean_($pathR); // This is for installl.php
-          
-$file = "$repo/core-download.zip"; 
+
+chdir($pathR);          
+$file = "$repoR/core-download.zip"; 
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/sounds.zip";        
+$file = "$repoR/sounds.zip";        
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/supermon.zip";      
+$file = "$repoR/supermon.zip";      
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/nodenames.zip";     
+$file = "$repoR/nodenames.zip";     
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/gmrs.zip";     
+$file = "$repoR/gmrs.zip";     
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/admin.zip";     
+$file = "$repoR/admin.zip";     
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repo/images.zip";     
+$file = "$repoR/images.zip";     
 if (file_exists($file)){unlink ($file);}
 if (file_exists($file)){print"Error removing old file $file\n";}
 
 
 
  print "Downloading new repos ...........\n";
-  exec("sudo wget $repo/core-download.zip",$output,$return_var);
-  exec("sudo wget $repo/sounds.zip",$output,$return_var);
-//exec("sudo wget $repo/supermon.zip",$output,$return_var);
-  exec("sudo wget $repo/nodenames.zip",$output,$return_var); 
-  exec("sudo wget $repo/gmrs.zip",$output,$return_var);
-  exec("sudo wget $repo/admin.zip",$output,$return_var);
-  exec("sudo wget $repo/images.zip",$output,$return_var);
+  exec("sudo wget $repoURL/core-download.zip",$output,$return_var);
+  exec("sudo wget $repoURL/sounds.zip",$output,$return_var);
+//exec("sudo wget $repoURL/supermon.zip",$output,$return_var);
+  exec("sudo wget $repoURL/nodenames.zip",$output,$return_var); 
+  exec("sudo wget $repoURL/gmrs.zip",$output,$return_var);
+  exec("sudo wget $repoURL/admin.zip",$output,$return_var);
+  exec("sudo wget $repoURL/images.zip",$output,$return_var);
 
  print "Downloading finished...........\n";
 chdir($pathR); 
