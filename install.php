@@ -2,13 +2,9 @@
 <?php
 //  ------------------------------------------------------------
 //  (c) 2023 by WRXB288 lagmrs.com all rights reserved
-//
 // This installer sets up and installs the software. 
-//
 // all software is hand coded in php from scratch 
 // in North Louisiana.
-//
-//
 // -------------------------------------------------------------
 
 // v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
@@ -18,30 +14,23 @@
 // v2.3 06/13/2023 Major finished release with setup and installer 
 // v2.4 06/21/2023 many add ons reg fix new api alerts decoding
 // v2.5 07/05/2023 
-//
-// stage 1
 // v2.0 06/29/2023 new core released  with seperate module versions#s
 //                 Automated Reg down detection and automated fix
 //                 Many changes to alerts,Alerts now play with time,Reg down notification is in cap_warn and weather_pws               
 //                 Many changes to setup program. Auto install of super mon is a work in progress and wont be released until fully tested.
-// stage 2                     a
 //                 First stages of a GMRS directory are working see the nodelist being created each day.
-// v2.6 07/15/023  New download and update routines
-//                 New bridging detection
-//                 Node directory for Repeaters and hubs
-// stage 3
+// v2.6 07/15/023  New download and update routines  New bridging detection   Node directory for Repeaters and hubs
 // v3.3 07/28/2023 Lots of new addons. New connect sounds. 
 // v3.4
 // v3.8 08/08/2023 new supermon lsnodes add on. bug fixes
-// v4.1 08/12/2023 Security fixes for supermon. New supermon addons
-//                 Directory finished
-//                 Log viewer finished
-//                 Supermon moved into setup for those who want to skip it.
-
+// v4.1 08/12/2023 
+// v4.3 08/28/2023 Rewrite of gmrs supermon now gets installed in a seperate directory. Totaly diffrent install code.
+//                 Many many changes New GMRS supermon is not yet finished and changes are being made daily
+//                 Once all filenames are set in stone this installer will be finished.
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.2"; $release="08-12-2023";
+$ver="v4.3"; $release="08-28-2023";
 $out="";
 c641($in);
 print "
@@ -55,12 +44,12 @@ print "
 PHP:$phpVersion  Installer:$ver  Release date:$release
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
- Welcome to my php installer.                                                  
-                                                          
+ Welcome to my php installer.
  This will install and setup the node controler software.                                              
-
  Most everything is automated no more editing config files.
-                                                         
+
+ All modules are optional you dont have to use the time and temp
+ or you can use time and temp and not supermon.
 ============================================================
 Software will be installed to $path
 
@@ -71,142 +60,210 @@ $a = readline('Enter your command: ');
 
 if ($a=="i"){
 installa($out);
+
+print " [checking install ....";
 // automatic node setup
-$file= "$path/mm-node.txt";
-create_nodea ($file);
+$file= "$path/mm-node.txt";create_nodea ($file); print"-";
+$path= "/etc/asterisk/local/mm-software"; chdir($path);   print"-";
+if file_exists("$path/nodelist_process.php"){
+ exec("php $path/nodelist_process.php",$output,$return_var); // Force a background database load
+ print"-";}  
+else {print "Error install failed! $path/nodelist_process.php missing\n";}
+
+
+if file_exists("$path/setup.php"){include ("$path/setup.php");}
+else {print "Error install failed! $path/setup.php missing\n";}
 
 print "
-============================================================
-PHP:$phpVersion  Installer:$ver  Release date:$release
-(c) 2023 by WRXB288 LAGMRS.com all rights reserved
-Custom installer Finished 
-============================================================
-
 Software Made in loUiSiAna
 Thank you for downloading........... And have Many nice days
-
 Software was installed to $path
 
 cd $path
 php setup.php
-
->>>>>>>>>>>>>>>>>Doing first time Setup<<<<<<<<<<<<<
 ";
-chdir($path);
-include ("$path/nodelist_process.php");
-include ("$path/setup.php");
-die;
 }
-else {print "
-Aborted  Type 'php install.php' to try again
-";}
+else {
+print "
+Aborted  Type 'php install.php' to try again\n";}
 
 
 function installa($in){
 
+// This is duplicated from setup_install.php 
+
 $repo = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
-$path1 = "/srv/http/supermon";
-$path  = "/etc/asterisk/local/mm-software"; if(!is_dir($path)){ mkdir($path, 0755);}
-$path2 = "$path/sounds";if(!is_dir($path2)){ mkdir($path2, 0755);}
-$path3 = "$path/repo";if(!is_dir($path3)){ mkdir($path3, 0755);}
-$path4 = "$path/backup";if(!is_dir($path4)){ mkdir($path4, 0755);}
- chdir($path3);
+$pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
+$pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
+$pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
+$pathG = "/srv/http/gmrs";if(!is_dir($pathG)){ mkdir($pathG, 0755);}
+$pathGA= "/srv/http/gmrs/admin";if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
+$pathGE= "/srv/http/gmrs/edit";if(!is_dir($pathGE)){ mkdir($pathGE, 0755);}
+ 
+$filesP = "supermon_lnodes.php,tagline.php,setup.php,setup_install.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,connect.php";
+$filesD = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,states.csv,cron.txt,readme.txt,taglines.txt";   
+$filesG = "favicon.ico,supermon.css,link.php,lsnodes.php,gmrs-node-index.php,server.php,controlserver.php,gmrs-chart.php,connect.php,controlpanel.php,index.php";
+$filesGE = "dtmf.php,controlserver.php,controlpanel.php";
+$filesGA = "log.php";
 
-clean_($path3);
+print"Cleaning any existing repos......\n";
+chdir($pathR);
+clean_($pathR); // This is diffrent than update due to duplocate function names        
+$file = "$repo/core-download.zip"; 
+if (file_exists($file)){unlink ($file);}
+if (file_exists($file)){print"Error removing old file $file\n";}
+$file = "$repo/sounds.zip";        
+if (file_exists($file)){unlink ($file);}
+if (file_exists($file)){print"Error removing old file $file\n";}
+$file = "$repo/supermon.zip";      
+if (file_exists($file)){unlink ($file);}
+if (file_exists($file)){print"Error removing old file $file\n";}
+$file = "$repo/nodenames.zip";     
+if (file_exists($file)){unlink ($file);}
+if (file_exists($file)){print"Error removing old file $file\n";}
 
-  print "Downloading the repo from the archive \n";
-  
+
+
+ print "Downloading new repos ...........\n";
   exec("sudo wget $repo/core-download.zip",$output,$return_var);
   exec("sudo wget $repo/sounds.zip",$output,$return_var);
-  exec("sudo wget $repo/supermon.zip",$output,$return_var);  // Moved to setup
-  exec("sudo wget $repo/nodenames.zip",$output,$return_var);
-   
-  exec("unzip core-download.zip",$output,$return_var);
-
-
-$files = "supermon_lnodes.php,tagline.php,setup.php,supermon_weather.php,load.php,forcast.php,temp.php,cap_warn.php,weather_pws.php,sound_db.php,check_reg.php,nodelist_process.php,check_gmrs.sh,connect.php";
-$u = explode(",",$files);
+  exec("sudo wget $repo/supermon.zip",$output,$return_var);
+  exec("sudo wget $repo/nodenames.zip",$output,$return_var);  
+  exec("unzip $pathR/core-download.zip",$output,$return_var);
+  
+ print "Downloading finished...........
+ 
+ 
+ 
+ ----------------------------------------------------------------\n";
+ 
+$u = explode(",",$filesP);// ------------------------------------
 foreach($u as $file) {
   print "Installing -PHP $path/$file ";
-  if (!file_exists("$path3/$file")){print"error file missing\n";}
+  if (!file_exists("$pathR/$file")){print"error file missing\n";}
   else{
-  if (file_exists("$path/$file")){unlink("$path/$file");}
-  rename ("$path3/$file", "$path/$file");
+  if (file_exists("$path/$file")){unlink("$path/$file");print"Replacing ";}
+  rename ("$pathR/$file", "$path/$file");
   exec("sudo chmod +x $path/$file",$output,$return_var); 
   print"ok\n";
   }
   } 
-
-$files = "sound_gsm_db.csv,sound_wav_db.csv,sound_ulaw_db.csv,states.csv,cron.txt,readme.txt,taglines.txt";   
-
-$u = explode(",",$files);
+ 
+$u = explode(",",$filesD);// ---------------------------------------
 foreach($u as $file) {
   print "Installing -database $path/$file ";
-    if (!file_exists("$path3/$file")){print"error file missing\n";}
+    if (!file_exists("$pathR/$file")){print"error file missing\n";}
   else{
   if (file_exists("$path/$file")){unlink("$path/$file");}
-  if (file_exists("$path3/$file")){rename ("$path3/$file", "$path/$file");}
+  if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$path/$file");print"Replacing ";}
   print"ok\n";
   } 
   }
+if (file_exists("$path/taglines.txt")){
+exec("touch -d 19910101 $path/taglines.txt",$output,$return_var);// Just being funny taglines are very old.
+}
 
 
-exec("unzip $path3/sounds.zip",$output,$return_var);
-$path2 = "$path/sounds";$path3 = "$path/repo";$path4 = "$path/backup"; // just for debugging
-chdir($path3);   
+
+
+exec("unzip $pathR/sounds.zip",$output,$return_var);
+//$path2 = "$path/sounds";$path3 = "$path/repo";$path4 = "$path/backup"; // just for debugging
+chdir($pathR);   
  foreach (glob("*.wav") as $file) {
-    if($file == '.' || $file == '..') continue;
+  if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-     if (!file_exists("$path2/$file")){ 
-     rename ("$path3/$file", "$path2/$file");
-     print"Installing sound file:$path2/$file\n"; 
-     }
-     else(unlink("$path3/$file"));// cleanup
+    print"Installing sound file:$pathS/$file "; 
+    if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
+    if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");print"--";} // Move it into the SOUNDS
+    print"ok\n";
     }
   }
 
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-     if (!file_exists("$path2/$file")){ 
-     rename ("$path3/$file", "$path2/$file");
-     print"Installing sound file:$path2/$file\n"; 
-     }
-     else(unlink("$path3/$file"));// cleanup
+    print"Installing sound file:$pathS/$file "; 
+    if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
+    if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");print"--";} // Move it into the SOUNDS
+    print"ok\n";
     }
   }
 
  foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-     if (!file_exists("$path2/$file")){ 
-     rename ("$path3/$file", "$path2/$file");
-     print"Installing sound file:$path2/$file\n"; 
-     }
-     else(unlink("$path3/$file"));// cleanup
+    print"Installing sound file:$pathS/$file "; 
+    if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
+    if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");print"--";} // Move it into the SOUNDS
+    print"ok\n";
     }
   }
+  
+
+//  
+// Installing -Supermon root favicon.ico,supermon.css,link.php,lsnodes.php,gmrs-node-index.php,server.php,controlserver.php,gmrs-chart.php,connect.php,controlpanel.php,index.php/favicon.ico ok
+
+//   $pathG     = "/srv/http/gmrs";
+exec("unzip $pathR/supermon.zip",$output,$return_var); 
+$u = explode(",",$filesG); 
+foreach($u as $file) {
+  print "Installing -Supermon root $pathG/$file ";
+  if (!file_exists("$pathR/$file")){print"error file missing\n";}
+  else{
+  if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}
+  rename ("$pathR/$file", "$pathG/$file");
+  exec("sudo chmod +x $pathG/$file",$output,$return_var); 
+  print"ok\n";
+  }
+}
+ 
+$pathGE = "$pathG/edit";
+
+$u = explode(",",$filesGE); 
+foreach($u as $file) {
+  print "Installing -Supermon edit $pathGE/$file ";
+  if (!file_exists("$pathR/$file")){print"error file missing\n";}
+  else{
+  if (file_exists("$pathGE/$file")){unlink("$pathGE/$file");print"Replacing ";}
+  rename ("$pathR/$file", "$pathGE/$file");
+  exec("sudo chmod +x $pathGE/$file",$output,$return_var); 
+  print"ok\n";
+  }
+
+}
 
 
-// Supermon install moved to setup program....
-// Some people may not want to install it so
-// its skipped here
 
-chdir($path3);//repo 
-
+$u = explode(",",$filesGA);
+foreach($u as $file) {
+  print "Installing -Supermon admin $pathGA/$file ";
+  if (!file_exists("$pathR/$file")){print"error file missing\n";}
+  else{
+  if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}
+  rename ("$pathR/$file", "$pathGA/$file");
+  print"ok\n";
+  }
+  }
 $nodesounds="/var/lib/asterisk/sounds/rpt/nodenames";
-exec("unzip $path3/nodenames.zip",$output,$return_var); 
-    
+
+ foreach (glob("*.ul") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }
+
+exec("unzip $pathR/nodenames.zip",$output,$return_var);
+
+
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-     if (!file_exists("$path2/$file")){ 
-     rename ("$path3/$file", "$path2/$file");
-     print"Installing sound file:$path2/$file\n"; 
-     }
-     else(unlink("$path3/$file"));// cleanup
+    print"Installing sound file:$pathS/$file "; 
+    if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
+    if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");print"--";} // Move it into the SOUNDS
+    print"ok\n";
     }
-  } 
+  }
+
 
 }
 
@@ -264,20 +321,13 @@ exit 0
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
  exec("sudo chmod +x $file",$output,$return_var);
  
-//$file="/usr/local/bin/AUTOSKY/SOUNDS/asn02.wav";
-//if(!file_exists($file)){ 
-//print"
-//We need the sound files from AUTOSKY for cap_warn 
-//They will now be installed by packman. enter Y
-//";  
-// exec("pacman -Sy hamvoip-autosky",$output,$return_var);
-//}
+
 } 
 function clean_($in){
 
    chdir($in);
    
-   foreach (glob("*.zip") as $file) {
+ foreach (glob("*.zip") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { unlink($file);print"del $file\n";  }
     } 
@@ -306,17 +356,12 @@ function clean_($in){
     if (is_file($file)) { unlink($file);print"del $file\n";  }
     }  
     
-  foreach (glob("*.merge") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file\n";  }
-    }     
+   
 
 } 
  
 function c641($in){
 print"
-
-
 
 
 
