@@ -89,7 +89,7 @@ function installa($in){
 // Dual code to be in setup_install.php and install.php
 
 $path  = "/etc/asterisk/local/mm-software";        
-$repoURL = "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
+$repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
@@ -101,51 +101,38 @@ $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
  
 print"Cleaning any existing repos......\n";
 chdir($pathR);
-
-chdir($pathR);          
-$file = "$repoR/core-download.zip"; 
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/sounds.zip";        
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/supermon.zip";      
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/nodenames.zip";     
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/gmrs.zip";     
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/admin.zip";     
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
-$file = "$repoR/images.zip";     
-if (file_exists($file)){unlink ($file);}
-if (file_exists($file)){print"Error removing old file $file\n";}
+clean_repo($pathR); clean_repo($pathS);// This is for setup_install.php
+//clean_($pathR); // This is for installl.php
+          
+$file = "$pathR/core-download.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$repoR/sounds.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$repoR/supermon.zip";if (file_exists($file)){unlink ($file);}
+$file = "$repoR/nodenames.zip";if (file_exists($file)){unlink ($file);}
+$file = "$repoR/gmrs.zip"; if (file_exists($file)){unlink ($file);}
+$file = "$repoR/admin.zip";if (file_exists($file)){unlink ($file);}
+$file = "$repoR/images.zip"; if (file_exists($file)){unlink ($file);}
 
 
 
  print "Downloading new repos ...........\n";
   exec("sudo wget $repoURL/core-download.zip",$output,$return_var);
   exec("sudo wget $repoURL/sounds.zip",$output,$return_var);
-//exec("sudo wget $repoURL/supermon.zip",$output,$return_var);
+//exec("sudo wget $repo/supermon.zip",$output,$return_var);
   exec("sudo wget $repoURL/nodenames.zip",$output,$return_var); 
   exec("sudo wget $repoURL/gmrs.zip",$output,$return_var);
   exec("sudo wget $repoURL/admin.zip",$output,$return_var);
   exec("sudo wget $repoURL/images.zip",$output,$return_var);
 
  print "Downloading finished...........\n";
-chdir($pathR); 
-  exec("unzip $pathR/core-download.zip",$output,$return_var);
+ chdir($pathR);
   
-
-    
+ exec("unzip $pathR/core-download.zip",$output,$return_var);
+  
+     
    foreach (glob("*.php") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$path/$file "; 
+    print"Installing php file:$path/$file "; 
     if (file_exists("$path/$file")){unlink("$path/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){
     rename ("$pathR/$file", "$path/$file");
@@ -158,7 +145,7 @@ chdir($pathR);
    foreach (glob("*.csv") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$path/$file "; 
+    print"Installing csv file:$path/$file "; 
     if (file_exists("$path/$file")){unlink("$path/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$path/$file"); } 
     print"ok\n";
@@ -168,7 +155,7 @@ chdir($pathR);
    foreach (glob("*.txt") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$path/$file "; 
+    print"Installing txt file:$path/$file "; 
     if (file_exists("$path/$file")){unlink("$path/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$path/$file"); } 
     print"ok\n";
@@ -190,7 +177,7 @@ chdir($pathR);
  foreach (glob("*.wav") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing sound file:$pathS/$file "; 
+    print"Installing wav file:$pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -200,7 +187,7 @@ chdir($pathR);
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing sound file:$pathS/$file "; 
+    print"Installing ul file:$pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -210,7 +197,7 @@ chdir($pathR);
  foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing sound file:$pathS/$file "; 
+    print"Installing gsm file:$pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -226,7 +213,7 @@ chdir($pathR);
  foreach (glob("*.php") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing php file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -236,7 +223,7 @@ chdir($pathR);
  foreach (glob("*.css") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing css file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -246,7 +233,7 @@ chdir($pathR);
  foreach (glob("*.js") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing js file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -255,7 +242,7 @@ chdir($pathR);
  foreach (glob("*.inc") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing inc file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -264,7 +251,7 @@ chdir($pathR);
  foreach (glob("*.ini") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing ini file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -273,7 +260,7 @@ chdir($pathR);
   foreach (glob("*.ico") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathG/$file "; 
+    print"Installing ico file:$pathG/$file "; 
     if (file_exists("$pathG/$file")){unlink("$pathG/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathG/$file");} 
     print"ok\n";
@@ -287,7 +274,7 @@ chdir($pathR);
  foreach (glob("*.php") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGA/$file "; 
+    print"Installing php file:$pathGA/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -297,7 +284,7 @@ chdir($pathR);
  foreach (glob("*.css") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGE/$file "; 
+    print"Installing css file:$pathGE/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -307,7 +294,7 @@ chdir($pathR);
  foreach (glob("*.js") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGE/$file "; 
+    print"Installing js file:$pathGE/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -316,7 +303,7 @@ chdir($pathR);
  foreach (glob("*.inc") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGA/$file "; 
+    print"Installing inc file:$pathGA/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -325,7 +312,7 @@ chdir($pathR);
  foreach (glob("*.ini") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGA/$file "; 
+    print"Installing ini file:$pathGA/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -334,7 +321,7 @@ chdir($pathR);
   foreach (glob("*.ico") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathGA/$file "; 
+    print"Installing ico file:$pathGA/$file "; 
     if (file_exists("$pathGA/$file")){unlink("$pathGA/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathGA/$file");} 
     print"ok\n";
@@ -348,7 +335,7 @@ chdir($pathR);
  foreach (glob("*.gif") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathI/$file "; 
+    print"Installing gif file:$pathI/$file "; 
     if (file_exists("$pathI/$file")){unlink("$pathI/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathI/$file");} 
     print"ok\n";
@@ -357,12 +344,15 @@ chdir($pathR);
  foreach (glob("*.jpg") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing file:$pathI/$file "; 
+    print"Installing jpg file:$pathI/$file "; 
     if (file_exists("$pathI/$file")){unlink("$pathI/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathI/$file");} 
     print"ok\n";
     }
   }
+
+//======================================
+
 
 // "/var/lib/asterisk/sounds/rpt/nodenames";    $pathN 
 
@@ -372,14 +362,12 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing Node Names file:$pathN/$file "; 
+    print"Installing ul file:$pathN/$file "; 
     if (file_exists("$pathN/$file")){unlink("$pathN/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathN/$file");print"--";} // Move it into the SOUNDS
     print"ok\n";
     }
   }
-
-
 }
 
 function create_nodea ($file){
