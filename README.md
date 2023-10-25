@@ -77,12 +77,15 @@ Weather scripts use keys specialy created for this software licensed to me.
 You may not use these keys in other software get your own.
 
 All software is written by me.
-Execpt for the mods to link.php
-link.php is licensed under the GNU General Public License v3.0
-https://www.gnu.org/licenses/gpl-3.0.en.html
-
 You must have my permission to redistribute this software package. 
 With I plan on granting I just need to list who is doing it thanks..... 
+
+
+
+supermon files which are in a seperate directory
+and are licensed under the GNU General Public License v3.0
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
 
 
 
