@@ -27,10 +27,11 @@
 // v4.3 08/28/2023 Rewrite of gmrs supermon now gets installed in a seperate directory. Totaly diffrent install code.
 //                 Many many changes New GMRS supermon is not yet finished and changes are being made daily
 //                 New installer
+// v4.4 10-25-23   Install tweeks to the startup routines.
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.3"; $release="08-28-2023";
+$ver="v4.4"; $release="10-25-2023";
 $out="";
 c641($in);
 print "
@@ -110,7 +111,7 @@ $file = "$pathR/nodenames.zip";if (file_exists($file)){unlink ($file);}
 $file = "$pathR/gmrs.zip"; if (file_exists($file)){unlink ($file);}
 $file = "$pathR/admin.zip";if (file_exists($file)){unlink ($file);}
 $file = "$pathR/images.zip"; if (file_exists($file)){unlink ($file);}
-
+$file = "$pathR/file_id.diz"; if (file_exists($file)){unlink ($file);}
 chdir($pathR);
 
  print "Downloading new repos ...........\n";
@@ -167,7 +168,21 @@ if (file_exists("$path/taglines.txt")){
 exec("touch -d 19910101 $path/taglines.txt",$output,$return_var);// Just being funny taglines are very old.
 }
 
+// install tweaks in startup routine
+$RCfile="/usr/local/etc/rc.allstar";
+if (file_exists("$path/rc.allstar.txt")){
+ print"Installing rc.allstar file:$RCfile "; 
+ if (!file_exists("$RCfile.bak")){ rename ("$RCfile", "$RCfile.bak");}// make a backup
+ if (file_exists($RCfile)){unlink($RCfile);print"Replacing ";}// kill existing file
+ rename ("$path/rc.allstar.txt", "$RCfile");// rename and move at the same time
+ if (file_exists("$RCfile")){print"ok\n";}
+ else {print"error ";
+ if (file_exists("$RCfile.bak")){ 
+  rename ("$RCfile.bak", "$RCfile");print "Restoring orginal\n";// restore backup
+  }
+ }
 
+}
 
 
 exec("unzip $pathR/sounds.zip",$output,$return_var);
