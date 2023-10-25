@@ -168,17 +168,17 @@ if (file_exists("$path/taglines.txt")){
 exec("touch -d 19910101 $path/taglines.txt",$output,$return_var);// Just being funny taglines are very old.
 }
 
-// install tweaks in startup routine
+// install tweaks in startup routine (will be located outside repo directory in path)
 $RCfile="/usr/local/etc/rc.allstar";
 if (file_exists("$path/rc.allstar.txt")){
  print"Installing rc.allstar file:$RCfile "; 
- if (!file_exists("$RCfile.bak")){ rename ("$RCfile", "$RCfile.bak");}// make a backup
+ if (!file_exists("$RCfile.bak")){ rename ($RCfile, "$RCfile.bak");}// make a backup
  if (file_exists($RCfile)){unlink($RCfile);print"Replacing ";}// kill existing file
- rename ("$path/rc.allstar.txt", "$RCfile");// rename and move at the same time
- if (file_exists("$RCfile")){print"ok\n";}
+ rename ("$path/rc.allstar.txt", $RCfile);// rename and move at the same time
+ if (file_exists($RCfile)){print"ok\n";}
  else {print"error ";
  if (file_exists("$RCfile.bak")){ 
-  rename ("$RCfile.bak", "$RCfile");print "Restoring orginal\n";// restore backup
+  rename ("$RCfile.bak", $RCfile);print "Restoring orginal\n";// restore backup
   }
  }
 
