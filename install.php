@@ -175,6 +175,7 @@ if (file_exists("$path/rc.allstar.txt")){
  if (!file_exists("$RCfile.bak")){ rename ($RCfile, "$RCfile.bak");}// make a backup
  if (file_exists($RCfile)){unlink($RCfile);print"Replacing ";}// kill existing file
  rename ("$path/rc.allstar.txt", $RCfile);// rename and move at the same time
+  exec("sudo chmod 755 $RCfile",$output,$return_var); print"CHMOD "; 
  if (file_exists($RCfile)){print"ok\n";}
  else {print"error ";
  if (file_exists("$RCfile.bak")){ 
