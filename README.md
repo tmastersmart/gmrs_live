@@ -20,6 +20,7 @@ This software was written for GMRS nodes.
 * CPU event alarms 
 * Uninstaller and Updater.
 * Totaly new nodelist updater
+* New bvootup system gives IP,Reg status and CPU temp
 
 download the installer.
 Drop to a shell
