@@ -23,8 +23,11 @@ This software was written for GMRS nodes.
 * New bootup system gives IP,Reg status and CPU temp
 
 download the installer.
+
 Drop to a shell
+
 type
+
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
 
 This in not a bunch of shell scripts nor are they modifications to any existing scripts
