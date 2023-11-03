@@ -28,10 +28,11 @@
 //                 Many many changes New GMRS supermon is not yet finished and changes are being made daily
 //                 New installer
 // v4.4 10-25-23   Install tweeks to the startup routines.
+// v4.5 11-03-23   Added time and temp to admin menu
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.4"; $release="10-25-2023";
+$ver="v4.5"; $release="11-03-2023";
 $out="";
 c641($in);
 print "
@@ -404,6 +405,7 @@ $call=$u[1];}
 }
 
  
+ 
 // /usr/local/etc/tts.conf 
 // Get any tss key if exists
 $file ="/usr/local/etc/tts.conf";
@@ -420,9 +422,17 @@ $tts=$u[1];}
 $file= "$path/mm-node.txt";// This will be the AutoNode varable
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call,$tts, , ,");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
-// phase 2 build the admin menu
+admin_sh_menuI("install");
+
+} 
+
+function admin_sh_menuI(){
 $file ="/usr/local/sbin/firsttime/adm01-shell.sh";
 $file2="/usr/local/sbin/firsttime/mmsoftware.sh";
+$file3="/usr/local/sbin/firsttime/mmsoftware2.sh";
+
+// build menu link
+if (file_exists($file2)){unlink ($file2);}
 copy($file, $file2);// copy existing to get correct permissions
 $file= $file2;
 $out='#/!bin/bash
@@ -439,8 +449,33 @@ exit 0
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
  exec("sudo chmod +x $file",$output,$return_var);
  
+ // build a second menu
+if (file_exists($file3)){unlink ($file3);}
+copy($file, $file3);// copy existing to get correct permissions
+$file= $file3;
+$out='#/!bin/bash
+#MENUFT%055%Say time and Weather 
 
+$SON
+reset
+
+php /etc/asterisk/local/mm-software/weather_pws.php
+
+exit 0
+';
+// overwrite with our menu.
+$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+ exec("sudo chmod +x $file",$output,$return_var); 
+ 
+ 
+ 
 } 
+
+
+
+
+
+
 function clean_($in){
 
    chdir($in);
