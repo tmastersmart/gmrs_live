@@ -29,12 +29,32 @@
 //                 New installer
 // v4.4 10-25-23   Install tweeks to the startup routines.
 // v4.5 11-03-23   Added time and temp to admin menu
+// v4.6 12-33-23   Automatic docRoute detection for webserver
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.5"; $release="11-03-2023";
+$ver="v4.6"; $release="12-31-2023";
 $out="";
 c641($in);
+
+
+// the APATCHIE config
+//DocumentRoot "/srv/http"
+//<Directory "/srv/http">
+$out="";
+$docRoute="Default"; $docRouteP="/srv/http";
+$hide=false;$fileEdit="/etc/httpd/conf/httpd.conf"; $search="DocumentRoot ";search_configI($out);
+print $out;
+if($ok and $out){
+  $u = explode(" ",$out); //DocumentRoot "/srv/http"
+  $docRoute=$u[0]; $docRouteP=$u[1]; 
+  $docRouteP = str_replace('"', '', $docRouteP);
+}  
+
+
+
+
+
 print "
    _____ __  __ _____   _____   _           _        _ _           
   / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
@@ -54,6 +74,7 @@ PHP:$phpVersion  Installer:$ver  Release date:$release
  or you can use time and temp and not supermon.
 ============================================================
 Software will be installed to $path
+GMRS Supermon [$docRoute $docRouteP] 
 
  i) install
  Any other key to abort 
@@ -87,18 +108,19 @@ Aborted  Type 'php install.php' to try again\n";}
 
 
 function installa($in){
-
+global $docRouteP;
 // Dual code to be in setup_install.php and install.php
+//$docRouteP
 
 $path  = "/etc/asterisk/local/mm-software";        
 $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
-$pathG = "/srv/http/gmrs";if(!is_dir($pathG)){ mkdir($pathG, 0755);}
-$pathGA= "/srv/http/gmrs/admin";if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
-$pathGE= "/srv/http/gmrs/edit";if(!is_dir($pathGE)){ mkdir($pathGE, 0755);}
-$pathI = "/srv/http/gmrs/images";if(!is_dir($pathI)){ mkdir($pathI, 0755);}
+$pathG = "$docRouteP/gmrs";if(!is_dir($pathG)){ mkdir($pathG, 0755);}
+$pathGA= "$docRouteP/gmrs/admin";if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
+$pathGE= "$docRouteP/gmrs/edit";if(!is_dir($pathGE)){ mkdir($pathGE, 0755);}
+$pathI = "$docRouteP/gmrs/images";if(!is_dir($pathI)){ mkdir($pathI, 0755);}
 $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
  
 print"Cleaning any existing repos......\n";
@@ -508,10 +530,36 @@ function clean_($in){
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { unlink($file);print"del $file\n";  }
     }  
-    
+  
    
 
 } 
+
+
+function search_configI($out){ 
+global $search,$path,$fileEdit,$ok,$out,$hide;
+
+if(!$hide){print "Search for $search in file:$fileEdit ";}
+$ok=false;$line="";
+if (file_exists($fileEdit)){
+$fileIN= file($fileEdit);
+foreach($fileIN as $line){
+$line = str_replace("\r", "", $line);
+$line = str_replace("\n", "", $line);
+//print "$line\n";
+$pos = strpos("-$line", $search);  
+if ($pos>=1){
+$out=$line;//print "$line - $search - $out\n"; 
+$ok=true;if(!$hide){print"found $out\n";}
+break;}
+ }
+}// end if exists
+else {print"File Not Found $fileEdit\n";}
+
+if(!$hide){
+ if (!$ok){print"not found $search\n";}
+ }
+}
  
 function c641($in){
 print"
@@ -525,3 +573,4 @@ READY.
 
 ";
 }
+
