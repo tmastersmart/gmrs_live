@@ -31,18 +31,25 @@
 // run by cron at 1am 
 // php /etc/asterisk/local/mm-software/archive.php
 
+// v1.4  archive moved to tmp directory and held until next night. Be sure ts a big memory card. Or clear after a hr.
+$cron=false;
+if (!empty($argv[1])) { 
+ if ($argv[1] =="cron"){$cron=true;}
+ }
 
-$ver= "1.3";  // 08/28/2223
+$ver= "1.4";  // 11/23/2223
 $path         = "/etc/asterisk/local/mm-software";
+$beta=true;
 
 include ("$path/load.php");
 include ("$path/sound_db.php");
 $cur   = date('mdyhis');
 $archiveDir= "/etc/asterisk/local/log/$node";
+$pathA= "/tmp/archive/"; if(!is_dir($pathA)){ mkdir($pathA, 0755);}
 
 
 // my local ftp server on the LAN
-$user= ""; $pass= ""; $ftp=""; 
+$user= "user"; $pass= "pass"; $ftp="192.168.0.xxx"; 
 
 check_gsm_db ("silence2");$silence=$file1; $archive="";$action="";
 
@@ -58,6 +65,27 @@ Archive backup
 Today:$today Yesterday: $yesterday 
 ===================================================
 ";
+
+chdir($pathA);
+
+// make sure all archives are removed
+foreach (glob("*.gsm") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+foreach (glob("*.mp3") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+foreach (glob("*.wav") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+
+
+
+
+
 
 // build audio timestamp
 $action="";
@@ -77,34 +105,26 @@ $oh=false;make_number ($x[$i]);$action = "$action $actionOut";
 check_gsm_db ("silence2");if($file1){$action = "$action $file1";}
 
 
-$timestamp="/tmp/timestamp.gsm";
+$timestamp="$pathA/timestamp.gsm";
 exec("sox $action $timestamp",$output,$return_var);//print "DEBUG $action";
 
 $action=""; save_task_log ("archive audio files");
-
-chdir("/etc/asterisk/local/log/");
-
-// make sure all archives are removed
-foreach (glob("*.gsm") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file\n";  }
-    } 
-foreach (glob("*.mp3") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file\n";  }
-    } 
 
 
 
 chdir("/etc/asterisk/local/log/$node");
 
-
+foreach (glob("*.txt") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    } 
+    
 $files = array();
 $dir = opendir('.'); // open the cwd..also do an err check.
 while(false != ($file = readdir($dir))) {
 if($file == '.' || $file == '..') {continue;}
-$pos = strpos("-$line", "txt");if($pos){continue;}
-$size=filesize($file);if($size==0){continue;}
+//$pos = strpos("-$line", "txt");if($pos){continue;}
+$size=filesize($file);if($size<=1){continue;}
 $files[] = $file; // put in array.
 }
 natsort($files); // sort.
@@ -112,23 +132,23 @@ natsort($files); // sort.
 
 if($beta){foreach ($files as $line){print "$line\n";}}
 
-$pos = strpos("-$line", "txt");
+//$pos = strpos("-$line", "txt");
 
 
 $ii=0;$ct=0;  $size=0; 
 foreach ($files as $file) {
     if($file == '.' || $file == '..') continue;
     $ii++;$ct++;
-    $size=filesize($file);if($size==0){print "$file = $size ";continue;}
+    $size=filesize($file);if($size<=1){print "$file = $size ";continue;}
     print "$ct ";
     $action ="$action $silence $file"; if ($ii>=500){ 
-    $archive   = "/etc/asterisk/local/log/raw$ct-$cur.wav";
+    $archive   = "$pathA/raw$ct-$cur.wav";
      exec("sox $action $archive",$output,$return_var);print"
 $archive $ii files added,";$ii=0; $action="";}
     }
 
   
-$archive   = "/etc/asterisk/local/log/raw$ct-$cur.wav";  
+$archive   = "$pathA/raw$ct-$cur.wav";  
 exec("sox $action $archive",$output,$return_var);
 print"
 $archive $ii files added <ok>
@@ -142,7 +162,7 @@ $datum found $ct files
 ";
 
 
-chdir("/etc/asterisk/local/log/");
+chdir($pathA);
 
 
 $ii=0;$ct=0;$size=0;$action=""; $file="";
@@ -160,13 +180,13 @@ print "$datum Converting and Compressing $curYesterday files
 // Stream #0:0: Audio: gsm, 8000 Hz, mono, s16, 13 kb/s
 
 // merge time audio time stamp and all the files into one
-$cur= date('mdyhis');$archive="/etc/asterisk/local/log/archive-$curYesterday.wav";
-$action="$timestamp $action $timestamp"; 
+$cur= date('mdyhis');$archive="$pathA/archive-$curYesterday.wav";
+$action="$timestamp $action "; 
 exec("sox $action $archive",$output,$return_var);
 
 //exec("curl -T $archive --user $user:$pass ftp://$ftp",$output,$return_var);
 
-$mp3="/etc/asterisk/local/log/archive-$curYesterday.mp3";
+$mp3="$pathA/archive-$curYesterday.mp3";
 exec("ffmpeg -i $archive $mp3",$output,$return_var);
 
 $file = $mp3; $size= filesize($file);
@@ -177,22 +197,23 @@ print"$datum upload  $ct files $file
 $datum   = date('m-d-Y H:i:s');
 
 $test=($size / 100000);print "$datum FileSize:$size  sleep $test\n"; 
- 
+
+//exit; 
 sleep ($test); // we have to wait for long uploads to finish before cleaning
 
-print"$datum Cleaning up"; 
+//print"$datum Cleaning up"; 
 
 // make sure all archives are removed
-foreach (glob("*.wav") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file
-    ";  }
-    } 
-foreach (glob("*.mp3") as $file) {
-    if($file == '.' || $file == '..') continue;
-    if (is_file($file)) { unlink($file);print"del $file
-    ";  }
-    }       
+//foreach (glob("*.wav") as $file) {
+//    if($file == '.' || $file == '..') continue;
+//    if (is_file($file)) { unlink($file);print"del $file
+//    ";  }
+//    } 
+//foreach (glob("*.mp3") as $file) {
+//    if($file == '.' || $file == '..') continue;
+//    if (is_file($file)) { unlink($file);print"del $file
+//    ";  }
+//    }       
 
 chdir($archiveDir);
 print"killing all old files
