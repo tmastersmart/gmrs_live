@@ -5,6 +5,13 @@
 // This installer sets up and installs the software. 
 // all software is hand coded in php from scratch 
 // in North Louisiana.
+//
+//  Installs from github.com repo
+//
+//  PHP Source code is readable in zips at
+//  https://github.com/tmastersmart/gmrs_live
+//
+//  I never want your passwords or access to you node.
 // -------------------------------------------------------------
 
 // v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
