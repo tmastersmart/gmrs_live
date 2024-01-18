@@ -37,10 +37,11 @@
 // v4.4 10-25-23   Install tweeks to the startup routines.
 // v4.5 11-03-23   Added time and temp to admin menu
 // v4.6 12-33-23   Automatic docRoute detection for webserver
+// v4.7 1/18/24    Bug fix in path
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.6"; $release="12-31-2023";
+$ver="v4.7"; $release="1-18-2024";
 $out="";
 c641($in);
 
