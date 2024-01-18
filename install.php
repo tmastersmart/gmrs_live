@@ -93,8 +93,9 @@ installa($out);
 
 print " [checking install ....";
 // automatic node setup
-$file= "$path/mm-node.txt";create_nodea ($file); print"-";
 $path= "/etc/asterisk/local/mm-software"; chdir($path);   print"-";
+$file= "$path/mm-node.txt";create_nodea ($file); print"-";
+
 
 
 if (file_exists("$path/setup.php")){include ("$path/setup.php");}
@@ -120,7 +121,8 @@ global $docRouteP;
 //$docRouteP
 
 $path  = "/etc/asterisk/local/mm-software";        
-$repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
+$repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main"
+ if(!is_dir($path)){ mkdir($path, 0755);}  
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
