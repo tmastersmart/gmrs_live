@@ -5,13 +5,6 @@
 // This installer sets up and installs the software. 
 // all software is hand coded in php from scratch 
 // in North Louisiana.
-//
-//  Installs from github.com repo
-//
-//  PHP Source code is readable in zips at
-//  https://github.com/tmastersmart/gmrs_live
-//
-//  I never want your passwords or access to you node.
 // -------------------------------------------------------------
 
 // v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
@@ -37,30 +30,38 @@
 // v4.4 10-25-23   Install tweeks to the startup routines.
 // v4.5 11-03-23   Added time and temp to admin menu
 // v4.6 12-33-23   Automatic docRoute detection for webserver
-// v4.7 1/18/24    Bug fix in path
+// v4.8 1/19/24 Custom install directory. Bug fix in creating main dir
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.7"; $release="1-18-2024";
+$ver="v4.8"; $release="1-19-2024";
 $out="";
 c641($in);
 
 
-// the APATCHIE config
-//DocumentRoot "/srv/http"
-//<Directory "/srv/http">
-$out="";
-$docRoute="Default"; $docRouteP="/srv/http";
-$hide=false;$fileEdit="/etc/httpd/conf/httpd.conf"; $search="DocumentRoot ";search_configI($out);
-print $out;
-if($ok and $out){
-  $u = explode(" ",$out); //DocumentRoot "/srv/http"
-  $docRoute=$u[0]; $docRouteP=$u[1]; 
-  $docRouteP = str_replace('"', '', $docRouteP);
-}  
 
+// the APATCHIE config test
 
+$out="";$docRoute="Default";$docRouteP="/srv/http";$changeall=false;$fileEdit="/etc/httpd/conf/httpd.conf"; 
 
+$file="/opt/httpd/httpd.conf"            ;if (file_exists($file)){ $fileEdit=$file;}
+$file="/opt/httpd/conf/httpd.conf"       ;if (file_exists($file)){ $fileEdit=$file;}
+$file="/etc/httpd/httpd.conf"            ;if (file_exists($file)){ $fileEdit=$file;}
+$file="/etc/httpd/conf/httpd.conf"       ;if (file_exists($file)){ $fileEdit=$file;}
+$file="/private/etc/apache2/httpd.conf"  ;if (file_exists($file)){ $fileEdit=$file;}
+$file="/usr/local/apache/conf/httpd.conf";if (file_exists($file)){ $fileEdit=$file;}
+$file="/usr/local/apache2/apache2.conf"  ;if (file_exists($file)){ $fileEdit=$file;}
+
+if (file_exists($fileEdit)){
+ print "Apache Config Path: $fileEdit \n";
+ $hide=false; $search="DocumentRoot ";search_configI($out);
+ if($ok and $out){
+ $u = explode(" ",$out); 
+ $docRoute=$u[0]; $docRouteP=$u[1]; 
+ $docRouteP = str_replace('"', '', $docRouteP);
+ } 
+} 
+print "DocumentRoot: $docRouteP \n";
 
 
 print "
@@ -81,31 +82,45 @@ PHP:$phpVersion  Installer:$ver  Release date:$release
  All modules are optional you dont have to use the time and temp
  or you can use time and temp and not supermon.
 ============================================================
-Software will be installed to $path
-GMRS Supermon [$docRoute $docRouteP] 
+Software will be installed to [$path]
+GMRS Supermon will be installed to [$docRouteP] <-Verify  
 
  i) install
+ c) Change  DocumentRoot: $docRouteP
  Any other key to abort 
 ";
 $a = readline('Enter your command: ');
+ if ($a=="c"){ 
+  $a = readline('Enter new Path: ') ; 
+  $docRouteP = $a;
+  print "DocumentRoot changed to: $docRouteP \n\n";
+  print "  i) install   Any other key to abort!\n";
+  $a = readline('Enter your command: ');
+  }
+
+
 
 if ($a=="i"){
+$path= "/etc/asterisk/local/mm-software"; 
+if(!is_dir($path)){ mkdir($path, 0755);}
+
 installa($out);
 
 print " [checking install ....";
-// automatic node setup
-$path= "/etc/asterisk/local/mm-software"; chdir($path);   print"-";
+chdir($path); print"-";
 $file= "$path/mm-node.txt";create_nodea ($file); print"-";
-
-
 
 if (file_exists("$path/setup.php")){include ("$path/setup.php");}
 else {print "Error install failed! $path/setup.php missing\n";}
 
 print "
+Software was installed to [$path]
+GMRS Supermon          to [$docRouteP]  
+
+
 Software Made in loUiSiAna
 Thank you for downloading........... And have Many nice days
-Software was installed to $path
+ 
 
 cd $path
 php setup.php
@@ -117,13 +132,12 @@ Aborted  Type 'php install.php' to try again\n";}
 
 
 function installa($in){
-global $docRouteP;
+global $docRouteP,$path;
 // Dual code to be in setup_install.php and install.php
 //$docRouteP
 
-$path  = "/etc/asterisk/local/mm-software";        
-$repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main"
- if(!is_dir($path)){ mkdir($path, 0755);}  
+$path  = "/etc/asterisk/local/mm-software";if(!is_dir($path)){ mkdir($path, 0755);}        
+$repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
@@ -150,7 +164,7 @@ chdir($pathR);
  print "Downloading new repos ...........\n";
   exec("sudo wget $repoURL/core-download.zip",$output,$return_var);
   exec("sudo wget $repoURL/sounds.zip",$output,$return_var);
-//exec("sudo wget $repo/supermon.zip",$output,$return_var);
+//exec("sudo wget $repoURL/supermon-bak/supermon-gmrs-backup.zip",$output,$return_var);// stock supermon for auto repair
   exec("sudo wget $repoURL/nodenames.zip",$output,$return_var); 
   exec("sudo wget $repoURL/gmrs.zip",$output,$return_var);
   exec("sudo wget $repoURL/admin.zip",$output,$return_var);
@@ -583,4 +597,3 @@ READY.
 
 ";
 }
-
