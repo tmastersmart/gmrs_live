@@ -5,15 +5,19 @@
 // This installer sets up and installs the software. 
 // all software is hand coded in php from scratch 
 // in North Louisiana.
+// -------------------------------------------------------------
 //
 //  Installs from github.com repo
 //
 //  PHP Source code is readable in zips at
 //  https://github.com/tmastersmart/gmrs_live
 //
-//  I never want your passwords or access to you node.
-// -------------------------------------------------------------
-
+//  I will never ask for your passwords dont give them to anyone!
+//  I do not want remote access to anyones node. Never open a SSH port on 
+//  your router to a PI running.
+//
+//  
+//
 // v1.6 06/01/2023 This is the first release with a mostly automated setup and installer.
 // v1.7 06/02/2023 Debugging after moving to seperate subdirectory. 
 // v1.8 06/03/2023 
@@ -38,19 +42,41 @@
 // v4.5 11-03-23   Added time and temp to admin menu
 // v4.6 12-33-23   Automatic docRoute detection for webserver
 // v4.8 1/19/24 Custom install directory. Bug fix in creating main dir
+// v4.9 2/1/24  Minor Adjustments to installer.
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.8"; $release="1-19-2024";
-$out="";
-c641($in);
+$ver="v4.9"; $release="2-1-2024";
+$out=""; $in=""; $skip="
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+";
+print $skip;c641($in);sleep(2);print $skip;
 
 // the APATCHIE config test
-
 $out="";$docRoute="Default";$docRouteP="/srv/http";$changeall=false;$fileEdit="/etc/httpd/conf/httpd.conf"; 
-
 $file="/opt/httpd/httpd.conf"            ;if (file_exists($file)){ $fileEdit=$file;}
 $file="/opt/httpd/conf/httpd.conf"       ;if (file_exists($file)){ $fileEdit=$file;}
 $file="/etc/httpd/httpd.conf"            ;if (file_exists($file)){ $fileEdit=$file;}
@@ -60,17 +86,13 @@ $file="/usr/local/apache/conf/httpd.conf";if (file_exists($file)){ $fileEdit=$fi
 $file="/usr/local/apache2/apache2.conf"  ;if (file_exists($file)){ $fileEdit=$file;}
 
 if (file_exists($fileEdit)){
- print "Apache Config Path: $fileEdit \n";
- $hide=false; $search="DocumentRoot ";search_configI($out);
+ $hide=true; $search="DocumentRoot ";search_configI($out);
  if($ok and $out){
  $u = explode(" ",$out); 
  $docRoute=$u[0]; $docRouteP=$u[1]; 
  $docRouteP = str_replace('"', '', $docRouteP);
  } 
 } 
-print "DocumentRoot: $docRouteP \n";
-
-
 print "
    _____ __  __ _____   _____   _           _        _ _           
   / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
@@ -79,21 +101,21 @@ print "
  | |__| | |  | | | \ \ ____) | | | | | \__ \ || (_| | | |  __/ |   
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
-PHP:$phpVersion  Installer:$ver  Release date:$release
+PHP:$phpVersion  Installer:$ver  Release date:$release 
+Apache Config Path: $fileEdit
+DocumentRoot: $docRouteP
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
- Welcome to my php installer.
- This will install and setup the node controler software.                                              
- Most everything is automated no more editing config files.
-
- All modules are optional you dont have to use the time and temp
- or you can use time and temp and not supermon.
+ Welcome to the Node Controler and GMRS Supermon system.
+  <-Be sure you have made a backup of your memory card->
+As with any software its importianat you have a backup.                                           
 ============================================================
 Software will be installed to [$path]
 GMRS Supermon will be installed to [$docRouteP] <-Verify  
 
  i) install
- c) Change  DocumentRoot: $docRouteP
+ c) Change  DocumentRoot: $docRouteP <-Verify
+ 
  Any other key to abort 
 ";
 $a = readline('Enter your command: ');
@@ -440,25 +462,18 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
 }
 
 function create_nodea ($file){
-global $file,$path,$tts;
-// phase 1 import node - call
+global $file,$path,$tts,$node,$call;
 //$line= exec("cat /usr/local/etc/allstar_node_info.conf  |egrep 'NODE1='",$output,$return_var);
-$file ="/usr/local/etc/allstar_node_info.conf"; copy($file, "$path/allstar_node_info.conf");
+$file ="/usr/local/etc/allstar_node_info.conf"; // This is a secure file. Contains passwords.
 $fileIN= file($file);
 foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
 $line = str_replace('"', "", $line);
-$pos = strpos("-$line", 'NODE1=');
-if ($pos){$u= explode("=",$line);
-$node=$u[1];}
-$pos2 = strpos("-$line", 'STNCALL='); 
-if ($pos2){$u= explode("=",$line);
-$call=$u[1];}
+$pos = strpos("-$line", 'NODE1=');   if($pos){ $u= explode("=",$line);$node=$u[1];}
+$pos2 = strpos("-$line", 'STNCALL=');if($pos2){$u= explode("=",$line);$call=$u[1];}
 }
 
- 
- 
 // /usr/local/etc/tts.conf 
 // Get any tss key if exists
 $file ="/usr/local/etc/tts.conf";
@@ -467,17 +482,15 @@ foreach($fileIN as $line){
 $line = str_replace("\r", "", $line);
 $line = str_replace("\n", "", $line);
 $line = str_replace('"', "", $line);
-$pos = strpos("-$line", 'tts_key=');
-if ($pos){$u= explode("=",$line);
-$tts=$u[1];}
+$pos = strpos("-$line", 'tts_key=');if ($pos){$u= explode("=",$line);$tts=$u[1];}
 }
 
 $file= "$path/mm-node.txt";// This will be the AutoNode varable
 $fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call,$tts, , ,");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
 
 admin_sh_menuI("install");
-
 } 
+
 
 function admin_sh_menuI(){
 $file ="/usr/local/sbin/firsttime/adm01-shell.sh";
