@@ -43,10 +43,11 @@
 // v4.6 12-33-23   Automatic docRoute detection for webserver
 // v4.8 1/19/24 Custom install directory. Bug fix in creating main dir
 // v4.9 2/1/24  Minor Adjustments to installer.
+// v5   2/25      Create the nodelist directory
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v4.9"; $release="2-1-2024";
+$ver="v5.0"; $release="2-25-2024";
 $out=""; $in=""; $skip="
 
 
@@ -170,6 +171,7 @@ $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathS = "$path/sounds";if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
+$pathNodelist = "$path/nodelist";if(!is_dir($pathNodelist)){ mkdir($pathNodelist, 0755);}
 $pathG = "$docRouteP/gmrs";if(!is_dir($pathG)){ mkdir($pathG, 0755);}
 $pathGA= "$docRouteP/gmrs/admin";if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
 $pathGE= "$docRouteP/gmrs/edit";if(!is_dir($pathGE)){ mkdir($pathGE, 0755);}
