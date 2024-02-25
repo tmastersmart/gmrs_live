@@ -86,6 +86,8 @@ $file="/private/etc/apache2/httpd.conf"  ;if (file_exists($file)){ $fileEdit=$fi
 $file="/usr/local/apache/conf/httpd.conf";if (file_exists($file)){ $fileEdit=$file;}
 $file="/usr/local/apache2/apache2.conf"  ;if (file_exists($file)){ $fileEdit=$file;}
 
+
+
 if (file_exists($fileEdit)){
  $hide=true; $search="DocumentRoot ";search_configI($out);
  if($ok and $out){
@@ -94,6 +96,8 @@ if (file_exists($fileEdit)){
  $docRouteP = str_replace('"', '', $docRouteP);
  } 
 } 
+
+$out=" i) install"; if (file_exists("$path/setup.php")){ $out=" Please uninstall before reinstalling\n";}
 print "
    _____ __  __ _____   _____   _           _        _ _           
   / ____|  \/  |  __ \ / ____| (_)         | |      | | |          
@@ -114,7 +118,7 @@ As with any software its importianat you have a backup.
 Software will be installed to [$path]
 GMRS Supermon will be installed to [$docRouteP] <-Verify  
 
- i) install
+ $out
  c) Change  DocumentRoot: $docRouteP <-Verify
  
  Any other key to abort 
@@ -127,8 +131,6 @@ $a = readline('Enter your command: ');
   print "  i) install   Any other key to abort!\n";
   $a = readline('Enter your command: ');
   }
-
-
 
 if ($a=="i"){
 $path= "/etc/asterisk/local/mm-software"; 
@@ -159,6 +161,14 @@ php setup.php
 else {
 print "
 Aborted  Type 'php install.php' to try again\n";}
+
+if (file_exists("$path/setup.php")){
+$a="";
+print "Can not install over existing setup\n
+type 'cd $path'    then
+type 'php setup.php' to fix install or uninstall\n";
+chdir($path);
+}
 
 
 function installa($in){
