@@ -10,7 +10,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.0"; $release="6-1-2024";
+$ver="v1.1"; $release="6-9-2024";
 $out=""; $in=""; $skip="
 
 
@@ -49,8 +49,6 @@ print "
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
 PHP:$phpVersion  Installer:$ver  Release date:$release 
-Apache Config Path: $fileEdit
-DocumentRoot: $docRouteP
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
  Welcome to my pi installer program.
@@ -66,14 +64,17 @@ Software will be installed to [$path]
 $a = readline('Enter your command: ');
 
 if ($a=="i"){
+print " [Verifing ....";
 $path= "/etc/asterisk/local/mm-software"; 
 if(!is_dir($path)){ mkdir($path, 0755);}
+print"-";
+$file= "$path/mm-node.txt";create_nodea ($file); print"-]\n";
+
 installa($out);
-print " [checking install ....";
-chdir($path); print"-";
-$file= "$path/mm-node.txt";create_nodea ($file); print"-";
-if (file_exists("$path/setup.php")){include ("$path/setup.php");}
-else {print "Error install failed! $path/setup.php missing\n";}
+chdir($path); 
+
+if (file_exists("$path/dvswitch_setup.php")){include ("$path/dvswitch_setup.php");}
+else {print "Error install failed! $path/dvswitch_setup.php missing\n";}
 print "
 
 DV Switch setup added to the admin menu.  
@@ -87,17 +88,7 @@ Thank you for downloading........... And have Many nice days
 
 ";
 }
-else {
-print "
-Aborted  Type 'php install.php' to try again\n";}
-
-if (file_exists("$path/setup.php")){
-$a="";
-print "Can not install over existing setup\n
-type 'cd $path'    then
-type 'php setup.php' to fix install or uninstall\n";
-chdir($path);
-}
+print"\n";
 
 
 function installa($in){
@@ -110,21 +101,15 @@ $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";
 $pathR = "$path/repo";  if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
 
-print"Cleaning any existing repos......\n";
+print"Cleaning any existing repos........\n";
+chdir($pathR);clean_($pathR);
+print "Downloading new repos ............\n";
+exec("sudo wget $repoURL/dvswitch-download.zip",$output,$return_var);
+print "Downloading finished..............\n";
 chdir($pathR);
+print "Unzipping and Installing..........\n";  
 
-  
-$file = "$pathR/dvswitch-download.zip"; if (file_exists($file)){unlink ($file);}
-$file = "$pathR/file_id.diz"; if (file_exists($file)){unlink ($file);}
-chdir($pathR);
-
- print "Downloading new repos ...........\n";
-  exec("sudo wget $repoURL/dvswitch-download.zip",$output,$return_var);
-
- print "Downloading finished...........\n";
- chdir($pathR);
-  
- exec("unzip $pathR/dvswitch-download.zip",$output,$return_var);
+exec("unzip $pathR/dvswitch-download.zip",$output,$return_var);
   
      
    foreach (glob("*.php") as $file) {
@@ -166,11 +151,13 @@ admin_sh_menuI("install");
 
 function create_nodea ($file){
 global $file,$path,$node,$call;
-// keep this file up to date
+// if the node manager is installed we just exit this
+$file= "$path/mm-node.txt";if (file_exists($file)){return;}
+
 $autotts="";
-//if(!$call){$call="hub";}
 $file ="/usr/local/etc/allstar_node_info.conf";// only on hamvoip 
 if (file_exists($file)){
+print"ok";
 $autotts=""; 
 $fileIN= file($file);
 foreach($fileIN as $line){
@@ -185,7 +172,18 @@ if ($pos2){$u= explode("=",$line);
 $call=$u[1];}
 }
 }
+else{
+print "
+This is not a GMRS LIVE Image. Autoload disabled. Switching to Manual mode.\n";
+$line = readline("Enter Your Node number: ");
+print "
+$node\n";
+$call = readline("Enter Your Call: ");
+print "
+$call\n";
+}
 $file= "$path/mm-node.txt";$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call, , , ,");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
+print"-ok-";
 }
  
 
@@ -193,7 +191,7 @@ $file= "$path/mm-node.txt";$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_E
 function admin_sh_menuI(){
 
 global $release;
-print "$datum Installing into admin menu ";
+print " Installing into admin menu ";
 $file ="/usr/local/sbin/firsttime/adm01-shell.sh";
 $file2="/usr/local/sbin/firsttime/dvswitch.sh";
                
@@ -219,7 +217,7 @@ else{print"<Error>\n";}
 }
  
  
-} 
+ 
 
 
 
@@ -257,7 +255,12 @@ function clean_($in){
  foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { unlink($file);print"del $file\n";  }
-    }  
+    } 
+  foreach (glob("*.diz") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { unlink($file);print"del $file\n";  }
+    }     
+     
 } 
 
 
