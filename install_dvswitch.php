@@ -7,10 +7,11 @@
 // in North Louisiana.
 // -------------------------------------------------------------
 //
+// Notes v1.2 setup for node moved out of installer. Support for custom images
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.1"; $release="6-9-2024";
+$ver="v1.2"; $release="6-9-2024";
 $out=""; $in=""; $skip="
 
 
@@ -38,6 +39,8 @@ $out=""; $in=""; $skip="
 
 ";
 print $skip;c641($in);sleep(2);print $skip;
+$piSystem=false;if (is_readable("/proc/device-tree/model")) {$piVersion = file_get_contents ("/proc/device-tree/model");$piSystem=true;}
+else {$piVersion =	exec('uname -m -p');}
 
 
 print "
@@ -49,9 +52,10 @@ print "
   \_____|_|  |_|_|  \_\_____/  |_|_| |_|___/\__\__,_|_|_|\___|_| 
 
 PHP:$phpVersion  Installer:$ver  Release date:$release 
+CPU:$piVersion
 (c) 2023 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
- Welcome to my pi installer program.
+ Welcome to my PI installer. Software made in loUiSiAna.
 <-Be sure you have made a backup of your memory card->
 ============================================================
 Software will be installed to [$path]
@@ -67,8 +71,7 @@ if ($a=="i"){
 print " [Verifing ....";
 $path= "/etc/asterisk/local/mm-software"; 
 if(!is_dir($path)){ mkdir($path, 0755);}
-print"-";
-$file= "$path/mm-node.txt";create_nodea ($file); print"-]\n";
+print"-]\n";
 
 installa($out);
 chdir($path); 
@@ -149,43 +152,7 @@ admin_sh_menuI("install");
 
 }
 
-function create_nodea ($file){
-global $file,$path,$node,$call;
-// if the node manager is installed we just exit this
-$file= "$path/mm-node.txt";if (file_exists($file)){return;}
 
-$autotts="";
-$file ="/usr/local/etc/allstar_node_info.conf";// only on hamvoip 
-if (file_exists($file)){
-print"ok";
-$autotts=""; 
-$fileIN= file($file);
-foreach($fileIN as $line){
-$line = str_replace("\r", "", $line);
-$line = str_replace("\n", "", $line);
-$line = str_replace('"', "", $line);
-$pos = strpos("-$line", 'NODE1=');
-if ($pos){$u= explode("=",$line);
-$node=$u[1];}
-$pos2 = strpos("-$line", 'STNCALL='); 
-if ($pos2){$u= explode("=",$line);
-$call=$u[1];}
-}
-}
-else{
-print "
-This is not a GMRS LIVE Image. Autoload disabled. Switching to Manual mode.\n";
-$line = readline("Enter Your Node number: ");
-print "
-$node\n";
-$call = readline("Enter Your Call: ");
-print "
-$call\n";
-}
-$file= "$path/mm-node.txt";$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, "$node,$call, , , ,");flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
-print"-ok-";
-}
- 
 
 
 function admin_sh_menuI(){
