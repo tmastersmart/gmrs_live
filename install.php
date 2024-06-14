@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 //  ------------------------------------------------------------
-//  (c) 2023 by WRXB288 lagmrs.com all rights reserved
+//  (c) 2023/2024 by WRXB288 lagmrs.com all rights reserved
 // This installer sets up and installs the software. 
 // all software is hand coded in php from scratch 
 // in North Louisiana.
@@ -110,11 +110,11 @@ print "
 PHP:$phpVersion  Installer:$ver  Release date:$release 
 Apache Config Path: $fileEdit
 DocumentRoot: $docRouteP
-(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
+(c) 2023/2024 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
  Welcome to the Node Controler and GMRS Supermon system.
   <-Be sure you have made a backup of your memory card->
-As with any software its importianat you have a backup.                                           
+         As with any software you need backups.                                           
 ============================================================
 Software will be installed to [$path]
 GMRS Supermon will be installed to [$docRouteP] <-Verify  
