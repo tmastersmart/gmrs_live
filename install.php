@@ -121,6 +121,7 @@ GMRS Supermon will be installed to [$docRouteP] <-Verify
 
  $out
  c) Change  DocumentRoot: $docRouteP <-Verify
+ i) Install Node Controler (full install)
  
  Any other key to abort 
 ";
