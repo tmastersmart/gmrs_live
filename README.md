@@ -2,6 +2,7 @@
 # GMRS Supermon
 
 =====================================================================
+update:6/14/24 The installer has been updated of you had problems try the new one.
 
 This software was written for GMRS nodes.  
 
@@ -27,8 +28,10 @@ download the installer.
 Drop to a shell
 
 type
-
+cd /tmp
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
+php install.php
+
 
 This in not a bunch of shell scripts nor are they modifications to any existing scripts
 This is a totaly new program written from the ground up in Louisiana in cross platform PHP.
@@ -96,9 +99,15 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
  
 * new updates
 
-The setup program can update and uninstall.
+There was a bug fix on the installer the I option worked bt was missing from the menu. No one told me? So it took me a whild to find it.
+DVSWITCH setup has been moved into its own module so it can be standalone.  It will install with the node manager or it can be installed by itsself.
 
-If you have any problems and need to uninstall please report them to me at www.lagmrs.com
+DVSWITCH setup tool seperate installer.
+
+type
+cd /tmp
+wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install_dvswitch.php
+php install_dvswitch.php
 
 
 
