@@ -2,6 +2,7 @@
 # GMRS Supermon
 
 =====================================================================
+
 update:6/14/24 The installer has been updated of you had problems try the new one.
 
 This software was written for GMRS nodes.  
@@ -29,7 +30,9 @@ Drop to a shell
 
 type
 cd /tmp
+
 sudo wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install.php
+
 php install.php
 
 
@@ -106,7 +109,9 @@ DVSWITCH setup tool seperate installer.
 
 type
 cd /tmp
+
 wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install_dvswitch.php
+
 php install_dvswitch.php
 
 
