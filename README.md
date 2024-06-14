@@ -102,10 +102,10 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
  
 * new updates
 
-There was a bug fix on the installer the I option worked bt was missing from the menu. No one told me? So it took me a whild to find it.
+There was a bug fix on the installer the I)option worked but was missing from the menu. No one told me? So it took me a while to find it.
 DVSWITCH setup has been moved into its own module so it can be standalone.  It will install with the node manager or it can be installed by itsself.
 
-DVSWITCH setup tool seperate installer.
+DVSWITCH setup tool seperate installer. (use only if your not installing node manager above)
 
 type
 cd /tmp
