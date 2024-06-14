@@ -79,6 +79,7 @@ php temp.php
 php cap_warn.php
 php weather_pws.php
 php nodelist_process.php
+php dvswitch_setup.php
 
 
 
