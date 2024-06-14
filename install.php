@@ -44,10 +44,11 @@
 // v4.8 1/19/24 Custom install directory. Bug fix in creating main dir
 // v4.9 2/1/24  Minor Adjustments to installer.
 // v5   2/25      Create the nodelist directory
+// v5.1 6/14/24  Support for seperating DVSWITCH into a seperate admin menu item
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v5.0"; $release="2-25-2024";
+$ver="v5.1"; $release="6-14-2024";
 $out=""; $in=""; $skip="
 
 
@@ -505,17 +506,25 @@ admin_sh_menuI("install");
 
 
 function admin_sh_menuI(){
+global $release;
 $file ="/usr/local/sbin/firsttime/adm01-shell.sh";
-$file2="/usr/local/sbin/firsttime/mmsoftware.sh";
-$file3="/usr/local/sbin/firsttime/mmsoftware2.sh";
+$file2="/usr/local/sbin/firsttime/mmsoftware.sh";  if (file_exists($file2)){unlink ($file2);}
+$file3="/usr/local/sbin/firsttime/mmsoftware2.sh"; if (file_exists($file3)){unlink ($file3);}
+$file4="/usr/local/sbin/firsttime/dvswitch.sh";    if (file_exists($file4)){unlink ($file4);}
+ 
+// this helps with permissions by presetting up the files. Should not be needed but sometimes is
+print " Building Admin menus "; 
+copy($file, $file2);print "-"; 
+copy($file, $file3);print "-"; 
+copy($file, $file4);print "-"; 
+               
 
-// build menu link
-if (file_exists($file2)){unlink ($file2);}
-copy($file, $file2);// copy existing to get correct permissions
-$file= $file2;
-$out='#/!bin/bash
-#MENUFT%055%Time/Weather/Node Manager Setup
+//$coreVersion
+$formated="#/!bin/bash
+#MENUFT%055%Node Manager Setup Program Version:$release
+";
 
+$out='
 $SON
 reset
 
@@ -523,14 +532,18 @@ php /etc/asterisk/local/mm-software/setup.php
 
 exit 0
 ';
+
+$out = "$formated $out";
+
+
 // overwrite with our menu.
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
- exec("sudo chmod +x $file",$output,$return_var);
+$fileOUT = fopen($file2, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT); print "-";
+exec("sudo chmod +x $file2",$output,$return_var);
+if (file_exists($file2)){print"<main ok>";}
+else{print"<Error>\n";}
  
- // build a second menu
-if (file_exists($file3)){unlink ($file3);}
-copy($file, $file3);// copy existing to get correct permissions
-$file= $file3;
+
+// build a second menu
 $out='#/!bin/bash
 #MENUFT%055%Say time and Weather 
 
@@ -542,12 +555,34 @@ php /etc/asterisk/local/mm-software/weather_pws.php
 exit 0
 ';
 // overwrite with our menu.
-$fileOUT = fopen($file, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT);
- exec("sudo chmod +x $file",$output,$return_var); 
- 
- 
- 
-} 
+$fileOUT = fopen($file3, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT); print "-";
+exec("sudo chmod +x $file3",$output,$return_var); 
+if (file_exists($file3)){print"<time ok>";}
+else{print"<Error>\n";}
+
+// install dvswitch module
+
+$formated="#/!bin/bash
+#MENUFT%055%DV SWITCH Setup Program Version:$release
+";
+
+$out='
+$SON
+reset
+
+php /etc/asterisk/local/mm-software/dvswitch_setup.php
+
+exit 0
+';
+$out = "$formated $out";
+
+$fileOUT = fopen($file4, "w") ;flock( $fileOUT, LOCK_EX );fwrite ($fileOUT, $out);flock( $fileOUT, LOCK_UN );fclose ($fileOUT); print "-";
+exec("sudo chmod +x $file4",$output,$return_var);
+if (file_exists($file4)){print"<dvswitch ok>";}
+else{print"<Error>\n";}
+
+print"\n"; 
+}  
 
 
 
