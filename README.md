@@ -107,6 +107,8 @@ DVSWITCH setup has been moved into its own module so it can be standalone.  It w
 
 DVSWITCH setup tool seperate installer. (use only if your not installing node manager above)
 
+Project now has its own webpage here https://www.lagmrs.com/dvswitch_setup.php
+
 type
 cd /tmp
 
