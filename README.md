@@ -118,5 +118,8 @@ wget https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/install_dvswi
 php install_dvswitch.php
 
 
-
+* TWS updates
+The weather service broke the icon urls. The fix reinstalls them if it sees them broken..  
+The nodelist updater now has auto correction and corrupt frame detection.
+The jingle system was not properly detecting roadkill. Fixed.
 
