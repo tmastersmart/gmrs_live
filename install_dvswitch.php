@@ -8,10 +8,11 @@
 // -------------------------------------------------------------
 //
 // Notes v1.2 setup for node moved out of installer. Support for custom images
+// v1.5 some bug fixes and new options
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.4"; $release="6-14-2024";
+$ver="v1.5"; $release="6-27-2024";
 $out=""; $in=""; $skip="
 
 
