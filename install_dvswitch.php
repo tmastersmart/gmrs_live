@@ -54,7 +54,7 @@ print "
 
 PHP:$phpVersion  Installer:$ver  Release date:$release 
 CPU:$piVersion
-(c) 2023 by WRXB288 LAGMRS.com all rights reserved 
+(c) 2023/2024 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
  Welcome to my PI installer. Software made in loUiSiAna.
 <-Be sure you have made a backup of your memory card->
