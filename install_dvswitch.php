@@ -13,7 +13,7 @@
 
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.6"; $release="6-28-2024";
+$ver="v1.7"; $release="6-29-2024";
 $out=""; $in=""; $skip="
 
 
