@@ -1,11 +1,11 @@
 #!/usr/bin/php
 <?php
 // (c)2023/2024 by WRXB288 and LAgmrs.com all rights reserved
-// Improved nodelist update with load sharing  (astdb.php  replacement)
-// No console output in called by cron to prevent log overflow
-// Much improved random load sharing.
-// Merging version Nodelist correctioon
-// v1.2   9/4/24   Special release bring back full nodelist
+// astdb.php drop in replacement. Major improved loading and backups
+// 
+// Brings back gmrs live names and calls to your status page.
+//
+// v1.2   9/4/24 
 $ver = "v1.2"; $release="9-4-2024"; $ver2 ="1-2";
 
 $callsDisplay = true;// set to false to not display calls
