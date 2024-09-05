@@ -15,7 +15,7 @@ $cron=false; if (!empty($argv[1])) {  if ($argv[1] =="cron"){$cron=true;} }
 $mtime = microtime();$mtime = explode(" ",$mtime);$mtime = $mtime[1] + $mtime[0];$script_start = $mtime;$in="";$sizeD="";
 $domain ="register.gmrslive.com"; $url = "/cgi-bin/privatenodes.txt"; 
 $path       = "/var/log/asterisk";
-$path       = "/tmp";
+//$path       = "/tmp";
 
 $nodelistBU     = "$path/astdb_bu.txt";
 $nodelistBackup = "$path/nodelist-database-$ver2.csv"; /// The old nodelist
