@@ -6,7 +6,9 @@
 // Brings back gmrs live names and calls to your status page.
 //
 // v1.2   9/4/24 
-$ver = "v1.3"; $release="9-8-2024";
+// v1.3   9/9/24 Create hub and extra file for directory system. 
+
+$ver = "v1.3"; $release="9-9-2024";
 $ver2 ="1-3";// the database version
 
 $callsDisplay = true;// set to false to not display calls
