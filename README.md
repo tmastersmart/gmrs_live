@@ -10,7 +10,7 @@ update:1/5/25
 This will now all be packaged in a node image.
 
 
-
+Download the IMG file and install it to your node sd card
 
 
 
