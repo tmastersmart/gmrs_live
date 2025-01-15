@@ -1,0 +1,3 @@
+core_download.zip
+sounds.zip
+firstime.zip
