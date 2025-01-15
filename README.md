@@ -1,16 +1,13 @@
-# GMRS NODE Manager
+# GMRS Louisiana Node Image 
 # GMRS Status Page
-# Louisiana Node Image
-
 =====================================================================
-
 update:1/5/25
 
+This is now the Louisiana Node Image
 
-This will now all be packaged in a node image.
+Underconstruction. Look for the image soon.
 
 
-Download the IMG file and install it to your node sd card
 
 
 
@@ -33,5 +30,5 @@ This software was written for GMRS nodes.
 * Totaly new nodelist updater
 * New bootup system gives IP,Reg status and CPU temp
 
-This now comes inside the image. Not installable
+This is no longer installable as it will be built into a beter customised arch image.
 
