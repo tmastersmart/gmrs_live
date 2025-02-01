@@ -2,13 +2,13 @@
 # GMRS Status Page
 =====================================================================
 
-update:1/15/25
+update:2/2/25
 
 This is now the Louisiana Node Image
 
 Underconstruction. Look for the image soon.
 
-
+Old files removed. This archive will only hold the image and any upgrades.
 
 
 
@@ -31,5 +31,5 @@ This software was written for GMRS nodes.
 * Totaly new nodelist updater
 * New bootup system gives IP,Reg status and CPU temp
 
-This is no longer installable as it will be built into a beter customised arch image.
+Only installable as a full PI image
 
