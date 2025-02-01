@@ -1,10 +1,11 @@
-# GMRS Louisiana Node Image 
+# GMRSHUB Louisiana Node Image 
+
 # GMRS Status Page
 =====================================================================
 
 update:2/2/25
 
-This is now the Louisiana Node Image
+This is now the Louisiana Node Image for GMRSHUB
 
 Underconstruction. Look for the image soon.
 
