@@ -3,7 +3,7 @@
 //  ------------------------------------------------------------
 //  (c) 2023/2025 by WRXB288 lagmrs.com all rights reserved
 //
-//  Node image upgrade system. 
+//  Node image live upgrade system. for GMRSHUB Louisiana Image
 // -------------------------------------------------------------
 // 1.9 09/18/23 added cleanup of license files and linefeeds
 // 2.0 09/29/23 Changes to allow for promptless updates later
@@ -53,7 +53,7 @@ System Update Module $verInstaller Release Date:$verRt
 -----------------------------------------------------------------------------
 
 
-This will Update the Node image to the currect release.
+This will Update the Louisiana Node image to the currect release.
 
 Be sure you have backups.  Use Win32DiskImager in read mode to make backups. 
 
