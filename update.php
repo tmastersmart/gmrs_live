@@ -3,19 +3,15 @@
 //  ------------------------------------------------------------
 //  (c) 2023/2025 by WRXB288 lagmrs.com all rights reserved
 //
-//  Node image live upgrade system. for GMRSHUB Louisiana Image
+// Node image live upgrade system. for GMRSHUB Louisiana Image
+// Merges from old code into new image
 // -------------------------------------------------------------
 // 1.9 09/18/23 added cleanup of license files and linefeeds
-// 2.0 09/29/23 Changes to allow for promptless updates later
 // 2.1 10/02/23 Stop backing up the log
-// 2.2 10/24/23 Installs my tweeks in the startup routine
 // 2.3 11/12/23 make extra backups rpt iax
-// 2.4 12/23/23 Checks the docRoute before installing. 
-// 2.5 1/2/24 Changes to search and edit module requires update
-// 2.6 1/19   New custom install directory $docRouteP passed through from setup files
-// 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
+// 2.7 1/24  Support for new sounds. 
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
-// 3.2 2/10/25  Rebuild upgrade for image  
+// 3.2 2/10/25  Rebuild  for automated upgrade for image  
 
 $verInstaller= "3.2"; $verRt="2-10-2025"; $changeall=false;
 $year = date("Y");
