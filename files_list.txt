@@ -1,3 +1,2 @@
-nodenames.zip
 sounds.zip
 version.txt
