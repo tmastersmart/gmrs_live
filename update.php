@@ -97,6 +97,13 @@ die;
 
  
  
+ //just to be safe backup or core files.
+$backupFile = "$path/backup/core-backup.zip"; // we only need one.
+//$command = "zip -r $backupFile $path -i '*.php'";
+$command = "tar -czvf $backupFile $path/*.php";
+exec($command, $output, $return_var);
+if ($return_var === 0) {echo "Backup core successful: $backupFile";}
+else {echo "Backup core failed!";} 
  
  
  
