@@ -3,17 +3,22 @@
 //  ------------------------------------------------------------
 //  (c) 2023/2025 by WRXB288 lagmrs.com all rights reserved
 //
-// Node image live upgrade system. for GMRSHUB Louisiana Image
-// Merges from old code into new image
+//  Node image upgrade system. 
 // -------------------------------------------------------------
 // 1.9 09/18/23 added cleanup of license files and linefeeds
+// 2.0 09/29/23 Changes to allow for promptless updates later
 // 2.1 10/02/23 Stop backing up the log
+// 2.2 10/24/23 Installs my tweeks in the startup routine
 // 2.3 11/12/23 make extra backups rpt iax
-// 2.7 1/24  Support for new sounds. 
+// 2.4 12/23/23 Checks the docRoute before installing. 
+// 2.5 1/2/24 Changes to search and edit module requires update
+// 2.6 1/19   New custom install directory $docRouteP passed through from setup files
+// 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
-// 3.2 2/10/25  Rebuild  for automated upgrade for image  
+// 3.2 2/10/25  Rebuild upgrade for image  
+// 3.3 2/18/25 Extra error checking if run with no downloads. bugfix 
 
-$verInstaller= "3.2"; $verRt="2-10-2025"; $changeall=false;
+$verInstaller= "3.3"; $verRt="2-18-2025"; $changeall=false;
 $year = date("Y");
 print "
 
@@ -49,15 +54,15 @@ System Update Module $verInstaller Release Date:$verRt
 -----------------------------------------------------------------------------
 
 
-This will Update the Louisiana Node image to the currect release.
+This will Update the Node image to the currect release.
 
 Be sure you have backups.  Use Win32DiskImager in read mode to make backups. 
 
-If you dont have a backup STOP and make one now PLEASE.
+If you want to see whats in this update the code is at github for inspection.
+https://github.com/tmastersmart/gmrs_live   (certified safe)
 
-If you need help just ask.  
+u) Update (any other key to abort!)
 
-u) Update (any other key to abort!)\n
 ";
 
 
@@ -69,7 +74,7 @@ $docRouteP="/srv/http";
 $path  = "/etc/asterisk/local/mm-software";        
 $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";  
 $pathS = "$path/sounds";//if(!is_dir($pathS)){ mkdir($pathS, 0755);}
-$pathR = "$path/repo"; // if(!is_dir($pathR)){ mkdir($pathR, 0755);}
+$pathR = "$path/repo"; if(!is_dir($pathR)){ mkdir($pathR, 0755);}
 $pathB = "$path/backup";if(!is_dir($pathB)){ mkdir($pathB, 0755);}
 $pathG = "$docRouteP/status";//if(!is_dir($pathG)){ mkdir($pathG, 0755);}
 $pathGA= "$docRouteP/admin";//if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
@@ -81,7 +86,6 @@ $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
 
 print "Running Live upgrade system ...........\n";
  chdir($pathR);
- if (file_exists("$pathR/version.txt")) {rename ("$pathR/version.txt", "$path/version-pending.txt"); }
 
 
 // first check for core
@@ -436,18 +440,26 @@ copy($file, $file2);print "Backup $file2\n";
 
 
 
-
+ print "----\n";
 
 chdir($pathR); clean_repo($pathR);
 // cleanup  old unused files 
 $file="$path/license-sounds.txt";if (file_exists($file)){unlink($file);}
 $file="$path/license-core.txt";  if (file_exists($file)){unlink($file);}
 $file="$path/license-web.txt";   if (file_exists($file)){unlink($file);}
-$file="$path/version.txt";       if (file_exists($file)){unlink($file);}
 
-rename ("$path/version-pending.txt", "$file");
+if (file_exists("$pathR/version.txt")) {
+ $file="$path/version.txt";       if (file_exists($file)){unlink($file);}
+rename ("$pathR/version.txt", "$path/version.txt"); 
+rename ("$path/version.txt", "$path/version-old.txt");
+print "Updating version.txt\n";
+}
+else {print "Cant find new version info So quiting. Did we even download anything? \n";
+print "Press ANY Key\n";
+$a = readline('Ready: ');
+die;
+}
 
-print "----\n";
 
 
 
