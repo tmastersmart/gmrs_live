@@ -16,7 +16,6 @@
 // 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
 // 3.2 2/10/25  Rebuild upgrade for image  
-// 3.3 2/18/25 Extra error checking if run with no downloads. bugfix 
 
 $verInstaller= "3.3"; $verRt="2-18-2025"; $changeall=false;
 $year = date("Y");
@@ -88,6 +87,22 @@ print "Running Live upgrade system ...........\n";
  chdir($pathR);
 
 
+ 
+if (file_exists("$pathR/version.txt")) {rename ("$pathR/version.txt", "$path/version-new.txt");}
+else {print "Cant find new version info So quiting. Did we even download anything? \n";
+print "Press ANY Key\n";
+$a = readline('Ready: ');
+die;
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 // first check for core
  if (file_exists("$pathR/core-download.zip")) { 
  exec("unzip $pathR/core-download.zip",$output,$return_var);
@@ -448,17 +463,12 @@ $file="$path/license-sounds.txt";if (file_exists($file)){unlink($file);}
 $file="$path/license-core.txt";  if (file_exists($file)){unlink($file);}
 $file="$path/license-web.txt";   if (file_exists($file)){unlink($file);}
 
-if (file_exists("$pathR/version.txt")) {
+if (file_exists("$path/version-new.txt")) {
  $file="$path/version.txt";       if (file_exists($file)){unlink($file);}
-rename ("$pathR/version.txt", "$path/version.txt"); 
-rename ("$path/version.txt", "$path/version-old.txt");
+rename ("$path/version-new.txt", "$path/version.txt"); 
 print "Updating version.txt\n";
 }
-else {print "Cant find new version info So quiting. Did we even download anything? \n";
-print "Press ANY Key\n";
-$a = readline('Ready: ');
-die;
-}
+else{print "Unknown error \n";}
 
 
 
