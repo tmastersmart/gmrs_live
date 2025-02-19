@@ -1,2 +1,2 @@
-core-download.zip
+update.php
 version.txt
