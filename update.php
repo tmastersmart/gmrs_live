@@ -15,7 +15,7 @@
 // 2.6 1/19   New custom install directory $docRouteP passed through from setup files
 // 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
-// 3.2 2/10/25  Rebuild upgrade for image  
+// 3.2.1 2/10/25  Rebuild upgrade for image  
 
 $verInstaller= "3.3"; $verRt="2-18-2025"; $changeall=false;
 $year = date("Y");
@@ -87,26 +87,28 @@ print "Running Live upgrade system ...........\n";
  chdir($pathR);
 
 
- 
 if (file_exists("$pathR/version.txt")) {rename ("$pathR/version.txt", "$path/version-new.txt");}
 else {print "Cant find new version info So quiting. Did we even download anything? \n";
 print "Press ANY Key\n";
 $a = readline('Ready: ');
 die;
-}
+} 
+  
+
 
  
  
  //just to be safe backup or core files.
-$backupFile = "$path/backup/core-backup.zip"; // we only need one.
-//$command = "zip -r $backupFile $path -i '*.php'";
-$command = "tar -czvf $backupFile $path/*.php";
-exec($command, $output, $return_var);
-if ($return_var === 0) {echo "Backup core successful: $backupFile";}
-else {echo "Backup core failed!";} 
+$backupFile = "$path/backup/core-backup.tar.gz"; $command = "tar -czvf $backupFile $path/*.php";exec($command, $output, $return_var);
+if ($return_var === 0) {echo "Backup core successful: $backupFile\n";}
+else {echo "Backup core failed!\n";} 
+
+ //just to be safe backup or core files.
+$backupFile = "$path/backup/core-backup-csv.tar.gz"; $command = "tar -czvf $backupFile $path/*.csv";exec($command, $output, $return_var);
+if ($return_var === 0) {echo "Backup csv core successful: $backupFile\n";}
+else {echo "Backup core failed!\n";} 
  
- 
- 
+
  
  
  
