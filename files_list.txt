@@ -1,2 +1,3 @@
 update.php
+core_download.php
 version.txt
