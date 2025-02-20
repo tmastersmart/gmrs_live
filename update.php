@@ -15,9 +15,10 @@
 // 2.6 1/19   New custom install directory $docRouteP passed through from setup files
 // 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
-// 3.2.1 2/10/25  Rebuild upgrade for image  
+// 3.2.1 2/10/25  Rebuild upgrade for image
+// 3.4  2/20   debugging added  
 
-$verInstaller= "3.3"; $verRt="2-18-2025"; $changeall=false;
+$verInstaller= "3.4"; $verRt="2-18-2025"; $changeall=false;
 $year = date("Y");
 print "
 
@@ -151,6 +152,7 @@ else {echo "Backup core failed!\n";}
   }  
  
 }
+else {print "no core_download.zip found \n"}
 // end of the core files. 
 
 
@@ -192,6 +194,8 @@ exec("unzip $pathR/sounds.zip",$output,$return_var);
     }
   }
 }
+}
+else {print "no sounds.zip found \n"}
 // end new sounds  
 
 
@@ -254,6 +258,7 @@ chdir($pathR);
   } 
   
 }
+else {print "no sstatus.zip found \n"}
 // end of status page updates
 
 
@@ -305,6 +310,7 @@ chdir($pathR);
   }            
 
 }
+else {print "no admin.zip found \n"}
 // end of admin
 
 if (file_exists("$pathR/images-s.zip")){
@@ -351,6 +357,7 @@ chdir($pathR);
     }
   } 
 }
+else {print "no images-s.zip found \n"}
 // end images  
   
 if (file_exists("$pathR/images.zip")){
@@ -397,6 +404,7 @@ chdir($pathR);
     }
   } 
 }
+else {print "no images.zip found \n"}
 // end images    
 //======================================
 
@@ -416,6 +424,7 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
   }
   
 }
+else {print "no nodenames.zip found \n"}
 // end nodenames. we wont update this very often
   
 
@@ -435,6 +444,7 @@ if (file_exists("$pathR/firsttime.zip")){
     }
   }
 }
+else {print "no firstime.zip found \n"}
 // end menus. Admin may need to be added later   
   
 // --------------------- expansion replace others at later date ----------------------- 
