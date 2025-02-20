@@ -152,7 +152,7 @@ else {echo "Backup core failed!\n";}
   }  
  
 }
-else {print "no core_download.zip found \n"}
+else {print "no core_download.zip found \n";}
 // end of the core files. 
 
 
@@ -195,7 +195,7 @@ exec("unzip $pathR/sounds.zip",$output,$return_var);
   }
 }
 }
-else {print "no sounds.zip found \n"}
+else {print "no sounds.zip found \n";}
 // end new sounds  
 
 
@@ -258,7 +258,7 @@ chdir($pathR);
   } 
   
 }
-else {print "no sstatus.zip found \n"}
+else {print "no sstatus.zip found \n";}
 // end of status page updates
 
 
@@ -310,7 +310,7 @@ chdir($pathR);
   }            
 
 }
-else {print "no admin.zip found \n"}
+else {print "no admin.zip found \n";}
 // end of admin
 
 if (file_exists("$pathR/images-s.zip")){
@@ -357,7 +357,7 @@ chdir($pathR);
     }
   } 
 }
-else {print "no images-s.zip found \n"}
+else {print "no images-s.zip found \n";}
 // end images  
   
 if (file_exists("$pathR/images.zip")){
@@ -404,7 +404,7 @@ chdir($pathR);
     }
   } 
 }
-else {print "no images.zip found \n"}
+else {print "no images.zip found \n";}
 // end images    
 //======================================
 
@@ -424,7 +424,7 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
   }
   
 }
-else {print "no nodenames.zip found \n"}
+else {print "no nodenames.zip found \n";}
 // end nodenames. we wont update this very often
   
 
@@ -444,7 +444,7 @@ if (file_exists("$pathR/firsttime.zip")){
     }
   }
 }
-else {print "no firstime.zip found \n"}
+else {print "no firstime.zip found \n";}
 // end menus. Admin may need to be added later   
   
 // --------------------- expansion replace others at later date ----------------------- 
