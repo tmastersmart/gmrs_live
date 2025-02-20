@@ -112,4 +112,17 @@ Temp alarms will now be given if the node overheats. Also if you internet
 fails you will receive a internet down alarm. If you turn on support for
 connection monitoring you will get a alarm if your not connected to a hub.
 
+8. Upgradable
+
+This image is upgradable you will never have to change images again. As
+improvements are made or bug fixes you just need to run the update. 
+
+9. Avahi mDNS Support
+This system includes Avahi, which enables multicast DNS (mDNS) resolution.
+With mDNS, devices on the local network can be accessed using the .local
+domain instead of needing to remember IP addresses.
+
+For example, you can access this node using:
+gmrsnode.local
+
 
