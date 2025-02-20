@@ -1,1 +1,1 @@
-10.4,2/18/2025,first release image,
+10.5,2/20/2025,weather update for private nodes,
