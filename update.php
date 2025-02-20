@@ -18,7 +18,7 @@
 // 3.2.1 2/10/25  Rebuild upgrade for image
 // 3.4  2/20   debugging added  
 
-$verInstaller= "3.4.1"; $verRt="2-18-2025"; $changeall=false;
+$verInstaller= "3.4.1"; $verRt="2-20-2025"; $changeall=false;
 $year = date("Y");
 print "
 
