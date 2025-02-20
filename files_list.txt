@@ -1,4 +1,4 @@
 update.php
 core_download.zip
-image-info.txt
+image_info.txt
 version.txt
