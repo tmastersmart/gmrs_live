@@ -15,9 +15,9 @@ Added Swap Space:
 Implemented a swap file to enhance memory management, particularly 
 under heavy loads.
 
-Automatic SD Card Size Expansion:
-Automated resizing of partitions to utilize the full capacity of the 
-SD card during initial boot.
+SD Card Size Expansion option:
+Option to resize partitions to utilize the full capacity of the 
+SD card. Stop running out of space.
 
 2. Logging and Backup Improvements
 
@@ -123,6 +123,9 @@ With mDNS, devices on the local network can be accessed using the .local
 domain instead of needing to remember IP addresses.
 
 For example, you can access this node using:
-gmrsnode.local
+gmrsnode10000.local   
+Each node will have its own local domain name based on its node number.
+
+
 
 
