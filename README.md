@@ -29,6 +29,10 @@ This software was written for GMRShub nodes.
 
 Only installable as a full PI image
 
+Download will not fit here so its been stored at this link.
+this is a beta so if something dows not work i need to know so a upgrade can be created. 
+https://www.mediafire.com/folder/q6z3i8plwwily/gmrs
+
 ---- new description -----
 
 
