@@ -32,7 +32,11 @@ Only installable as a full PI image
 Download will not fit here so its been stored at this link.
 this is a beta so if something does not work i need to know so a upgrade can be created. 
 https://www.mediafire.com/folder/q6z3i8plwwily/gmrs
-This image is upgradable so you dont have to redownload it
+
+This image is upgradable so you dont have to redownload it.
+There is much in this release. Many things that could go wrong that I havent
+been able to test since i dont have all types of hardware. 
+
 
 ---- new description -----
 
