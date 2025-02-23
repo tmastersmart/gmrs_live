@@ -17,8 +17,9 @@
 // 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
 // 3.2.1 2/10/25  Rebuild upgrade for image
 // 3.4  2/20   debugging added  
+// 3.5  2/23   added update for sbin
 
-$verInstaller= "3.4.1"; $verRt="2-20-2025"; $changeall=false;
+$verInstaller= "3.5"; $verRt="2-23-2025"; $changeall=false;
 $year = date("Y");
 print "
 
@@ -80,6 +81,7 @@ $pathG = "$docRouteP/status";//if(!is_dir($pathG)){ mkdir($pathG, 0755);}
 $pathGA= "$docRouteP/admin";//if(!is_dir($pathGA)){ mkdir($pathGA, 0755);}
 $pathGE= "$docRouteP/images";//if(!is_dir($pathGE)){ mkdir($pathGE, 0755);}
 $pathI = "$docRouteP/status/images";//if(!is_dir($pathI)){ mkdir($pathI, 0755);}
+$pathSBIN = "/usr/local/sbin";
 $pathF = "/usr/local/sbin/firsttime";
 $pathN = "/var/lib/asterisk/sounds/rpt/nodenames";
  
@@ -110,8 +112,7 @@ if ($return_var === 0) {echo "Backup csv core successful: $backupFile\n";}
 else {echo "Backup core failed!\n";} 
  
 
- 
- 
+
  
 // first check for core
  if (file_exists("$pathR/core-download.zip")) { 
@@ -427,25 +428,44 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
 else {print "no nodenames.zip found \n";}
 // end nodenames. we wont update this very often
   
-
-// this is the admin menu install 
-if (file_exists("$pathR/firsttime.zip")){ 
- exec("unzip $pathR/firsttime.zip",$output,$return_var);
-
-
+ if (file_exists("$pathR/sbin.zip")) { 
+ exec("unzip $pathR/sbin.zip",$output,$return_var);
+ 
  foreach (glob("*.sh") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing sh file:$pathN/$file "; 
-    if (file_exists("$pathF/$file")){unlink("$pathF/$file");print"Replacing ";}// kill existing file
-    if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathF/$file");print"--";} // Move it into the SOUNDS
-    exec("sudo chmod 755 $pathF/$file",$output,$return_var); print"CHMOD 755"; 
+    print"Installing sh file:$pathSBIN/$file "; 
+    if (file_exists("$pathSBIN/$file")) {rename("$pathSBIN/$file", "$pathB/$file.bak"); print "Back up ";}
+    rename("$pathR/$file", "$pathSBIN/$file");print "Replacing $file\n";
+    // Change permissions only if necessary
+    exec("sudo chmod 755 $pathSBIN/$file", $output, $return_var); print"CHMOD 755"; 
+    print"ok\n";
+    }
+  }
+}
+else {print "no sbin.zip found \n";}
+
+if (file_exists("$pathR/firsttime.zip")){ 
+ exec("unzip $pathR/firsttime.zip",$output,$return_var);
+ 
+ foreach (glob("*.sh") as $file) {
+    if($file == '.' || $file == '..') continue;
+    if (is_file($file)) { 
+    print"Installing sh file:$pathF/$file "; 
+    if (file_exists("$pathF/$file")) {rename("$pathF/$file", "$pathB/$file.bak"); print "Back up ";}
+    rename("$pathR/$file", "$pathF/$file");print "Replacing $file\n";
+    // Change permissions only if necessary
+    exec("sudo chmod 755 $pathF/$file", $output, $return_var); print"CHMOD 755"; 
     print"ok\n";
     }
   }
 }
 else {print "no firstime.zip found \n";}
-// end menus. Admin may need to be added later   
+
+
+
+
+
   
 // --------------------- expansion replace others at later date ----------------------- 
   
