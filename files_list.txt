@@ -1,5 +1,6 @@
 update.php
 core_download.zip
 status.zip
+admin.zip
 image_info.txt
 version.txt
