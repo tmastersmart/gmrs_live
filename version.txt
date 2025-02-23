@@ -1,1 +1,1 @@
-10.5,2/20/2025,weather update for private nodes,
+10.5,2/20/2025,weather update for private nodes- bug fixes in status pages,
