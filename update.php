@@ -54,15 +54,12 @@ System Update Module $verInstaller Release Date:$verRt
 (c) 2023/$year by WRXB288 lagmrs.com all rights reserved 
 -----------------------------------------------------------------------------
 
-
 This will Update the Node image to the currect release.
-
 Be sure you have backups.  Use Win32DiskImager in read mode to make backups. 
-
 If you want to see whats in this update the code is at github for inspection.
 https://github.com/tmastersmart/gmrs_live   (certified safe)
 
-u) Update (any other key to abort!)
+ u) Update (any other key to abort!)
 
 ";
 
@@ -195,7 +192,7 @@ exec("unzip $pathR/sounds.zip",$output,$return_var);
     }
   }
 }
-}
+
 else {print "no sounds.zip found \n";}
 // end new sounds  
 
