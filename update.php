@@ -18,8 +18,9 @@
 // 3.2.1 2/10/25  Rebuild upgrade for image
 // 3.4  2/20   debugging added  
 // 3.5  2/23   added update for sbin
+// 3.6  2/24 Minor tweeks for new updates to menus.
 
-$verInstaller= "3.5"; $verRt="2-23-2025"; $changeall=false;
+$verInstaller= "3.6"; $verRt="2-24-2025"; $changeall=false;
 $year = date("Y");
 print "
 
@@ -40,6 +41,11 @@ print "
 
 
 
+
+   _   _   _   _   _   _  
+  / \ / \ / \ / \ / \ / \ 
+ ( U | P | D | A | T | E )
+  \_/ \_/ \_/ \_/ \_/ \_/ 
 
 
 
@@ -113,6 +119,7 @@ else {echo "Backup core failed!\n";}
  
 // first check for core
  if (file_exists("$pathR/core-download.zip")) { 
+ print"processing core-download\n";
  exec("unzip $pathR/core-download.zip",$output,$return_var);
   
      
@@ -150,7 +157,7 @@ else {echo "Backup core failed!\n";}
   }  
  
 }
-else {print "no core_download.zip found \n";}
+//else {print "no core_download.zip found \n";}
 // end of the core files. 
 
 
@@ -161,7 +168,7 @@ if (file_exists("$pathR/sounds.zip")){
 // chdir($pathS); clean_repo($pathS);  
 chdir($pathR); 
 exec("unzip $pathR/sounds.zip",$output,$return_var);
- 
+print"processing new sounds\n"; 
  foreach (glob("*.wav") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) {                                                
@@ -193,18 +200,17 @@ exec("unzip $pathR/sounds.zip",$output,$return_var);
   }
 }
 
-else {print "no sounds.zip found \n";}
+//else {print "no sounds.zip found \n";}
 // end new sounds  
 
 
 // install the status page updates
 if (file_exists("$pathR/status.zip")){
 exec("unzip $pathR/status.zip",$output,$return_var); 
-
+print"processing status\n";
 chdir($pathR); 
 
-//if (file_exists("$pathR/setup.edit.php")){unlink("$pathR/setup.edit.php");}// Make sure this file is not in non admin area.
-  
+
  foreach (glob("*.php") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
@@ -256,13 +262,13 @@ chdir($pathR);
   } 
   
 }
-else {print "no sstatus.zip found \n";}
+//else {print "no sstatus.zip found \n";}
 // end of status page updates
 
 
 if (file_exists("$pathR/admin.zip")){
 exec("unzip $pathR/admin.zip",$output,$return_var); 
-//$pathGA = "$pathG/admin";
+print"processing admin\n";
 
 chdir($pathR);   
 
@@ -308,13 +314,13 @@ chdir($pathR);
   }            
 
 }
-else {print "no admin.zip found \n";}
+//else {print "no admin.zip found \n";}
 // end of admin
 
 if (file_exists("$pathR/images-s.zip")){
 
 exec("unzip $pathR/images-s.zip",$output,$return_var); 
-//$pathI = "$pathG/images";
+print"processing images-s\n";
 
 chdir($pathR);   
  foreach (glob("*.gif") as $file) {
@@ -355,13 +361,13 @@ chdir($pathR);
     }
   } 
 }
-else {print "no images-s.zip found \n";}
+//else {print "no images-s.zip found \n";}
 // end images  
   
 if (file_exists("$pathR/images.zip")){
 
 exec("unzip $pathR/images.zip",$output,$return_var); 
-//$pathI = "$pathG/images";
+print"processing images\n";
 
 chdir($pathR);   
  foreach (glob("*.gif") as $file) {
@@ -402,7 +408,7 @@ chdir($pathR);
     }
   } 
 }
-else {print "no images.zip found \n";}
+//else {print "no images.zip found \n";}
 // end images    
 //======================================
 
@@ -411,6 +417,7 @@ else {print "no images.zip found \n";}
 
 if (file_exists("$pathR/nodenames.zip")){ 
 exec("unzip $pathR/nodenames.zip",$output,$return_var);
+ print"processing nodenames\n";
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
@@ -422,12 +429,12 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
   }
   
 }
-else {print "no nodenames.zip found \n";}
+//else {print "no nodenames.zip found \n";}
 // end nodenames. we wont update this very often
   
  if (file_exists("$pathR/sbin.zip")) { 
  exec("unzip $pathR/sbin.zip",$output,$return_var);
- 
+ print"processing sbin\n";
  foreach (glob("*.sh") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
@@ -440,11 +447,11 @@ else {print "no nodenames.zip found \n";}
     }
   }
 }
-else {print "no sbin.zip found \n";}
+//else {print "no sbin.zip found \n";}
 
 if (file_exists("$pathR/firsttime.zip")){ 
  exec("unzip $pathR/firsttime.zip",$output,$return_var);
- 
+ print"processing firsttime\n";
  foreach (glob("*.sh") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
@@ -457,7 +464,7 @@ if (file_exists("$pathR/firsttime.zip")){
     }
   }
 }
-else {print "no firstime.zip found \n";}
+//else {print "no firstime.zip found \n";}
 
 
 
@@ -511,7 +518,7 @@ else{print "Unknown error \n";}
 
 
 print "Finished Upgrade. In most cases this is a live update. No reboot needed.!\n";
-print "Admin screens wont change unless you logout and back in. \n";
+print "\n";
 print "Louisiana Image its just better!\n\n";
 print "Press ANY Key\n";
 $a = readline('Ready: ');
