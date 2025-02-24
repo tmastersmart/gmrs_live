@@ -19,8 +19,8 @@
 // 3.4  2/20   debugging added  
 // 3.5  2/23   added update for sbin
 // 3.6  2/24 Minor tweeks for new updates to menus.
-
-$verInstaller= "3.6"; $verRt="2-24-2025"; $changeall=false;
+// 3.7       fixes permissions on webmin service
+$verInstaller= "3.7"; $verRt="2-24-2025"; $changeall=false;
 $year = date("Y");
 print "
 
@@ -473,9 +473,19 @@ if (file_exists("$pathR/firsttime.zip")){
   
 // --------------------- expansion replace others at later date ----------------------- 
   
-  
-  
-  
+
+// webmin as released had wrong permissions
+$file = "/usr/lib/systemd/system/webmin.service";
+// Check current permissions
+$perms = fileperms($file);
+// Remove executable permissions if set
+if ($perms & 0x0040 || $perms & 0x0008 || $perms & 0x0001) { // Check if owner, group, or others have execute permission
+    echo "Fixing permissions on webmin service ...";
+    exec("sudo chmod 644 $file", $output, $return_var);
+    if ($return_var === 0) { echo "ok.\n";} 
+    else { echo "Error: unable to fix.[$file]\n"; }
+} 
+ 
   
  
   
