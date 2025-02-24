@@ -1,7 +1,6 @@
 update.php
-core_download.zip
+core-download.zip
 status.zip
 admin.zip
 sbin.zip
-image_info.txt
 version.txt
