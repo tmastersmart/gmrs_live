@@ -115,7 +115,7 @@ if ($return_var === 0) {echo "Backup csv core successful: $backupFile\n";}
 else {echo "Backup core failed!\n";} 
  
 // The update script is suposted to move this file it should not be here.
-if (file_exists("$pathR/update.php")) {unlink ("$pathR/update.php");print "Fixing file that was not moved ....";} 
+if (file_exists("$pathR/update.php")) {unlink ("$pathR/update.php");print "Fixing file that was not moved ....\n";} 
  
 // first check for core
  if (file_exists("$pathR/core-download.zip")) { 
