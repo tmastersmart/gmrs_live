@@ -1,5 +1,4 @@
 update.php
-core-download.zip
 status.zip
 admin.zip
 sbin.zip
