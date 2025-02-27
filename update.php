@@ -20,8 +20,18 @@
 // 3.5  2/23   added update for sbin
 // 3.6  2/24 Minor tweeks for new updates to menus.
 // 3.7       fixes permissions on webmin service
-$verInstaller= "3.7"; $verRt="2-24-2025"; $changeall=false;
+$verInstaller= "3.8"; $verRt="2-27-2025"; $changeall=false;
 $year = date("Y");
+
+$docRouteP="/srv/http";        
+$path  = "/etc/asterisk/local/mm-software"; 
+
+// Load version numbers
+// To be used to select which download in the future   
+$currentVersion = getVersionFromCSV("$path/version.txt");
+$imageVersion = getVersionFromCSV("$path/version-image.txt");
+
+
 print "
 
 
@@ -59,6 +69,7 @@ print "
 System Update Module $verInstaller Release Date:$verRt
 (c) 2023/$year by WRXB288 lagmrs.com all rights reserved 
 -----------------------------------------------------------------------------
+Running:$currentVersion   Orginal Image:$imageVersion
 
 This will Update the Node image to the currect release.
 Be sure you have backups.  Use Win32DiskImager in read mode to make backups. 
@@ -74,8 +85,7 @@ https://github.com/tmastersmart/gmrs_live   (certified safe)
  if ($a <> "u"){die;}
 
 
-$docRouteP="/srv/http";        
-$path  = "/etc/asterisk/local/mm-software";        
+       
 $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";  
 $pathS = "$path/sounds";//if(!is_dir($pathS)){ mkdir($pathS, 0755);}
 $pathR = "$path/repo"; if(!is_dir($pathR)){ mkdir($pathR, 0755);}
@@ -544,6 +554,19 @@ foreach($files as $filed) {
    if (is_file($filed)) { unlink($filed);print"del $filed\n";  }
  }
 }
+
+function getVersionFromCSV($filename) {
+    if (file_exists($filename)) {
+        $file = fopen($filename, "r");
+        if ($file !== false) {
+            $line = fgetcsv($file); // Read first line as CSV
+            fclose($file);
+            return $line[0] ?? "N/A"; // Return the first column or "N/A" if empty
+        }
+    }
+    return "N/A"; // File not found or empty
+}
+
 
  
 
