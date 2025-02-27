@@ -126,8 +126,10 @@ For example, you can access this node using:
 gmrsnode10000.local   
 Each node will have its own local domain name based on its node number.
 
+Avahi is now off by default because it wont work with my hotspot.
+Use only on routers.  A new menu has been added to turn it on and off.
+
 10. Simple Tune USB menu update
 Corrections to the menu interface to make it clear which settings are
 for transmit to the net and which is for your MIC adjustments.
 'simpleusb-tune-menu'  or 'simpleusb-tune-menu-bak' for the old version
-
