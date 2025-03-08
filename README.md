@@ -166,6 +166,20 @@ With mDNS, devices on the local network can be accessed using the .local
 domain instead of needing to remember IP addresses.
 
 For example, you can access this node using:
-gmrsnode.local
+gmrsnode10000.local   
+Each node will have its own local domain name based on its node number.
 
+Avahi is now off by default because it wont work with my hotspot.
+Use only on routers.  A new menu has been added to turn it on and off.
+
+10. Simple Tune USB menu update.
+Corrections to the menu interface to make it clear which settings are
+for transmit to the net and which is for your MIC adjustments.
+'simpleusb-tune-menu'  or 'simpleusb-tune-menu-bak' for the old version
+
+11. Installed fake hardware clock.
+fake-hwclock is a utility used on PIs OS because they have no hardware clock.
+Its function is to save the system's time & date to a file and restore it
+upon boot. On the node this will prevent time from going out of sync if
+it reboots with the network down. 
 
