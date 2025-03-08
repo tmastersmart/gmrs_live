@@ -133,3 +133,8 @@ Use only on routers.  A new menu has been added to turn it on and off.
 Corrections to the menu interface to make it clear which settings are
 for transmit to the net and which is for your MIC adjustments.
 'simpleusb-tune-menu'  or 'simpleusb-tune-menu-bak' for the old version
+
+11. Installed fake hardware clock
+Installed fakehdclock from rasbery pi. This saves clock to a file and
+restores on reboot. In case of internet down your clock wont be wrong.
+This is standard on pi systems but was missing on node image.
