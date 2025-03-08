@@ -595,68 +595,28 @@ function getVersionFromCSV($filename) {
 }
 
 
-function FakeClock ($in){
 
-// Define the path to the fake-hwclock data file
+
+
+
+function FakeClock($in){
+
 $file_path = '/etc/fake-hwclock.data';
+if (!file_exists($file_path)) {shell_exec('sudo touch ' . $file_path);echo "Creating the fake-hwclock data file...\n";}
+else { echo "Fake-hwclock detected.\n";return;}
 
-// Check if fake-hwclock is installed using Pacman
 $output = shell_exec('pacman -Qi fake-hwclock');
-if (empty($output)) {
-    echo "fake-hwclock is not installed. Installing...\n";
-    // Install fake-hwclock if not found
-    shell_exec('sudo pacman -Syu --noconfirm fake-hwclock');
-} else {
-    echo "fake-hwclock is already installed.\n";
-    return;
-}
+if (empty($output)) {echo "fake-hwclock is not installed. Installing...\n";shell_exec('sudo pacman -Syu --noconfirm fake-hwclock');} 
+else {echo "fake-hwclock is already installed.\n";return;}
 
-// Check if the fake-hwclock data file exists, create it if not
-if (!file_exists($file_path)) {
-    echo "Creating the fake-hwclock data file...\n";
-    // Create the directory if it doesn't exist
-    // shell_exec('sudo mkdir -p /etc');
-    // Create the empty data file
-    shell_exec('sudo touch ' . $file_path);
-} else {
-    echo "Fake-hwclock data file already exists.\n";
-}
-
-// Enable the fake-hwclock service
-shell_exec('sudo systemctl enable fake-hwclock');
-
-// Start the fake-hwclock service to restore the time
-shell_exec('sudo systemctl start fake-hwclock');
-
-// Enable the timer to restore the system time on boot
-shell_exec('sudo systemctl enable fake-hwclock.timer');
-
-// Start the timer manually to ensure the time is restored right away
-shell_exec('sudo systemctl start fake-hwclock.timer');
-
-// Start the date restoration manually
+//   
+// Start up the service   
+shell_exec('sudo systemctl enable fake-hwclock');      shell_exec('sudo systemctl start fake-hwclock');
+shell_exec('sudo systemctl enable fake-hwclock.timer');shell_exec('sudo systemctl start fake-hwclock.timer');
+   
 shell_exec('sudo /usr/lib/systemd/scripts/fake-hwclock.sh save');
 
 echo "fake-hwclock service and timer are enabled and started. Data file created (if necessary).\n";
-?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
 } 
-
 
 ?>
