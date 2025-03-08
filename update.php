@@ -6,30 +6,61 @@
 //  Node image upgrade system. 
 // -------------------------------------------------------------
 // 1.9 09/18/23 added cleanup of license files and linefeeds
-// 2.0 09/29/23 Changes to allow for promptless updates later
-// 2.1 10/02/23 Stop backing up the log
-// 2.2 10/24/23 Installs my tweeks in the startup routine
-// 2.3 11/12/23 make extra backups rpt iax
-// 2.4 12/23/23 Checks the docRoute before installing. 
-// 2.5 1/2/24 Changes to search and edit module requires update
-// 2.6 1/19   New custom install directory $docRouteP passed through from setup files
-// 2.7 1/24  Support for new sounds. erase old sounds before reinstall.
-// 3.1 6/14/24  There was a bug in the reistall of our nodes audio file.
 // 3.2.1 2/10/25  Rebuild upgrade for image
 // 3.4  2/20   debugging added  
 // 3.5  2/23   added update for sbin
 // 3.6  2/24 Minor tweeks for new updates to menus.
 // 3.7       fixes permissions on webmin service
-$verInstaller= "3.8"; $verRt="2-27-2025"; $changeall=false;
-$year = date("Y");
+// 3.9  3/8.25 Fix to stop upgrades to old versions. 
 
+$verInstaller= "3.9"; $verRt="3-8-2025"; 
+
+$changeall=false;$year = date("Y");
 $docRouteP="/srv/http";        
 $path  = "/etc/asterisk/local/mm-software"; 
 
 // Load version numbers
-// To be used to select which download in the future   
 $currentVersion = getVersionFromCSV("$path/version.txt");
 $imageVersion = getVersionFromCSV("$path/version-image.txt");
+
+$header=
+"-----------------------------------------------------------------------------
+System Update Module $verInstaller Release Date:$verRt
+(c) 2023/$year by WRXB288 lagmrs.com all rights reserved 
+-----------------------------------------------------------------------------
+Running:$currentVersion   Orginal Image:$imageVersion
+";
+
+
+
+if($imageVersion=="N/A" ){
+print"
+
+
+   _   _   _   _   _   _  
+  / \ / \ / \ / \ / \ / \ 
+ ( S | T | O | P |   | 1!)
+  \_/ \_/ \_/ \_/ \_/ \_/ 
+  
+ $header
+ Can not update to a beta version [$imageVersion] please download new image.
+";
+ $a = readline('Enter your command: ');die;}
+
+$test= 10.8;
+if($imageVersion < $test ){
+print"
+
+
+   _   _   _   _   _   _  
+  / \ / \ / \ / \ / \ / \ 
+ ( S | T | O | P |   | 2!)
+  \_/ \_/ \_/ \_/ \_/ \_/ 
+  
+ $header
+ Can not update to a version older than [$test] you have [$imageVersion] please download new image.
+";
+ $a = readline('Enter your command: ');die;}
 
 
 print "
@@ -65,11 +96,7 @@ print "
 
 
 
------------------------------------------------------------------------------
-System Update Module $verInstaller Release Date:$verRt
-(c) 2023/$year by WRXB288 lagmrs.com all rights reserved 
------------------------------------------------------------------------------
-Running:$currentVersion   Orginal Image:$imageVersion
+$header
 
 This will Update the Node image to the currect release.
 Be sure you have backups.  Use Win32DiskImager in read mode to make backups. 
