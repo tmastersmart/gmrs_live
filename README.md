@@ -33,6 +33,8 @@ Download will be here and on mediafire
 This is a beta so if something does not work i need to know so a upgrade can be created. 
 Dont just complain that ot doesnt work you need to tell me. 
 
+https://github.com/tmastersmart/gmrs_live/releases
+
 https://www.mediafire.com/folder/q6z3i8plwwily/gmrs
 
 
