@@ -4,3 +4,16 @@ Copyright 2023/2025 by lagmrs.com all rights reserved
 This is not opensource.   
 
 Opensource software is inside the node but this software is copyrighted  
+
+
+
+
+
+Node image does contain opensource code but its all internaly marked.
+
+
+https://hamvoip.org/
+https://hamvoip.org/public_domain/rpt_flow.pdf
+https://hamvoip.org/public_domain/votersystem.pdf
+https://hamvoip.org/public_domain/VOTER%20protocol.pdf
+https://hamvoip.org/#credits
