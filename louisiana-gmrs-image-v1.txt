@@ -1,2 +1,1 @@
-This is the louisiana node image for the pi v1 
-It will inclure core code from Node Manager 10.2
+.
