@@ -4,6 +4,10 @@ This document outlines the significant changes made to the GMRS image
 to create the Louisiana Image, a customized and enhanced version 
 tailored for specific use cases. The modifications include performance 
 improvements, added functionality, and increased system reliability.
+Hamvoip was modified to remove many bugs and and improvements that 
+have caused problems for gmrs users. Much of the orginal code was 
+replaced in favor of new more morden code. It is the goal to create
+a system thats autorepairing and is easy for new users to setup.
 
 1. File System and Storage Enhancements
 
@@ -144,3 +148,5 @@ Nothing worse than your pi rebooting with the wrong clock.
 
 12. Detection of powerfalure
 
+13. Webserver bug fixed.
+Webserver service was improperly setup not to restart on falure. Fixed.
