@@ -4,3 +4,9 @@ All codding here is coyrighted . Node image does contain opensource code but its
 
 
 
+HAMVOIP licenses are here but they do not apply to new copyrighted code. 
+
+ https://hamvoip.org/public_domain/rpt_flow.pdf
+ https://hamvoip.org/public_domain/votersystem.pdf
+ https://hamvoip.org/public_domain/VOTER%20protocol.pdf
+ https://hamvoip.org/#credits
