@@ -62,6 +62,14 @@ print"
 ";
  $a = readline('Enter your command: ');die;}
 
+$test= 10.9;
+if($imageVersion < $test ){$header= "$header \n
+NOTE: this will install fake hardware clock however the next image includes
+a modified version with bug fixes. This script will not install those mods.
+You need to download the upgraded image.
+";
+                          }
+                           
 
 print "
 
