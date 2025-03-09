@@ -117,7 +117,11 @@ https://github.com/tmastersmart/gmrs_live   (certified safe)
 
 
  $a = readline('Enter your command: ');
- if ($a <> "u"){die;}
+ if ($a <> "u"){
+    chdir($pathR);
+    clean_repo($pathR);// make sure we erase all if you abort
+    die;
+ }
 
 $in= "check"; FakeClock ($in);
        
