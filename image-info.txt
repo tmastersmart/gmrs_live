@@ -135,7 +135,12 @@ for transmit to the net and which is for your MIC adjustments.
 'simpleusb-tune-menu'  or 'simpleusb-tune-menu-bak' for the old version
 
 11. Installed fake hardware clock.
-fake-hwclock is a utility used on PIs OS because they have no hardware clock.
-Its function is to save the system's time & date to a file and restore it
-upon boot. On the node this will prevent time from going out of sync if
-it reboots with the network down. 
+Created a special fake-hwclock mod just for the node since the orginal version
+arch installs has a bug and wont save and load. Likely why it was not included in 
+hamvoip. Its now been rewritten by me for the node. Its function is to save
+the system's time & date to a file and restore it upon boot. On the node 
+this will prevent time from going out of sync if it reboots with the network down.
+Nothing worse than your pi rebooting with the wrong clock.
+
+12. Detection of powerfalure
+
