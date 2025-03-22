@@ -1,4 +1,4 @@
 update.php
-core-download.zip
+nodenames.zip
 version.txt
 image-info.txt
