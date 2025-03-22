@@ -12,8 +12,9 @@
 // 3.6  2/24 Minor tweeks for new updates to menus.
 // 3.7       fixes permissions on webmin service
 // 3.9  3/8.25 Fix to stop upgrades to old versions. 
+// 4.0  3/22/25 fixes the connect line problem.
 
-$verInstaller= "3.9"; $verRt="3-8-2025"; 
+$verInstaller= "4.0"; $verRt="3-22-2025"; 
 
 $changeall=false;$year = date("Y");
 $docRouteP="/srv/http";        
@@ -62,14 +63,6 @@ print"
 ";
  $a = readline('Enter your command: ');die;}
 
-$test= 10.9;
-if($imageVersion < $test ){$header= "$header \n
-NOTE: this will install fake hardware clock however the next image includes
-a modified version with bug fixes. This script will not install those mods.
-You need to download the upgraded image.
-";
-                          }
-                           
 
 print "
 
@@ -117,13 +110,9 @@ https://github.com/tmastersmart/gmrs_live   (certified safe)
 
 
  $a = readline('Enter your command: ');
- if ($a <> "u"){
-    chdir($pathR);
-    clean_repo($pathR);// make sure we erase all if you abort
-    die;
- }
+ if ($a <> "u"){die;}
 
-$in= "check"; FakeClock ($in);
+
        
 $repoURL= "https://raw.githubusercontent.com/tmastersmart/gmrs_live/main";  
 $pathS = "$path/sounds";//if(!is_dir($pathS)){ mkdir($pathS, 0755);}
@@ -535,8 +524,9 @@ if ($perms & 0x0040 || $perms & 0x0008 || $perms & 0x0001) { // Check if owner, 
     else { echo "Error: unable to fix.[$file]\n"; }
 } 
  
-  
- 
+// Orginal connect string didnt work. Modify  
+$configFile = "/usr/local/etc/asterisk_tpl/rpt.conf_tpl"; fixConnect($configFile);
+$configFile = "/etc/asterisk/rpt.conf"; fixConnect($configFile); 
   
 $pathB = "$path/backup";
 
@@ -608,27 +598,34 @@ function getVersionFromCSV($filename) {
 
 
 
+// 
+function fixConnect($configFile){
+$newConnPgm = "connpgm= php /etc/asterisk/local/mm-software/connect.php 1";
+$newDiscPgm = "discpgm= php /etc/asterisk/local/mm-software/connect.php 2";
 
+$lines = file($configFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$updated = false;
 
+foreach ($lines as &$line) {
+    if (strpos($line, "connpgm=") === 0 && $line !== $newConnPgm) {
+        $line = $newConnPgm;
+        $updated = true;
+    }
+    if (strpos($line, "discpgm=") === 0 && $line !== $newDiscPgm) {
+        $line = $newDiscPgm;
+        $updated = true;
+    }
+}
 
-function FakeClock($in){
-
-$file_path = '/etc/fake-hwclock.data';
-if (!file_exists($file_path)) {shell_exec('sudo touch ' . $file_path);echo "Creating the fake-hwclock data file...\n";}
-else { echo "Fake-hwclock detected.\n";return;}
-
-$output = shell_exec('pacman -Qi fake-hwclock');
-if (empty($output)) {echo "fake-hwclock is not installed. Installing...\n";shell_exec('sudo pacman -Syu --noconfirm fake-hwclock');} 
-else {echo "fake-hwclock is already installed.\n";return;}
-
-//   
-// Start up the service   
-shell_exec('sudo systemctl enable fake-hwclock');      shell_exec('sudo systemctl start fake-hwclock');
-shell_exec('sudo systemctl enable fake-hwclock.timer');shell_exec('sudo systemctl start fake-hwclock.timer');
-   
-shell_exec('sudo /usr/lib/systemd/scripts/fake-hwclock.sh save');
-
-echo "fake-hwclock service and timer are enabled and started. Data file created (if necessary).\n";
+// Only write to the file if a change was made
+if ($updated) {
+    file_put_contents($configFile, implode("\n", $lines) . "\n");
+    echo "Configuration $in fixed connect line.\n";
 } 
+
+
+}
+
+
 
 ?>
