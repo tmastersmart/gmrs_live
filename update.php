@@ -620,7 +620,7 @@ foreach ($lines as &$line) {
 // Only write to the file if a change was made
 if ($updated) {
     file_put_contents($configFile, implode("\n", $lines) . "\n");
-    echo "Configuration $in fixed connect line.\n";
+    echo "Configuration $configFile fixed connect line.\n";
 } 
 
 
