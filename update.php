@@ -13,8 +13,9 @@
 // 3.7       fixes permissions on webmin service
 // 3.9  3/8.25 Fix to stop upgrades to old versions. 
 // 4.0  3/22/25 fixes the connect line problem.
+// 4.1  7/25 minor fix Asking for permission
 
-$verInstaller= "4.0"; $verRt="3-22-2025"; 
+$verInstaller= "4.1"; $verRt="7-23-2025"; 
 
 $changeall=false;$year = date("Y");
 $docRouteP="/srv/http";        
@@ -131,7 +132,10 @@ print "Running Live upgrade system ...........\n";
  chdir($pathR);
 
 
-if (file_exists("$pathR/version.txt")) {rename ("$pathR/version.txt", "$path/version-new.txt");}
+if (file_exists("$pathR/version.txt")) {
+   rename ("$pathR/version.txt", "$pathR/version-new.txt");// safety to make sure its renamed
+   rename ("$pathR/version-new.txt", "$path/version-new.txt");
+  }
 else {print "Cant find new version info So quiting. Did we even download anything? \n";
 print "Press ANY Key\n";
 $a = readline('Ready: ');
@@ -154,9 +158,11 @@ else {echo "Backup core failed!\n";}
  
 // The update script is suposted to move this file it should not be here.
 if (file_exists("$pathR/update.php")) {unlink ("$pathR/update.php");print "Fixing file that was not moved ....\n";} 
- 
+if (file_exists("$pathR/version.txt")){ unlink("$pathR/version.txt");print "Fixing file that was not moved ....\n";}  
 // first check for core
+chdir($pathR);
  if (file_exists("$pathR/core-download.zip")) { 
+ 
  print"processing core-download\n";
  exec("unzip $pathR/core-download.zip",$output,$return_var);
   
@@ -554,6 +560,7 @@ chdir($pathR); clean_repo($pathR);
 $file="$path/license-sounds.txt";if (file_exists($file)){unlink($file);}
 $file="$path/license-core.txt";  if (file_exists($file)){unlink($file);}
 $file="$path/license-web.txt";   if (file_exists($file)){unlink($file);}
+
 
 if (file_exists("$path/version-new.txt")) {
  $file="$path/version.txt";       if (file_exists($file)){unlink($file);}
