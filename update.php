@@ -158,7 +158,8 @@ else {echo "Backup core failed!\n";}
  
 // The update script is suposted to move this file it should not be here.
 if (file_exists("$pathR/update.php")) {unlink ("$pathR/update.php");print "Fixing file that was not moved ....\n";} 
-if (file_exists("$pathR/version.txt")){ unlink("$pathR/version.txt");print "Fixing file that was not moved ....\n";}  
+if (file_exists("$pathR/version.txt")){ unlink("$pathR/version.txt");print "Fixing file that was not moved ....\n";} 
+if (file_exists("$pathR/image-info.txt")){ unlink("$pathR/image-info.txt");print "Fixing file that was not moved ....\n";} 
 // first check for core
 chdir($pathR);
  if (file_exists("$pathR/core-download.zip")) { 
