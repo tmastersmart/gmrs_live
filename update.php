@@ -567,7 +567,7 @@ $file="$path/license-web.txt";   if (file_exists($file)){unlink($file);}
 if (file_exists("$path/version-new.txt")) {
  $file="$path/version.txt";       if (file_exists($file)){unlink($file);}
 rename ("$path/version-new.txt", "$path/version.txt"); 
-print "Updating version.txt\n";
+print "Updating $file\n";
 }
 else{print "Unknown error \n";}
 
