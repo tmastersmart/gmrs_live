@@ -14,8 +14,9 @@
 // 3.9  3/8.25 Fix to stop upgrades to old versions. 
 // 4.0  3/22/25 fixes the connect line problem.
 // 4.1  7/25 minor fix Asking for permission
+// 4.2  7/28 rename sound files
 
-$verInstaller= "4.1"; $verRt="7-23-2025"; 
+$verInstaller= "4.2"; $verRt="7-28-2025"; 
 
 $changeall=false;$year = date("Y");
 $docRouteP="/srv/http";        
@@ -570,7 +571,11 @@ print "Updating version.txt\n";
 }
 else{print "Unknown error \n";}
 
-
+$file="$pathS/rain.gsm"; 
+if (file_exists($file)){
+rename($file,"$pathS/rain2.gsm");
+print "Renaming sound file $file\n";
+}
 
 
 
