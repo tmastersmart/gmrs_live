@@ -16,12 +16,13 @@ You may call it several times a day it wont actualy update unless it needs a new
 More later........
 
 
-
+/usr/local/sbin/dns-update.sh
 DNS registry file updater with logs. This replaces the ast system wrongly called nodelist????? 
-why i dont know its a registeryt dns system not a nodelist.    
+why i dont know its a registery dns system not a nodelist.    
 
-This is a new service that runs in the background not needing cron. That calls a php file to process
-the registry and install it also creating a backup.   It has many improvements over the current system
+This is a new service that runs in the background not needing cron to process
+the registry and install it also creating a backup.  
+It has many improvements over the current system
 along with a error log so you can see whats going on. 
 You will need the install file and the php file. 
 
