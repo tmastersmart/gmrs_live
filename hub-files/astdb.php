@@ -1,7 +1,10 @@
 #!/usr/bin/php
 <?php
 // (c)2024/2025 by WRXB288 and LAgmrs.com all rights reserved
-// 
+// Louisiana Nationwide GMRS codebase.
+// This is not opensource. Permission granted to use on your 
+// GMRSHUB   server but not to distribute without permission
+//
 // astdb.php drop in replacement.  
 //
 // v1.2   9/4/24 
@@ -13,11 +16,11 @@
 // v2.1   1/10 rebuild con output
 // v2.3   special removing the work repeater
 // v2.4   3-17  Changed hub detection and added some overides
-// $ver = "v2.5"; $release="5/3/2025";
-// $ver = "v2.7"; $release="7/1/2025";// censor flag added
+// v2.5   5/3/2025
+// v2.7   7/1/2025 // censor flag added
 // v2.8   7/14 added kludge for uk hub
 // v2.9   8/22 added detection for new INVALID flag
-// v3.0   8/23 Fix users trying to slip through %quote and better triming that ignores unicode
+// v3.0   8/23 Fix users trying to slip through &quote
 //
 //  call with the cron flag to turn off output 'php astdb.php cron'
 $ver = "v3.0"; $release="8/23/2025";$count=0;$cronCon=false;$cron=false; 
