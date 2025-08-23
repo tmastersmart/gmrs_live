@@ -1,0 +1,13 @@
+[Unit]
+Description=GMRS DNS Update by lagmrs.com
+Wants=network.target
+After=network-online.target asterisk.service
+
+[Service]
+ExecStart=/usr/local/sbin/dns-update.sh
+ExecStop=/usr/bin/kill -9 $MAINPID
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
