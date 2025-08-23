@@ -27,3 +27,16 @@ along with a error log so you can see whats going on.
 You will need the install file and the php file. 
 
 You also need to stop the current nodelist (misnamed) ast service so it wont run.
+
+
+
+install 
+curl -sL https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/hub-files/install-gmrs-dns-update.sh | sudo bash
+
+Or if you dont want to run it from github. and want to look at it before it runs do this.
+
+cd /tmp
+curl -sLO https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/hub-files/install-gmrs-dns-update.sh
+sudo bash install-gmrs-dns-update.sh
+
+
