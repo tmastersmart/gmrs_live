@@ -1,42 +1,88 @@
-GMRS HUB server files for creating a better hub.
+GMRS HUB Server Files
+===================================================GMRS DNS Update and NodeList System v1.0(c)2023/2025 WRXB288 LAGMRS.com all rights reservedAmerica/Chicago | Release date: 8/23/2025  
+This repository provides server files for GMRSHUB.com systems to enhance DNS registry and NodeList updates for GMRS hubs. It includes a DNS registry service (dns_update.sh) and a NodeList update service (astdb.php), addressing issues like server crashes, corrupted NodeLists, and invalid data.
+Components
+astdb.php
+A drop-in replacement for the NodeList update system, designed to:
 
+Fix NULL issues on boot by validating updates.
+Store backups to prevent data loss.
+Sanitize input to block invalid NodeList data.
+Trim long names for Supermon display, preserving emoticons (e.g., 😊, ★, 日本語).
+Create multiple NodeLists: hubs-only, unmodified, and backup.
+Run via cron multiple times daily, updating only when needed.
 
-astdb.php is a drop in replacement.   IT corrects the NULL problems on boot up
-by storing old copies and only updating if they are valid. It is desgined
-to fix many problems that have happned i the past like servers going down 
-or just corrupted nodelist being distributed. This fixes it all. 
+Path: /usr/local/sbin/astdb.phpCron: 0 0,6,12,18 * * * php /usr/local/sbin/astdb.php >/dev/null 2>&1 (12AM, 6AM, 12PM, 6PM)
+dns_update.sh
+A DNS registry updater (not a NodeList, despite previous misnaming) running as a background service. It:
 
-It also stops users from entering bad data in the nodelist as well as trims
-lines that are to long for the supermon display while allowing through emotocons.
+Replaces the outdated “ast” service (misnamed as “nodelist”).
+Creates backups and logs errors for debugging.
+Runs continuously via gmrs-dns-update.service.
 
-It will also create more than one nodelist one with only hubs as well as a unmodified list and a backup list
+Path: /usr/local/sbin/dns_update.shService: /etc/systemd/system/gmrs-dns-update.service
+install-gmrs-dns-update.sh
+Installs all components on Debian-based systems, including:
 
-This is to be called from cron as astdb.php cron.
-You may call it several times a day it wont actualy update unless it needs a new file unlike the orginal.
-More later........
+Downloading files from this repository.
+Installing dns_update.sh and astdb.php to /usr/local/sbin/ (owned by root:root).
+Backing up existing astdb.php to astdb.php.old (once only).
+Installing and enabling gmrs-dns-update.service.
+Setting up the cron job for astdb.php.
+Installing dependencies (curl, php-cli).
 
+Important: Stop the old “nodelist” (misnamed) ast service before installation:
+sudo systemctl stop ast.service
+sudo systemctl disable ast.service
 
-/usr/local/sbin/dns-update.sh
-DNS registry file updater with logs. This replaces the ast system wrongly called nodelist????? 
-why i dont know its a registery dns system not a nodelist.    
-
-This is a new service that runs in the background not needing cron to process
-the registry and install it also creating a backup.  
-It has many improvements over the current system
-along with a error log so you can see whats going on. 
-You will need the install file and the php file. 
-
-You also need to stop the current nodelist (misnamed) ast service so it wont run.
-
-
-
-install 
+Installation
+Option 1: Single Command (Direct)
+Run the installer directly from GitHub:
 curl -sL https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/hub-files/install-gmrs-dns-update.sh | sudo bash
 
-Or if you dont want to run it from github. and want to look at it before it runs do this.
-
+Option 2: Download and Inspect (Safer)
+Download the script to /tmp, inspect it, then run:
 cd /tmp
 curl -sLO https://raw.githubusercontent.com/tmastersmart/gmrs_live/main/hub-files/install-gmrs-dns-update.sh
+cat install-gmrs-dns-update.sh  # Review the script
 sudo bash install-gmrs-dns-update.sh
 
+Post-Installation
 
+Verify Files:ls -l /etc/systemd/system/gmrs-dns-update.service
+ls -l /usr/local/sbin/dns_update.sh
+ls -l /usr/local/sbin/astdb.php
+
+
+Check Service:systemctl status gmrs-dns-update.service
+
+
+Check Cron:crontab -l
+
+
+Should show: 0 0,6,12,18 * * * php /usr/local/sbin/astdb.php >/dev/null 2>&1
+
+
+Test NodeList Update:php /usr/local/sbin/astdb.php
+
+
+Expected output:08-23-2025 16:27:54 191210 AURSINC MMDVM Hotspot Spot Radio WiFi Digital Voice Modem Work Contained with Raspberry Pi Zero W with Firmware V4.1.5
+08-23-2025 16:27:54 191210 AURSINC MMDVM Hotspot Spot Radio ... Trimmed
+
+
+
+
+
+Notes
+
+Dependencies: Requires curl and php-cli (installed automatically).
+Ownership: All files are owned by root:root.
+Cron: Replaces existing astdb.php cron jobs for consistency.
+Logs: dns_update.sh logs errors (check /usr/local/sbin/dns_update.sh for log path). astdb.php cron output is discarded (/dev/null).
+Safety: Use prepared statements in astdb.php for database operations:$stmt = $pdo->prepare("INSERT INTO devices (id, name) VALUES (?, ?)");
+$stmt->execute([$u[0], clean_input($u[1])]);
+
+
+Service: The gmrs-dns-update.service uses ExecStop=/usr/bin/kill -9 $MAINPID. If issues arise, consider ExecStop=/usr/bin/pkill -f dns_update.sh.
+
+For issues or contributions, contact WRXB288 via LAGMRS.com.
