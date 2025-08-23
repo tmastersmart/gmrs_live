@@ -6,6 +6,16 @@
 # Exit on error
 set -e
 
+
+# Display copyright header and message
+echo "==================================================="
+echo "GMRS DNS and nodelist Update Installer  v1.0"
+echo "(c)2023/2025 WRXB288 LAGMRS.com all rights reserved"
+echo "Release date:8/23/2025"
+echo "==================================================="
+echo "This script installs a DNS registry service and a new NodeList update service"
+echo "for GMRSHUB.com systems only."
+echo ""
 # Define URLs
 SERVICE_URL="https://raw.githubusercontent.com/tmastersmart/gmrs_live/refs/heads/main/hub-files/gmrs-dns-update.service"
 SCRIPT_URL="https://raw.githubusercontent.com/tmastersmart/gmrs_live/refs/heads/main/hub-files/dns_update.sh"
