@@ -1,5 +1,8 @@
 GMRS HUB Server Files
-===================================================GMRS DNS Update and NodeList System v1.0(c)2023/2025 WRXB288 LAGMRS.com all rights reservedAmerica/Chicago | Release date: 8/23/2025  
+
+GMRS DNS Update and NodeList System v1.0
+(c)2023/2025 WRXB288 LAGMRS.com all rights reserved
+Release date: 8/23/2025  
 This repository provides server files for GMRSHUB.com systems to enhance DNS registry and NodeList updates for GMRS hubs. It includes a DNS registry service (dns_update.sh) and a NodeList update service (astdb.php), addressing issues like server crashes, corrupted NodeLists, and invalid data.
 Components
 astdb.php
@@ -31,9 +34,18 @@ Installing and enabling gmrs-dns-update.service.
 Setting up the cron job for astdb.php.
 Installing dependencies (curl, php-cli).
 
-Important: Stop the old “nodelist” (misnamed) ast service before installation:
-sudo systemctl stop ast.service
-sudo systemctl disable ast.service
+Important: Stop the old registory service (misnamed) as a nodelist service before installation:
+Why they call it a nodelist service I dont know because nodelist is handeled by astdb.php.  It is a registry service.
+
+If your install script asked you .you can select not to install it. But if you installed it you need to find it and uninstall it.
+If might be called nodelist.service
+
+sudo systemctl stop nodelist.service
+sudo systemctl disable nodelist.service
+
+
+Or on some installs it might be running from cron.  its a .sh script not the php file
+
 
 Installation
 Option 1: Single Command (Direct)
