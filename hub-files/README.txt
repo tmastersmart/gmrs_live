@@ -78,10 +78,6 @@ Should show: 0 0,6,12,18 * * * php /usr/local/sbin/astdb.php >/dev/null 2>&1
 Test NodeList Update:php /usr/local/sbin/astdb.php
 
 
-Expected output:08-23-2025 16:27:54 191210 AURSINC MMDVM Hotspot Spot Radio WiFi Digital Voice Modem Work Contained with Raspberry Pi Zero W with Firmware V4.1.5
-08-23-2025 16:27:54 191210 AURSINC MMDVM Hotspot Spot Radio ... Trimmed
-
-
 
 
 
@@ -95,6 +91,5 @@ Safety: Use prepared statements in astdb.php for database operations:$stmt = $pd
 $stmt->execute([$u[0], clean_input($u[1])]);
 
 
-Service: The gmrs-dns-update.service uses ExecStop=/usr/bin/kill -9 $MAINPID. If issues arise, consider ExecStop=/usr/bin/pkill -f dns_update.sh.
 
 For issues or contributions, contact WRXB288 via LAGMRS.com.
