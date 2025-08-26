@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 //  ------------------------------------------------------------
-//  (c) 2023 by WRXB288 lagmrs.com all rights reserved
+//  (c) 2023/2025 by WRXB288 lagmrs.com all rights reserved
 // This installer sets up and installs the software. 
 // all software is hand coded in php from scratch 
 // in North Louisiana.
@@ -11,10 +11,10 @@
 // v1.5 some bug fixes and new options
 // v1.6 Auto repair added
 // v1.8 Update system added( new id system phasing in)
-
+// v1.9 A update to add gmrsHUB
 $phpVersion= phpversion();
 $path= "/etc/asterisk/local/mm-software";
-$ver="v1.8"; $release="7-3-2024";
+$ver="v1.9"; $release="8-26-2025";
 $out=""; $in=""; $skip="
 
 
@@ -56,7 +56,7 @@ print "
 
 PHP:$phpVersion  Installer:$ver  Release date:$release 
 CPU:$piVersion
-(c) 2023/2024 by WRXB288 LAGMRS.com all rights reserved 
+(c) 2023/2025 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
  Welcome to my PI installer. Software made in loUiSiAna.
 <-Be sure you have made a backup of your memory card->
