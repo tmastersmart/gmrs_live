@@ -59,6 +59,7 @@ CPU:$piVersion
 (c) 2023/2025 by WRXB288 LAGMRS.com all rights reserved 
 ============================================================
  Welcome to my PI installer. Software made in loUiSiAna.
+ This release is for GMRSHUB.com 
 <-Be sure you have made a backup of your memory card->
 ============================================================
 Software will be installed to [$path]
@@ -85,6 +86,8 @@ print "
 
 DV Switch setup added to the admin menu.  
 You now need to reboot to activate the admin menu.
+
+If you like this software try the Louisiana Image. 
 
 
 Software Made in loUiSiAna
