@@ -2,7 +2,7 @@
 
 =====================================================================
 
-update:3/8/25
+update:8/27/25
 
 This is now the Louisiana Node Image for GMRSHUB
 
@@ -183,5 +183,18 @@ for transmit to the net and which is for your MIC adjustments.
 fake-hwclock is a utility used on PIs OS because they have no hardware clock.
 Its function is to save the system's time & date to a file and restore it
 upon boot. On the node this will prevent time from going out of sync if
-it reboots with the network down. 
+it reboots with the network down.
+
+
+
+Live updates 8/25
+Sound code has been rewritten and VSS added if you have a key it will make
+its own missing sound files if the weather service changes things. 
+More changes comming as huricane system is being rewriten.
+once i get updates stablised i will likely release a new updated image for now all
+updates requre you update from 11 to 11.3 using the live update
+
+
+
+
 
