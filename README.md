@@ -2,7 +2,7 @@
 
 =====================================================================
 
-update:8/27/25
+update:9/4/25
 
 This is now the Louisiana Node Image for GMRSHUB
 
@@ -30,15 +30,14 @@ This software was written for GMRShub nodes.
 Only installable as a full PI image
 
 Download will be here and on mediafire
-This is a beta so if something does not work i need to know so a upgrade can be created. 
-Dont just complain that ot doesnt work you need to tell me. 
+This is a active production image and there will be updates unlike others
+that get frozen with bugs. If see something does not work i need to know
+so I can fix it use the chat link at lagmrs.com 
 
-https://github.com/tmastersmart/gmrs_live/releases
-
-https://www.mediafire.com/folder/q6z3i8plwwily/gmrs
-
-
-
+There are 2 download streams you can use just to be sure that its always
+online. 
+1) https://github.com/tmastersmart/gmrs_live/releases
+2) https://www.mediafire.com/folder/q6z3i8plwwily/gmrs
 
 ---- new description -----
 
@@ -185,14 +184,11 @@ Its function is to save the system's time & date to a file and restore it
 upon boot. On the node this will prevent time from going out of sync if
 it reboots with the network down.
 
+12. Can update words on the fly with a voices key https://voicerss.org
 
+13. Now has a jingle system on the botom of the area to play your custom
+messages.  key will be need to do customs https://voicerss.org
 
-Live updates 8/25
-Sound code has been rewritten and VSS added if you have a key it will make
-its own missing sound files if the weather service changes things. 
-More changes comming as huricane system is being rewriten.
-once i get updates stablised i will likely release a new updated image for now all
-updates requre you update from 11 to 11.3 using the live update
 
 
 
