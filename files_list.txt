@@ -4,3 +4,5 @@ core-download.zip
 version.txt
 image-info.txt
 status.zip
+sounds.zip
+admin.zip
