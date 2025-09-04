@@ -207,6 +207,10 @@ chdir($pathR);
 // end of the core files. 
 
 
+// fix the bug where one upgrade had a filename in its zip
+$pathFIX = "$path/repo/sounds"; 
+if(is_dir($pathFIX)){print"Cleaning old ZIP archive ----------"; chdir($pathFIX);clean_repo($pathFIX);rmdir($pathFIX);print" ok\n";}
+
 
 // sounds files
 if (file_exists("$pathR/sounds.zip")){ 
