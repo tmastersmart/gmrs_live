@@ -15,8 +15,9 @@
 // 4.0  3/22/25 fixes the connect line problem.
 // 4.1  7/25 minor fix Asking for permission
 // 4.2  7/28 rename sound files
+// 4.3  9/4  cleanup sound.zip file unziping into /repo/sounds bug fix cleanup
 
-$verInstaller= "4.2"; $verRt="7-28-2025"; 
+$verInstaller= "4.3"; $verRt="9-4-2025"; 
 
 $changeall=false;$year = date("Y");
 $docRouteP="/srv/http";        
@@ -222,7 +223,7 @@ print"processing new sounds\n";
  foreach (glob("*.wav") as $file) {
   if($file == '.' || $file == '..') continue;
     if (is_file($file)) {                                                
-    print"Installing wav file:$pathS/$file "; 
+    print"Instal wav:$pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -232,7 +233,7 @@ print"processing new sounds\n";
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing ul file:$pathS/$file "; 
+    print"Instal ul $pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -242,7 +243,7 @@ print"processing new sounds\n";
  foreach (glob("*.gsm") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing gsm file:$pathS/$file "; 
+    print"Instal gsm $pathS/$file "; 
     if (file_exists("$pathS/$file")){unlink("$pathS/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathS/$file");} // Move it into the SOUNDS
     print"ok\n";
@@ -471,7 +472,7 @@ exec("unzip $pathR/nodenames.zip",$output,$return_var);
  foreach (glob("*.ul") as $file) {
     if($file == '.' || $file == '..') continue;
     if (is_file($file)) { 
-    print"Installing ul file:$pathN/$file "; 
+    print"Instal $pathN/$file "; 
     if (file_exists("$pathN/$file")){unlink("$pathN/$file");print"Replacing ";}// kill existing file
     if (file_exists("$pathR/$file")){rename ("$pathR/$file", "$pathN/$file");print"--";} // Move it into the SOUNDS
     print"ok\n";
