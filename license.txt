@@ -1,4 +1,6 @@
-(c)2023/2025 all rights reserved by lagmrs.com la2way.com
+(c)2023/2025 all rights reserved by 
+https://www.lagmrs.com 
+https://www.la2way.com
 
 All new code here is copyrighted. 
 All php code in mm-software directory is copyrighted
