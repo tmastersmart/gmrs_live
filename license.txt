@@ -1,13 +1,17 @@
-(c)2023/2025 all rights reserved by lagmrs.com
+(c)2023/2025 all rights reserved by lagmrs.com la2way.com
 
-All new code here is coyrighted. 
+All new code here is copyrighted. 
+All php code in mm-software directory is copyrighted
+
+Parts of status page in this version contains some opensurce code
+and is marked. 
 
 
+=========================================================================
 Node image does contain opensource code but its all internaly marked.
-
-
 https://hamvoip.org/
 https://hamvoip.org/public_domain/rpt_flow.pdf
 https://hamvoip.org/public_domain/votersystem.pdf
 https://hamvoip.org/public_domain/VOTER%20protocol.pdf
 https://hamvoip.org/#credits
+===========================================================================
