@@ -185,6 +185,7 @@ upon boot. On the node this will prevent time from going out of sync if
 it reboots with the network down.
 
 12. Can update words on the fly with a voices key https://voicerss.org
+No more weather service sending words we dont have sounds for.
 
 13. Now has a jingle system on the botom of the area to play your custom
 messages.  key will be need to do customs https://voicerss.org
