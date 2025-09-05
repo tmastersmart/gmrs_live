@@ -12,17 +12,22 @@
 # ===============================================
 
 # Display header to the user
-echo "=============================================="
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo "=================================================="
 echo "GMRS Hamvoip Apache Proxy Module Hardening Script"
-echo "=============================================="
+echo "=================================================="
 echo "Author: WRXB288"
 echo "Copyright: 2025 LAGMRS.com LA2way.com "
-echo ""
+echo "V1.0 release 9/4/25"
 echo "Purpose:"
 echo "  This script disables unsafe Apache proxy modules"
 echo "  (proxy, proxy_http, proxy_ftp, proxy_connect)"
 echo "  on Hamvoip/Debian-based nodes to improve security."
-echo ""
+echo "==================================================="
 echo "Press any key to continue..."
 # Wait for user input
 read -n 1 -s -r
