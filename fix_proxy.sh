@@ -1,11 +1,33 @@
 #!/bin/bash
 # ===============================================
-# Hamvoip Apache Proxy Module Fix Script
-# Author: The Master
-# Purpose: Disable unsafe proxy modules in Apache
-# Tested on Hamvoip/Debian-based nodes
-# Usage: curl -sSL <URL> | bash
+# Hamvoip Apache Proxy Module Hardening Script
 # ===============================================
+# Author: WRXB288
+# Copyright: lagmrs.com Louisiana Nationwide
+# ===============================================
+# Purpose:
+#   This script disables unsafe Apache proxy modules 
+#   (proxy, proxy_http, proxy_ftp, proxy_connect) 
+#   on Hamvoip/Debian-based nodes to improve security.
+# ===============================================
+
+# Display header to the user
+echo "=============================================="
+echo "GMRS Hamvoip Apache Proxy Module Hardening Script"
+echo "=============================================="
+echo "Author: WRXB288"
+echo "Copyright: 2025 LAGMRS.com LA2way.com "
+echo ""
+echo "Purpose:"
+echo "  This script disables unsafe Apache proxy modules"
+echo "  (proxy, proxy_http, proxy_ftp, proxy_connect)"
+echo "  on Hamvoip/Debian-based nodes to improve security."
+echo ""
+echo "Press any key to continue..."
+# Wait for user input
+read -n 1 -s -r
+echo ""
+
 
 CONFIG_FILE="/etc/httpd/conf/httpd.conf"
 BACKUP_FILE="${CONFIG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
