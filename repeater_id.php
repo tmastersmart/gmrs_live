@@ -1,6 +1,6 @@
 <?php
 //This is the repeater sound control file. Whats listed here will play after the time
-// 
+//place in mm-software directory and it will start working. be sure to install your custom file names.
 $randomR = mt_rand(1, 5);
 //$randomR = 4;
 if ($randomR ==1){check_sound("la-nationwide-blip1");  if($file1){$action = "$action $file1";}}
