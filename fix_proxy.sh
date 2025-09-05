@@ -71,5 +71,5 @@ if [ $CHANGES -gt 0 ]; then
     systemctl restart httpd
     echo "Done! You may want to reboot the node."
 else
-    echo "No active proxy modules found. Nothing to do."
+    echo "No active proxy modules found. Your safe your image is patched."
 fi
