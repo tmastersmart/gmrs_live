@@ -19,6 +19,7 @@ echo ""
 echo ""
 echo "=================================================="
 echo "GMRS Hamvoip Apache Proxy Module Hardening Script"
+echo "Software made in Louisiana its just better!"
 echo "=================================================="
 echo "Author: WRXB288"
 echo "Copyright: 2025 LAGMRS.com LA2way.com "
@@ -70,6 +71,8 @@ if [ $CHANGES -gt 0 ]; then
     echo "Restarting Apache..."
     systemctl restart httpd
     echo "Done! You may want to reboot the node."
+    echo "Software made in Louisiana its just better!"
 else
     echo "No active proxy modules found. Your safe your image is patched."
+    echo "Software made in Louisiana its just better!"
 fi
