@@ -35,7 +35,7 @@ System Update Module $verInstaller Release Date:$verRt
 Running:$currentVersion   Orginal Image:$imageVersion
 ";
 
-
+proxieCheck();
 
 if($imageVersion=="N/A" ){
 print"
@@ -644,6 +644,73 @@ if ($updated) {
 
 }
 
+function proxieCheck(){
 
+// File path to Apache config
+$configFile = "/etc/httpd/conf/httpd.conf";
+
+// Modules to disable
+$modules = [
+    "proxy_module",
+    "proxy_connect_module",
+    "proxy_ftp_module",
+    "proxy_http_module",
+    "proxy_fcgi_module",
+    "proxy_scgi_module",
+    "proxy_wstunnel_module",
+    "proxy_ajp_module",
+    "proxy_balancer_module",
+    "proxy_express_module"
+];
+
+// Backup first
+$backupFile = $configFile . ".bak." . date("YmdHis");
+if (!copy($configFile, $backupFile)) {
+    die("<b>ERROR:</b> Could not back up config file.<br>\n");
+}
+echo "Backup created: $backupFile<br>\n";
+
+// Read file
+$lines = file($configFile, FILE_IGNORE_NEW_LINES);
+
+// Track changes
+$changes = [];
+
+// Process each line
+foreach ($lines as &$line) {
+    foreach ($modules as $mod) {
+        if (preg_match("/^LoadModule\s+$mod\s+/", $line)) {
+            if (strpos($line, "#") !== 0) {  // if not already commented
+                $line = "#" . $line;
+                $changes[] = $mod;
+            }
+        }
+    }
+}
+unset($line); // break ref
+
+// Save file
+if (file_put_contents($configFile, implode("\n", $lines)) === false) {
+    die("ERROR: Could not write updated config file.\n");
+}
+
+// Show what was done
+if (!empty($changes)) {
+    echo "Security Fix Applied:\n";
+    foreach ($changes as $c) {
+        echo " - Disabled proxy module: $c\n";
+    }
+    echo "Apache config updated successfully.\n";
+    echo "Restarting Apache ...\n";
+
+    // Restart Apache and reboot system
+    exec("systemctl restart httpd");
+   // exec("reboot");
+} 
+else {echo "No active proxy modules found. .\n";}
+
+
+   
+}
 
 ?>
