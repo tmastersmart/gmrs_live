@@ -1,1 +1,2 @@
-11.7,9/22/2025, changes for 9-25  upgrades to to 11.6 and fixes a cyclone speach bug going global.,
+11.8,10/11/2025, changes for 11-25  removed acuweather.,
+
