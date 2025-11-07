@@ -1,7 +1,7 @@
 GMRS HUB Server Files
 
 GMRS DNS Update and NodeList System v1.0
-(c)2023/2025 WRXB288 LAGMRS.com all rights reserved
+(c)2023/2025 WRXB288 KJ5MZL LAGMRS.com all rights reserved
 Release date: 8/23/2025  
 This repository provides server files for GMRSHUB.com systems to enhance DNS registry and NodeList updates for GMRS hubs. It includes a DNS registry service (dns_update.sh) and a NodeList update service (astdb.php), addressing issues like server crashes, corrupted NodeLists, and invalid data.
 Components
