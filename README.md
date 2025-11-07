@@ -8,7 +8,6 @@ This is now the Louisiana Node Image for GMRSHUB
 
 Old files removed. This archive will only hold the image and any upgrades.
 
-![Alt text](https://github.com/tmastersmart/gmrs_live/releases/download/v11.5/node-menu.jpg?raw=true)
 
 This software was written for GMRShub nodes.  
 
@@ -194,4 +193,5 @@ messages.  key will be need to do customs https://voicerss.org
 
 
 
+WRXB288 / KJ5MZL
 
