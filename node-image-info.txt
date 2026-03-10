@@ -19,3 +19,6 @@ The node image has been voluntarily removed
 The project is temporarily on hold
 Work will resume once an installer-based distribution method is ready
 Thank you to everyone who has supported and used this project. Updates will be posted here as progress continues.
+
+This will delay the project for moths or longer. Sorry but CA passed a law requiring
+Age verification in all OS and the node contained a OS
