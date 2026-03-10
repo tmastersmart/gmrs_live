@@ -1,0 +1,21 @@
+Project Update – Voluntary Removal of Node Image
+
+Due to new online age-verification regulations that affect software distribution in some regions, I have made the decision to voluntarily remove the prebuilt node system image from distribution.
+
+The image itself has not been subject to any complaint or enforcement action. However, because the current distribution method does not include age-verification mechanisms that may now be required under these new laws, continuing to distribute the full system image could create potential compliance issues.
+
+To avoid those complications, the downloadable node image has been removed by choice until a better distribution method can be implemented.
+
+The project itself is not cancelled, but development will be temporarily paused while work begins on a new approach.
+
+The plan moving forward is to develop a simple installer package that will install the node software onto an existing Linux operating system rather than distributing a complete prebuilt image. This approach should allow the project to continue while avoiding the legal concerns created by the new regulations.
+
+For now:
+
+The node image has been voluntarily removed
+
+The project is temporarily on hold
+
+Work will resume once an installer-based distribution method is ready
+
+Thank you to everyone who has supported and used this project. Updates will be posted here as progress continues.
