@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 // Recovering oprginal CAP-Warn code from 2023.   Capwarn is now a standalone project And has been moved to its own 
-// Archive. 
+// Archive. (c) 2026  https://github.com/tmastersmart/cap-warn
 //
-// The folowing is the history of cap-warn a hand coded orginal projet.....
+// The folowing is the history of cap-warn a hand coded orginal projet.....DO not use this its part of a larger system and wont run
 //
 // (c)2023 by WRXB288 and LAgmrs.com  
 //
